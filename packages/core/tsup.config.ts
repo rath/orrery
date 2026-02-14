@@ -15,6 +15,5 @@ export default defineConfig({
   dts: true,
   splitting: true,
   clean: true,
-  external: ['swisseph-wasm'],
   noExternal: ['lunar-javascript'],
 })

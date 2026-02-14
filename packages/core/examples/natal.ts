@@ -3,7 +3,7 @@
  *
  * 실행: bun packages/core/examples/natal.ts
  *
- * 주의: swisseph-wasm이 설치되어 있어야 합니다.
+ * 외부 의존성 없이 순수 TypeScript로 실행됩니다.
  */
 import { calculateNatal, ZODIAC_SYMBOLS, PLANET_SYMBOLS, PLANET_KO, ASPECT_SYMBOLS, ROMAN, formatDegree } from '../src/natal.ts'
 import type { BirthInput } from '../src/types.ts'

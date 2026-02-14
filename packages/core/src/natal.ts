@@ -1,14 +1,14 @@
 /**
  * 서양 점성술 Natal Chart 계산 엔진
  *
- * flatlib/pyswisseph 기반을 TypeScript로 포팅.
- * 브라우저에서 Swiss Ephemeris를 사용하기 위해 swisseph-wasm을 활용한다.
+ * Pure TypeScript ephemeris (Moshier 이론 기반).
+ * 외부 데이터 파일이나 WASM 없이 브라우저에서 동기 실행 가능.
  */
-import SwissEph from 'swisseph-wasm'
 import type {
   BirthInput, ZodiacSign, PlanetId, PlanetPosition,
   NatalHouse, NatalAngles, AspectType, NatalAspect, NatalChart,
 } from './types.ts'
+import { julday, calcPlanet, calcHouses } from './ephemeris/index.ts'
 
 export { isKoreanDaylightTime } from './kdt.ts'
 
@@ -100,25 +100,6 @@ export const HOUSE_SYSTEMS: [string, string][] = [
 ]
 
 // =============================================
-// WASM 싱글턴
-// =============================================
-
-let sweInstance: SwissEph | null = null
-let initPromise: Promise<SwissEph> | null = null
-
-export async function getSwissEph(): Promise<SwissEph> {
-  if (sweInstance) return sweInstance
-  if (initPromise) return initPromise
-  initPromise = (async () => {
-    const swe = new SwissEph()
-    await swe.initSwissEph()
-    sweInstance = swe
-    return swe
-  })()
-  return initPromise
-}
-
-// =============================================
 // 유틸리티
 // =============================================
 
@@ -153,7 +134,7 @@ export function formatDegree(lon: number): string {
 }
 
 /** 행성이 어느 하우스에 속하는지 판정 (cusps는 1-indexed: cusps[1]~cusps[12]) */
-function findHouse(planetLon: number, cusps: Float64Array): number {
+function findHouse(planetLon: number, cusps: number[]): number {
   const lon = normalizeDeg(planetLon)
   for (let i = 1; i <= 12; i++) {
     const start = normalizeDeg(cusps[i])
@@ -217,8 +198,6 @@ function calculateAspects(planets: PlanetPosition[]): NatalAspect[] {
 // =============================================
 
 export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Promise<NatalChart> {
-  const swe = await getSwissEph()
-
   const lat = input.latitude ?? DEFAULT_LAT
   const lon = input.longitude ?? DEFAULT_LON
 
@@ -245,32 +224,24 @@ export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Prom
     utMonth = d.getMonth() + 1
     utDay = d.getDate()
   }
-  const jd = swe.julday(utYear, utMonth, utDay, utHour)
+  const jd = julday(utYear, utMonth, utDay, utHour)
 
-  // 하우스 계산 (Placidus)
-  // houses_ex는 d.ts에 없으므로 런타임 캐스팅으로 호출
-  type HousesExFn = (jd: number, iflag: number, lat: number, lon: number, hsys: string) => { cusps: Float64Array; ascmc: Float64Array }
-  const housesEx = (swe as unknown as { houses_ex: HousesExFn }).houses_ex.bind(swe)
-  const { cusps, ascmc } = housesEx(jd, 0, lat, lon, houseSystem)
-  // ascmc[0]=ASC, ascmc[1]=MC
-
-  const calcFlags = swe.SEFLG_SWIEPH | swe.SEFLG_SPEED
+  // 하우스 계산
+  const { cusps, ascmc } = calcHouses(jd, lat, lon, houseSystem)
 
   // 행성 위치 계산
   const planets: PlanetPosition[] = []
   for (const [id, bodyNum] of PLANET_BODIES) {
-    const pos = swe.calc_ut(jd, bodyNum, calcFlags)
-    // pos: [longitude, latitude, distance, longitudeSpeed, latitudeSpeed, distanceSpeed]
-    const longitude = pos[0]
+    const pos = calcPlanet(jd, bodyNum)
     planets.push({
       id,
-      longitude,
-      latitude: pos[1],
-      speed: pos[3],
-      sign: lonToSign(longitude),
-      degreeInSign: degreeInSign(longitude),
-      isRetrograde: pos[3] < 0,
-      house: findHouse(longitude, cusps),
+      longitude: pos.longitude,
+      latitude: pos.latitude,
+      speed: pos.longitudeSpeed,
+      sign: lonToSign(pos.longitude),
+      degreeInSign: degreeInSign(pos.longitude),
+      isRetrograde: pos.longitudeSpeed < 0,
+      house: findHouse(pos.longitude, cusps),
     })
   }
 

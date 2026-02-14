@@ -6,7 +6,7 @@ export { createChart, calculateLiunian, getDaxianList } from './ziwei.ts'
 
 // 서양 점성술 (Natal Chart)
 export {
-  calculateNatal, getSwissEph, lonToSign, normalizeDeg, formatDegree,
+  calculateNatal, lonToSign, normalizeDeg, formatDegree,
   isKoreanDaylightTime,
   ZODIAC_SIGNS, ZODIAC_SYMBOLS, ZODIAC_KO,
   PLANET_SYMBOLS, PLANET_KO, ASPECT_SYMBOLS,

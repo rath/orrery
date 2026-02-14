@@ -1,6 +1,6 @@
 {
   "name": "@orrery/core",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "license": "AGPL-3.0-only",
   "type": "module",
   "keywords": [
@@ -60,14 +60,6 @@
   },
   "dependencies": {
     "lunar-javascript": "^1.7.7"
-  },
-  "peerDependencies": {
-    "swisseph-wasm": "^0.0.4"
-  },
-  "peerDependenciesMeta": {
-    "swisseph-wasm": {
-      "optional": true
-    }
   },
   "devDependencies": {
     "tsup": "^8.5.0",

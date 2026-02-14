@@ -39,7 +39,7 @@ packages/core/          # @orrery/core — 독립 npm 패키지 (계산 엔진)
 │   ├── pillars.ts      # 사주 계산 엔진 (60갑자, 절기, 대운)
 │   ├── saju.ts         # 사주 결과 조립 (십신, 운성)
 │   ├── ziwei.ts        # 자미두수 계산 엔진 (명반 생성)
-│   ├── natal.ts        # 서양 점성술 계산 엔진 (swisseph-wasm)
+│   ├── natal.ts        # 서양 점성술 계산 엔진 (순수 TypeScript ephemeris)
 │   └── cities.ts       # 출생 도시 데이터
 └── tests/
     ├── fixtures.ts     # Python 기준 참조 데이터
@@ -66,7 +66,7 @@ src/                    # 웹앱 (Vite + React)
 
 - bun workspaces (모노레포, 패키지 매니저)
 - TypeScript 5 (strict mode)
-- **@orrery/core**: tsup (빌드), Vitest (테스트), lunar-javascript (음력 변환), swisseph-wasm (서양 점성술, optional peer dep)
+- **@orrery/core**: tsup (빌드), Vitest (테스트), lunar-javascript (음력 변환)
 - **웹앱**: React 19, Vite 7 (빌드/개발 서버), Tailwind CSS 4 (스타일링), Vitest (테스트)
 
 ## 포팅 주의사항

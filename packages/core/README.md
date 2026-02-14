@@ -4,7 +4,7 @@
 
 - **사주팔자(四柱八字)** — 60갑자, 십신, 12운성, 12신살, 대운, 간지 관계 분석
 - **자미두수(紫微斗數)** — 명반(命盤) 생성, 대한(大限), 유년(流年)/유월(流月) 분석
-- **서양 점성술 출생차트(Natal Chart)** — 행성 위치, 하우스, 앵글, 애스펙트 (Swiss Ephemeris WASM)
+- **서양 점성술 출생차트(Natal Chart)** — 행성 위치, 하우스, 앵글, 애스펙트 (순수 TypeScript)
 
 백엔드 불필요. 모든 계산이 클라이언트에서 수행됩니다.
 
@@ -14,21 +14,13 @@
 
 - **사주 만세력** — 고영창님의 Perl [진짜만세력](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)을 김정균님이 [PHP로 포팅](https://github.com/OOPS-ORG-PHP/Lunar)한 것을, 2018년 11월 황장호가 Java와 Python으로 포팅하여 사용해오다가, 2026년 2월 Claude Code (Opus 4.6)로 TypeScript로 포팅
 - **자미두수 명반** — [lunar-javascript](https://www.npmjs.com/package/lunar-javascript) 라이브러리 기반으로 Claude (Opus 4.5)가 중국어 문헌을 리서치하며 구현
-- **점성술 출생차트** — [Swiss Ephemeris](https://github.com/arturania/swisseph)를 WASM으로 빌드한 [swisseph-wasm](https://www.npmjs.com/package/swisseph-wasm) 기반
+- **점성술 출생차트** — [Swiss Ephemeris](https://www.astro.com/swisseph/)의 Moshier 이론을 순수 TypeScript로 포팅
 
 ## 설치
 
 ```bash
 npm install @orrery/core
 ```
-
-서양 점성술(natal) 기능을 사용하려면 `swisseph-wasm`도 설치하세요:
-
-```bash
-npm install swisseph-wasm
-```
-
-> `swisseph-wasm`은 optional peer dependency입니다. 사주/자미두수만 사용한다면 설치하지 않아도 됩니다.
 
 ## 사용법
 
@@ -212,9 +204,8 @@ bun packages/core/examples/natal.ts
 | 패키지 | 유형 | 용도 |
 |--------|------|------|
 | `lunar-javascript` | dependency | 음력 변환 (자미두수) |
-| `swisseph-wasm` | optional peer | Swiss Ephemeris WASM (서양 점성술) |
 
-`swisseph-wasm`을 설치하지 않으면 사주/자미두수만 사용 가능합니다.
+외부 WASM이나 데이터 파일 의존성 없이 모든 기능이 순수 TypeScript로 동작합니다.
 
 ## 라이선스
 
