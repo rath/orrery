@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import BirthForm from './BirthForm.tsx'
 import SajuView from './saju/SajuView.tsx'
 import ZiweiView from './ziwei/ZiweiView.tsx'
@@ -9,22 +9,24 @@ type Tab = 'saju' | 'ziwei'
 export default function App() {
   const [tab, setTab] = useState<Tab>('saju')
   const [birthInput, setBirthInput] = useState<BirthInput | null>(null)
+  const resultsRef = useRef<HTMLDivElement>(null)
+
+  function handleSubmit(input: BirthInput) {
+    setBirthInput(input)
+    requestAnimationFrame(() => {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth' })
+    })
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-2xl mx-auto px-4 py-3">
-          <h1 className="text-lg font-bold text-gray-800">Orrery</h1>
-        </div>
-      </header>
-
       <main className="max-w-2xl mx-auto px-4 py-6">
-        <BirthForm onSubmit={setBirthInput} />
+        <BirthForm onSubmit={handleSubmit} />
 
         {birthInput && (
           <>
             {/* 탭 네비게이션 */}
-            <div className="flex border-b border-gray-200 mt-6 mb-4">
+            <div ref={resultsRef} className="flex border-b border-gray-200 mt-6 mb-4">
               <button
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                   tab === 'saju'
