@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { calculateSaju } from '../../core/saju.ts'
+import { calculateSaju } from '@orrery/core/saju'
 import PillarTable from './PillarTable.tsx'
 import RelationList from './RelationList.tsx'
 import SinsalList from './SinsalList.tsx'
@@ -7,7 +7,7 @@ import DaewoonTable from './DaewoonTable.tsx'
 import TransitView from './TransitView.tsx'
 import CopyButton from '../CopyButton.tsx'
 import { sajuToText } from '../../utils/text-export.ts'
-import type { BirthInput } from '../../core/types.ts'
+import type { BirthInput } from '@orrery/core/types'
 
 interface Props {
   input: BirthInput

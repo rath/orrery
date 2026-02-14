@@ -1,5 +1,5 @@
-import type { NatalAspect } from '../../core/types.ts'
-import { PLANET_SYMBOLS, PLANET_KO, ASPECT_SYMBOLS } from '../../core/natal.ts'
+import type { NatalAspect } from '@orrery/core/types'
+import { PLANET_SYMBOLS, PLANET_KO, ASPECT_SYMBOLS } from '@orrery/core/natal'
 
 interface Props {
   aspects: NatalAspect[]

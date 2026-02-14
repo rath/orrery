@@ -1,5 +1,5 @@
 /**
- * 사주 결과 조립 (saju.py 로직 포팅)
+ * 사주 결과 조립
  */
 import {
   getFourPillars, getDaewoon, getRelation, getJeonggi,

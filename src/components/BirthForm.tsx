@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import type { BirthInput, Gender } from '../core/types.ts'
-import type { City } from '../core/cities.ts'
-import { SEOUL } from '../core/cities.ts'
+import type { BirthInput, Gender } from '@orrery/core/types'
+import type { City } from '@orrery/core/cities'
+import { SEOUL } from '@orrery/core/cities'
 import CityCombobox from './CityCombobox.tsx'
 import logo from '../assets/icon-512.png'
 

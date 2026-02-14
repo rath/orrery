@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getFourPillars } from '../src/core/pillars.ts'
+import { getFourPillars } from '../src/pillars.ts'
 import { PILLAR_FIXTURES } from './fixtures.ts'
 
 describe('getFourPillars', () => {

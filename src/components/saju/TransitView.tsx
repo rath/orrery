@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
-import { findTransits } from '../../core/pillars.ts'
+import { findTransits } from '@orrery/core/pillars'
 import { formatRelation } from '../../utils/format.ts'
-import type { TransitItem } from '../../core/types.ts'
+import type { TransitItem } from '@orrery/core/types'
 
 interface Props {
   natalPillars: string[]  // [시주, 일주, 월주, 년주]

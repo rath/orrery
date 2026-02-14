@@ -1,4 +1,4 @@
-import type { PillarDetail } from '../../core/types.ts'
+import type { PillarDetail } from '@orrery/core/types'
 import {
   stemColorClass,
   branchColorClass,

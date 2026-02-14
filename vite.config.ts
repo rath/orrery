@@ -28,6 +28,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  resolve: {
+    alias: {
+      '@orrery/core': resolve(__dirname, 'packages/core/src'),
+    },
+  },
   optimizeDeps: { exclude: ['swisseph-wasm'] },
   assetsInclude: ['**/*.wasm'],
 })

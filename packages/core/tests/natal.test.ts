@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { calculateNatal, normalizeDeg } from '../src/core/natal.ts'
+import { calculateNatal, normalizeDeg } from '../src/natal.ts'
 import { NATAL_FIXTURES } from './fixtures.ts'
-import type { BirthInput } from '../src/core/types.ts'
+import type { BirthInput } from '../src/types.ts'
 
 function makeInput(f: typeof NATAL_FIXTURES[0]): BirthInput {
   return {

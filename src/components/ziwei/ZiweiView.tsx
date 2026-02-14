@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
-import { createChart } from '../../core/ziwei.ts'
+import { createChart } from '@orrery/core/ziwei'
 import MingPanGrid from './MingPanGrid.tsx'
 import SihuaSummary from './SihuaSummary.tsx'
 import DaxianTable from './DaxianTable.tsx'
 import LiunianView from './LiunianView.tsx'
 import CopyButton from '../CopyButton.tsx'
 import { ziweiToText } from '../../utils/text-export.ts'
-import type { BirthInput } from '../../core/types.ts'
+import type { BirthInput } from '@orrery/core/types'
 
 interface Props {
   input: BirthInput

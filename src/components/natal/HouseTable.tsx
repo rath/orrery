@@ -1,5 +1,5 @@
-import type { NatalHouse } from '../../core/types.ts'
-import { ZODIAC_SYMBOLS, ZODIAC_KO, ROMAN, formatDegree } from '../../core/natal.ts'
+import type { NatalHouse } from '@orrery/core/types'
+import { ZODIAC_SYMBOLS, ZODIAC_KO, ROMAN, formatDegree } from '@orrery/core/natal'
 
 interface Props {
   houses: NatalHouse[]

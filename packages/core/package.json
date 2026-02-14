@@ -1,0 +1,62 @@
+{
+  "name": "@orrery/core",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./saju": {
+      "import": "./dist/saju.js",
+      "types": "./dist/saju.d.ts"
+    },
+    "./ziwei": {
+      "import": "./dist/ziwei.js",
+      "types": "./dist/ziwei.d.ts"
+    },
+    "./natal": {
+      "import": "./dist/natal.js",
+      "types": "./dist/natal.d.ts"
+    },
+    "./pillars": {
+      "import": "./dist/pillars.js",
+      "types": "./dist/pillars.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types.js",
+      "types": "./dist/types.d.ts"
+    },
+    "./constants": {
+      "import": "./dist/constants.js",
+      "types": "./dist/constants.d.ts"
+    },
+    "./cities": {
+      "import": "./dist/cities.js",
+      "types": "./dist/cities.d.ts"
+    }
+  },
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "lunar-javascript": "^1.7.7"
+  },
+  "peerDependencies": {
+    "swisseph-wasm": "^0.0.4"
+  },
+  "peerDependenciesMeta": {
+    "swisseph-wasm": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "~5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

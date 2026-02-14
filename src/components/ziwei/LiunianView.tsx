@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
-import { calculateLiunian } from '../../core/ziwei.ts'
-import type { ZiweiChart } from '../../core/types.ts'
-import { MAIN_STAR_NAMES } from '../../core/constants.ts'
+import { calculateLiunian } from '@orrery/core/ziwei'
+import type { ZiweiChart } from '@orrery/core/types'
+import { MAIN_STAR_NAMES } from '@orrery/core/constants'
 
 interface Props {
   chart: ZiweiChart

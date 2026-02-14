@@ -1,8 +1,8 @@
 /**
  * 외곽 별자리 링 — 12개 호형 세그먼트, 심볼, 눈금
  */
-import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '../../../core/natal.ts'
-import type { ZodiacSign } from '../../../core/types.ts'
+import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '@orrery/core/natal'
+import type { ZodiacSign } from '@orrery/core/types'
 import {
   CX, CY, R_OUTER, R_ZODIAC_INNER,
   lonToAngle, angleToPoint, arcPath,

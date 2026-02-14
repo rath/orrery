@@ -1,5 +1,5 @@
-import type { PlanetPosition, NatalAngles } from '../../core/types.ts'
-import { PLANET_SYMBOLS, PLANET_KO, ZODIAC_SYMBOLS, ZODIAC_KO, ROMAN, formatDegree } from '../../core/natal.ts'
+import type { PlanetPosition, NatalAngles } from '@orrery/core/types'
+import { PLANET_SYMBOLS, PLANET_KO, ZODIAC_SYMBOLS, ZODIAC_KO, ROMAN, formatDegree } from '@orrery/core/natal'
 
 interface Props {
   planets: PlanetPosition[]

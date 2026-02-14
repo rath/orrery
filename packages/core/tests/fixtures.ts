@@ -1,5 +1,5 @@
 /**
- * Python 기준 참조 데이터 (pillars.py, ziwei.py 실행 결과)
+ * 참조 데이터
  */
 
 export interface PillarFixture {

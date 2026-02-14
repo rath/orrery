@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react'
-import type { ZiweiChart } from '../../core/types.ts'
-import { getDaxianList } from '../../core/ziwei.ts'
+import type { ZiweiChart } from '@orrery/core/types'
+import { getDaxianList } from '@orrery/core/ziwei'
 import { stemSolidBgClass, branchSolidBgClass } from '../../utils/format.ts'
 
 interface Props {

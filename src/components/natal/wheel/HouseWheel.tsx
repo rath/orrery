@@ -1,8 +1,8 @@
 /**
  * 하우스 커스프 선 + 라벨 + 내원
  */
-import { ROMAN } from '../../../core/natal.ts'
-import type { NatalHouse, NatalAngles } from '../../../core/types.ts'
+import { ROMAN } from '@orrery/core/natal'
+import type { NatalHouse, NatalAngles } from '@orrery/core/types'
 import {
   CX, CY, R_ZODIAC_INNER, R_INNER, R_HOUSE_LABEL,
   lonToAngle, angleToPoint,

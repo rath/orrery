@@ -1,5 +1,5 @@
-import type { SpecialSals } from '../../core/types.ts'
-import { PILLAR_NAMES } from '../../core/constants.ts'
+import type { SpecialSals } from '@orrery/core/types'
+import { PILLAR_NAMES } from '@orrery/core/constants'
 
 interface Props {
   sals: SpecialSals

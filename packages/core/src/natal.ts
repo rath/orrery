@@ -1,7 +1,7 @@
 /**
  * 서양 점성술 Natal Chart 계산 엔진
  *
- * natal.py (flatlib/pyswisseph 기반)를 TypeScript로 포팅.
+ * flatlib/pyswisseph 기반을 TypeScript로 포팅.
  * 브라우저에서 Swiss Ephemeris를 사용하기 위해 swisseph-wasm을 활용한다.
  */
 import SwissEph from 'swisseph-wasm'

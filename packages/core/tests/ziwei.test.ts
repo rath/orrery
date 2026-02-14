@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createChart } from '../src/core/ziwei.ts'
+import { createChart } from '../src/ziwei.ts'
 import { ZIWEI_FIXTURES } from './fixtures.ts'
 
 describe('createChart', () => {

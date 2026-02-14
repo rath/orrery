@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
-import { calculateNatal, HOUSE_SYSTEMS } from '../../core/natal.ts'
+import { calculateNatal, HOUSE_SYSTEMS } from '@orrery/core/natal'
 import PlanetTable from './PlanetTable.tsx'
 import HouseTable from './HouseTable.tsx'
 import AspectGrid from './AspectGrid.tsx'
 import NatalWheel from './wheel/NatalWheel.tsx'
 import CopyButton from '../CopyButton.tsx'
 import { natalToText } from '../../utils/text-export.ts'
-import type { BirthInput, NatalChart } from '../../core/types.ts'
+import type { BirthInput, NatalChart } from '@orrery/core/types'
 
 interface Props {
   input: BirthInput

@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react'
-import type { DaewoonItem } from '../../core/types.ts'
+import type { DaewoonItem } from '@orrery/core/types'
 import { stemColorClass, branchColorClass, stemSolidBgClass, branchSolidBgClass } from '../../utils/format.ts'
 
 interface Props {

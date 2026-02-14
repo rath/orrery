@@ -1,4 +1,4 @@
-import type { ZiweiChart } from '../../core/types.ts'
+import type { ZiweiChart } from '@orrery/core/types'
 
 interface Props {
   chart: ZiweiChart

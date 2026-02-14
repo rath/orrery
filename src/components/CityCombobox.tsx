@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import type { City } from '../core/cities.ts'
-import { KOREAN_CITIES, filterCities, formatCityName } from '../core/cities.ts'
+import type { City } from '@orrery/core/cities'
+import { KOREAN_CITIES, filterCities, formatCityName } from '@orrery/core/cities'
 
 interface Props {
   selectedCity: City | null

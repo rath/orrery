@@ -1,5 +1,5 @@
 /**
- * 자미두수 (紫微斗數) 계산 엔진 (ziwei.py core 포팅)
+ * 자미두수 (紫微斗數) 계산 엔진
  */
 // @ts-expect-error lunar-javascript has no type declarations
 import { Solar } from 'lunar-javascript'

@@ -1,5 +1,5 @@
-import type { AllRelations } from '../../core/types.ts'
-import { ELEMENT_HANJA, PILLAR_NAMES } from '../../core/constants.ts'
+import type { AllRelations } from '@orrery/core/types'
+import { ELEMENT_HANJA, PILLAR_NAMES } from '@orrery/core/constants'
 
 interface Props {
   relations: AllRelations
