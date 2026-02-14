@@ -42,11 +42,14 @@ export default function BirthForm({ onSubmit }: Props) {
     <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
       <div className="flex flex-col items-center md:flex-row md:items-start gap-5">
         {/* 로고 */}
-        <img
-          src={logo}
-          alt="Orrery"
-          className="w-80 max-w-full md:w-64 shrink-0"
-        />
+        <div className="flex flex-col items-center shrink-0">
+          <img
+            src={logo}
+            alt="혼천의"
+            className="w-80 max-w-full md:w-64"
+          />
+          <span className="text-sm text-gray-400 font-hanja -mt-1">혼천의(渾天儀)</span>
+        </div>
 
         {/* 폼 필드 전체 */}
         <div className="w-full min-w-0">

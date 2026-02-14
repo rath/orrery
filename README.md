@@ -1,6 +1,6 @@
 <div align="center">
   <img src="src/assets/icon-512.png" alt="Orrery" width="256" />
-  <h1>Orrery</h1>
+  <h1>Orrery — 혼천의(渾天儀)</h1>
 </div>
 
 브라우저 기반 명리학 도구. 사주팔자(四柱八字)와 자미두수(紫微斗數)를 백엔드 없이 클라이언트에서 계산합니다.
