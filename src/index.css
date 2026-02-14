@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --color-wood: #22c55e;
+  --color-tree: #22c55e;
   --color-fire: #ef4444;
   --color-earth: #eab308;
   --color-metal: #9ca3af;
@@ -26,20 +26,20 @@ body {
     sans-serif;
 }
 
-.el-wood { color: var(--color-wood); }
+.el-tree { color: var(--color-tree); }
 .el-fire { color: var(--color-fire); }
 .el-earth { color: var(--color-earth); }
 .el-metal { color: var(--color-metal); }
 .el-water { color: var(--color-water); }
 
-.bg-el-wood { background-color: color-mix(in srgb, var(--color-wood) 15%, transparent); }
+.bg-el-tree { background-color: color-mix(in srgb, var(--color-tree) 15%, transparent); }
 .bg-el-fire { background-color: color-mix(in srgb, var(--color-fire) 15%, transparent); }
 .bg-el-earth { background-color: color-mix(in srgb, var(--color-earth) 15%, transparent); }
 .bg-el-metal { background-color: color-mix(in srgb, var(--color-metal) 15%, transparent); }
 .bg-el-water { background-color: color-mix(in srgb, var(--color-water) 15%, transparent); }
 
-.bg-el-solid-wood  { background-color: var(--color-wood); color: #fff; }
+.bg-el-solid-tree  { background-color: var(--color-tree); color: #fff; }
 .bg-el-solid-fire  { background-color: var(--color-fire); color: #fff; }
 .bg-el-solid-earth { background-color: var(--color-earth); color: #1a1a1a; }
-.bg-el-solid-metal { background-color: var(--color-metal); color: #1a1a1a; }
+.bg-el-solid-metal { background-color: #fff; color: #000; box-shadow: inset 0 0 0 1px #d1d5db; }
 .bg-el-solid-water { background-color: var(--color-water); color: #fff; }
