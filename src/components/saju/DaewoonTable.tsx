@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react'
 import type { DaewoonItem } from '../../core/types.ts'
 import { stemColorClass, branchColorClass, stemSolidBgClass, branchSolidBgClass } from '../../utils/format.ts'
 
@@ -27,12 +28,22 @@ export default function DaewoonTable({ daewoon }: Props) {
   }
 
   const activeIdx = findActiveDaewoonIndex(daewoon)
+  const activeRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (activeRef.current && scrollRef.current) {
+      const container = scrollRef.current
+      const el = activeRef.current
+      container.scrollLeft = el.offsetLeft - container.offsetWidth / 2 + el.offsetWidth / 2
+    }
+  }, [activeIdx])
 
   return (
     <section>
       <h3 className="text-sm font-medium text-gray-700 mb-2">大運</h3>
-      <div className="overflow-x-auto py-1">
-        <div className="flex flex-row-reverse gap-1 w-fit font-hanja">
+      <div ref={scrollRef} className="overflow-x-auto py-1">
+        <div className="flex flex-row-reverse gap-2 w-fit font-hanja">
           {daewoon.map((dw, i) => {
             const isActive = i === activeIdx
             const stem = dw.ganzi[0]
@@ -40,6 +51,7 @@ export default function DaewoonTable({ daewoon }: Props) {
             return (
               <div
                 key={dw.index}
+                ref={isActive ? activeRef : undefined}
                 className={`flex flex-col items-center gap-0.5 rounded-lg px-1 py-1 ${isActive ? 'ring-2 ring-amber-400 bg-amber-50' : ''}`}
               >
                 <span className="text-xs text-gray-500">{dw.age}세</span>
