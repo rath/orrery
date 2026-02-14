@@ -28,9 +28,10 @@ export default function PlanetTable({ planets, angles }: Props) {
                   <span className="mr-1">{PLANET_SYMBOLS[p.id]}</span>
                   <span className="text-gray-600">{PLANET_KO[p.id]}</span>
                 </td>
-                <td className="py-1.5 pr-2">
+                <td className="py-1.5 pr-2 whitespace-nowrap">
                   <span className="mr-1">{ZODIAC_SYMBOLS[p.sign]}</span>
-                  <span className="text-gray-600">{ZODIAC_KO[p.sign]}</span>
+                  <span className="text-gray-600 sm:hidden">{ZODIAC_KO[p.sign].slice(0, -2)}</span>
+                  <span className="text-gray-600 hidden sm:inline">{ZODIAC_KO[p.sign]}</span>
                 </td>
                 <td className="py-1.5 pr-2 text-right font-mono text-gray-700">
                   {formatDegree(p.longitude)}
@@ -60,7 +61,8 @@ export default function PlanetTable({ planets, angles }: Props) {
             <div key={label} className="flex items-center gap-2">
               <span className="font-medium text-gray-700 w-10">{label}</span>
               <span>{ZODIAC_SYMBOLS[a.sign]}</span>
-              <span className="text-gray-600">{ZODIAC_KO[a.sign]}</span>
+              <span className="text-gray-600 sm:hidden">{ZODIAC_KO[a.sign].slice(0, -2)}</span>
+              <span className="text-gray-600 hidden sm:inline">{ZODIAC_KO[a.sign]}</span>
               <span className="font-mono text-gray-700">{formatDegree(a.longitude)}</span>
             </div>
           ))}

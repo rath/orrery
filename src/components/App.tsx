@@ -54,7 +54,7 @@ export default function App() {
             {/* 탭 네비게이션 */}
             <div ref={resultsRef} className="flex items-center border-b border-gray-200 mt-6 mb-4">
               <button
-                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                className={`px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-colors ${
                   tab === 'saju'
                     ? 'border-gray-800 text-gray-800'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -64,7 +64,7 @@ export default function App() {
                 사주팔자
               </button>
               <button
-                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                className={`px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-colors ${
                   tab === 'ziwei'
                     ? 'border-gray-800 text-gray-800'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -74,7 +74,7 @@ export default function App() {
                 자미두수
               </button>
               <button
-                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                className={`px-4 py-2 text-xs sm:text-sm font-medium border-b-2 transition-colors ${
                   tab === 'natal'
                     ? 'border-gray-800 text-gray-800'
                     : 'border-transparent text-gray-500 hover:text-gray-700'

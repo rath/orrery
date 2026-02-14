@@ -21,7 +21,10 @@ export default function HouseTable({ houses }: Props) {
                     {ROMAN[h.number - 1]}
                   </td>
                   <td className="py-1 pr-1">{ZODIAC_SYMBOLS[h.sign]}</td>
-                  <td className="py-1 pr-2 text-gray-600">{ZODIAC_KO[h.sign]}</td>
+                  <td className="py-1 pr-2 text-gray-600 whitespace-nowrap">
+                    <span className="sm:hidden">{ZODIAC_KO[h.sign].slice(0, -2)}</span>
+                    <span className="hidden sm:inline">{ZODIAC_KO[h.sign]}</span>
+                  </td>
                   <td className="py-1 text-right font-mono text-gray-700">
                     {formatDegree(h.cuspLongitude)}
                   </td>

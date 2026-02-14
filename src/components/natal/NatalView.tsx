@@ -91,9 +91,9 @@ export default function NatalView({ input }: Props) {
       {/* Planets + Angles */}
       <section className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 sm:gap-3">
             <h2 className="text-sm font-medium text-gray-700">Natal Chart</h2>
-            <label className="flex items-center gap-1.5 text-xs text-gray-400 ml-2">
+            <label className="flex items-center gap-1.5 text-xs text-gray-400 sm:ml-2">
               House
               <select
                 value={houseSystem}
