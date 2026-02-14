@@ -13,18 +13,18 @@ export function sajuToText(result: SajuResult): string {
   lines.push(`四柱八字 (${genderChar})`)
   lines.push('─────')
 
-  const displayPillars = input.unknownTime ? pillars.slice(1) : pillars
-  const labels = input.unknownTime ? ['日柱', '月柱', '年柱'] : ['時柱', '日柱', '月柱', '年柱']
+  const labels = ['時柱', '日柱', '月柱', '年柱']
+  const q = input.unknownTime
 
   lines.push(`       ${labels.join('    ')}`)
   lines.push('─────')
-  lines.push(`십신   ${displayPillars.map(p => fmt2(p.stemSipsin)).join('    ')}`)
-  lines.push(`천간     ${displayPillars.map(p => p.pillar.stem).join('      ')}`)
-  lines.push(`지지     ${displayPillars.map(p => p.pillar.branch).join('      ')}`)
-  lines.push(`십신   ${displayPillars.map(p => fmt2(p.branchSipsin)).join('    ')}`)
+  lines.push(`십신   ${pillars.map((p, i) => fmt2(i === 0 && q ? '? ' : p.stemSipsin)).join('    ')}`)
+  lines.push(`천간     ${pillars.map((p, i) => i === 0 && q ? '?' : p.pillar.stem).join('      ')}`)
+  lines.push(`지지     ${pillars.map((p, i) => i === 0 && q ? '?' : p.pillar.branch).join('      ')}`)
+  lines.push(`십신   ${pillars.map((p, i) => fmt2(i === 0 && q ? '? ' : p.branchSipsin)).join('    ')}`)
   lines.push('─────')
-  lines.push(`운성   ${displayPillars.map(p => fmt2(p.unseong)).join('    ')}`)
-  lines.push(`장간  ${displayPillars.map(p => p.jigang).join('  ')}`)
+  lines.push(`운성   ${pillars.map((p, i) => fmt2(i === 0 && q ? '? ' : p.unseong)).join('    ')}`)
+  lines.push(`장간  ${pillars.map((p, i) => i === 0 && q ? '  ?  ' : p.jigang).join('  ')}`)
   lines.push('')
 
   // 팔자 관계
