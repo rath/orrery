@@ -73,6 +73,32 @@ bun test
 - swisseph-wasm (Swiss Ephemeris WASM, 서양 점성술)
 - Vitest (테스트)
 
+## `@orrery/core` 맛보기
+
+계산 엔진을 npm 패키지로 사용할 수 있습니다. → [`@orrery/core`](https://www.npmjs.com/package/@orrery/core)
+
+```typescript
+import { calculateSaju } from '@orrery/core/saju'
+import { createChart } from '@orrery/core/ziwei'
+import { calculateNatal } from '@orrery/core/natal'
+
+const input = { year: 1993, month: 3, day: 12, hour: 9, minute: 45, gender: 'M' as const }
+
+// 사주팔자
+const saju = calculateSaju(input)
+saju.pillars.forEach(p => console.log(p.pillar.ganzi)) // 乙巳, 壬辰, 乙卯, 癸酉
+
+// 자미두수 명반
+const ziwei = createChart(1993, 3, 12, 9, 45, true)
+console.log(ziwei.mingGongZhi)  // 명궁 지지
+console.log(ziwei.wuXingJu.name) // 오행국
+
+// 서양 점성술 출생차트
+const natal = await calculateNatal(input)
+natal.planets.forEach(p => console.log(`${p.id}: ${p.sign} ${p.degreeInSign.toFixed(1)}°`))
+console.log(`ASC: ${natal.angles.asc.sign}`)
+```
+
 ## 라이선스
 
 MIT
