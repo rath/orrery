@@ -1,7 +1,12 @@
 import { useRef, useState } from 'react'
 import BirthForm from './BirthForm.tsx'
+import Guide from './Guide.tsx'
+import CopyButton from './CopyButton.tsx'
 import SajuView from './saju/SajuView.tsx'
 import ZiweiView from './ziwei/ZiweiView.tsx'
+import { calculateSaju } from '../core/saju.ts'
+import { createChart } from '../core/ziwei.ts'
+import { sajuToText, ziweiToText } from '../utils/text-export.ts'
 import type { BirthInput } from '../core/types.ts'
 
 type Tab = 'saju' | 'ziwei'
@@ -39,7 +44,7 @@ export default function App() {
         {birthInput && (
           <>
             {/* 탭 네비게이션 */}
-            <div ref={resultsRef} className="flex border-b border-gray-200 mt-6 mb-4">
+            <div ref={resultsRef} className="flex items-center border-b border-gray-200 mt-6 mb-4">
               <button
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                   tab === 'saju'
@@ -60,12 +65,28 @@ export default function App() {
               >
                 紫微斗數
               </button>
+              <div className="ml-auto pb-1">
+                <CopyButton
+                  label="AI 해석용 전부 복사"
+                  getText={() => {
+                    const saju = calculateSaju(birthInput)
+                    const parts = [sajuToText(saju)]
+                    if (!birthInput.unknownTime) {
+                      const chart = createChart(birthInput.year, birthInput.month, birthInput.day, birthInput.hour, birthInput.minute, birthInput.gender === 'M')
+                      parts.push(ziweiToText(chart))
+                    }
+                    return parts.join('\n\n')
+                  }}
+                />
+              </div>
             </div>
 
             {tab === 'saju' && <SajuView input={birthInput} />}
             {tab === 'ziwei' && <ZiweiView input={birthInput} />}
           </>
         )}
+
+        <Guide />
       </main>
       <footer className="text-center text-xs text-gray-400 py-6">
         <p>&copy; 2026 Jang-Ho Hwang &middot; <a href="https://x.com/xrath" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600">@xrath</a></p>

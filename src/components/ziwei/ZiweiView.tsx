@@ -37,7 +37,7 @@ export default function ZiweiView({ input }: Props) {
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex items-center gap-2 mb-3">
           <h2 className="text-sm font-medium text-gray-700">紫微斗數 命盤</h2>
-          <CopyButton getText={() => ziweiToText(chart)} />
+          <CopyButton getText={() => ziweiToText(chart)} label="AI 해석용 복사" />
         </div>
         <MingPanGrid chart={chart} />
       </div>

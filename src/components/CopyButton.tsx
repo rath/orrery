@@ -2,9 +2,10 @@ import { useState } from 'react'
 
 interface Props {
   getText: () => string
+  label?: string
 }
 
-export default function CopyButton({ getText }: Props) {
+export default function CopyButton({ getText, label = '복사' }: Props) {
   const [copied, setCopied] = useState(false)
 
   async function handleClick() {
@@ -30,7 +31,7 @@ export default function CopyButton({ getText }: Props) {
       onClick={handleClick}
       className="px-3 py-1 text-xs border border-gray-300 rounded hover:bg-gray-100 transition-colors text-gray-600"
     >
-      {copied ? '복사됨' : '복사'}
+      {copied ? '복사됨 ✓' : label}
     </button>
   )
 }
