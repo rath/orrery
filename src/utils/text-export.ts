@@ -1,5 +1,6 @@
 import type { SajuResult, ZiweiChart, LiuNianInfo } from '../core/types.ts'
 import { ELEMENT_HANJA, PILLAR_NAMES, PALACE_NAMES, MAIN_STAR_NAMES } from '../core/constants.ts'
+import { getDaxianList } from '../core/ziwei.ts'
 import { formatRelation, fmt2 } from './format.ts'
 
 /** 사주 결과를 CLI 형식 텍스트로 변환 */
@@ -11,18 +12,18 @@ export function sajuToText(result: SajuResult): string {
   lines.push(`${input.year}年 ${input.month}月 ${input.day}日 ${input.hour}時 ${input.minute}分 (${genderChar})`)
   lines.push('')
   lines.push('四柱八字')
-  lines.push('─────────────────────────────────────')
+  lines.push('─────')
 
   const displayPillars = input.unknownTime ? pillars.slice(1) : pillars
   const labels = input.unknownTime ? ['日柱', '月柱', '年柱'] : ['時柱', '日柱', '月柱', '年柱']
 
   lines.push(`       ${labels.join('    ')}`)
-  lines.push('─────────────────────────────────────')
+  lines.push('─────')
   lines.push(`십신   ${displayPillars.map(p => fmt2(p.stemSipsin)).join('    ')}`)
   lines.push(`천간     ${displayPillars.map(p => p.pillar.stem).join('      ')}`)
   lines.push(`지지     ${displayPillars.map(p => p.pillar.branch).join('      ')}`)
   lines.push(`십신   ${displayPillars.map(p => fmt2(p.branchSipsin)).join('    ')}`)
-  lines.push('─────────────────────────────────────')
+  lines.push('─────')
   lines.push(`운성   ${displayPillars.map(p => fmt2(p.unseong)).join('    ')}`)
   lines.push(`장간  ${displayPillars.map(p => p.jigang).join('  ')}`)
   lines.push('')
@@ -68,7 +69,7 @@ export function sajuToText(result: SajuResult): string {
 
   if (relLines.length > 0) {
     lines.push('八字關係')
-    lines.push('─────────────────────────────────────')
+    lines.push('─────')
     relLines.forEach(l => lines.push(l))
     lines.push('')
   }
@@ -82,7 +83,7 @@ export function sajuToText(result: SajuResult): string {
   if (specialSals.goegang) salItems.push('괴강살')
   if (salItems.length > 0) {
     lines.push('神殺')
-    lines.push('─────────────────────────────────────')
+    lines.push('─────')
     lines.push(salItems.join(' · '))
     lines.push('')
   }
@@ -90,7 +91,7 @@ export function sajuToText(result: SajuResult): string {
   // 대운
   if (daewoon.length > 0) {
     lines.push('大運')
-    lines.push('─────────────────────────────────────')
+    lines.push('─────')
     for (const dw of daewoon) {
       lines.push(`${String(dw.index).padStart(2)}運 (${String(dw.age).padStart(2)}세)  ${fmt2(dw.stemSipsin)}  ${dw.ganzi}  ${fmt2(dw.branchSipsin)}  (${dw.startDate.getFullYear()}年)`)
     }
@@ -105,7 +106,7 @@ export function ziweiToText(chart: ZiweiChart, liunian?: LiuNianInfo): string {
   const genderChar = chart.isMale ? '男' : '女'
 
   lines.push('紫微斗數 命盤')
-  lines.push('═══════════════════════════════════════')
+  lines.push('═════')
   lines.push('')
   lines.push(`陽曆: ${chart.solarYear}年 ${chart.solarMonth}月 ${chart.solarDay}日 ${chart.hour}時 ${chart.minute}分`)
   lines.push(`陰曆: ${chart.lunarYear}年 ${chart.lunarMonth}月 ${chart.lunarDay}日${chart.isLeapMonth ? ' (閏月)' : ''}`)
@@ -128,7 +129,7 @@ export function ziweiToText(chart: ZiweiChart, liunian?: LiuNianInfo): string {
 
   // 12궁
   lines.push('十二宮')
-  lines.push('─────────────────────────────────────')
+  lines.push('─────')
   for (const palaceName of PALACE_NAMES) {
     const palace = chart.palaces[palaceName]
     if (!palace) continue
@@ -159,16 +160,40 @@ export function ziweiToText(chart: ZiweiChart, liunian?: LiuNianInfo): string {
     }
   }
 
+  // 사화 요약
+  lines.push('')
+  lines.push('四化')
+  lines.push('─────')
+  const huaOrder = ['化祿', '化權', '化科', '化忌']
+  for (const huaType of huaOrder) {
+    for (const palace of Object.values(chart.palaces)) {
+      for (const star of palace.stars) {
+        if (star.siHua === huaType) {
+          lines.push(`${huaType}: ${star.name} 在 ${palace.name}`)
+        }
+      }
+    }
+  }
+
+  // 대운
+  lines.push('')
+  lines.push('大限')
+  lines.push('─────')
+  const daxianList = getDaxianList(chart)
+  for (const dx of daxianList) {
+    const stars = dx.mainStars.length > 0 ? dx.mainStars.join(' ') : '(空宮)'
+    lines.push(`${String(dx.ageStart).padStart(3)}-${String(dx.ageEnd).padStart(3)}歲  ${dx.palaceName}  ${dx.ganZhi}  ${stars}`)
+  }
+
   // 유년
   if (liunian) {
     lines.push('')
     lines.push(`流年 (${liunian.year}年 ${liunian.gan}${liunian.zhi}年)`)
-    lines.push('═══════════════════════════════════════')
+    lines.push('═════')
     lines.push(`大限: ${liunian.daxianAgeStart}-${liunian.daxianAgeEnd}歲 ${liunian.daxianPalaceName}`)
     lines.push(`流年命宮: ${liunian.mingGongZhi}宮 → 本命 ${liunian.natalPalaceAtMing}`)
 
-    const huaOrder = ['化祿', '化權', '化科', '化忌']
-    for (const huaType of huaOrder) {
+    for (const huaType of ['化祿', '化權', '化科', '化忌']) {
       let starName = ''
       for (const [s, h] of Object.entries(liunian.siHua)) {
         if (h === huaType) { starName = s; break }
