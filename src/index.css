@@ -5,7 +5,7 @@
   --color-fire: #ef4444;
   --color-earth: #eab308;
   --color-metal: #9ca3af;
-  --color-water: #3b82f6;
+  --color-water: #1a1a1a;
 }
 
 body {
@@ -35,3 +35,9 @@ body {
 .bg-el-earth { background-color: color-mix(in srgb, var(--color-earth) 15%, transparent); }
 .bg-el-metal { background-color: color-mix(in srgb, var(--color-metal) 15%, transparent); }
 .bg-el-water { background-color: color-mix(in srgb, var(--color-water) 15%, transparent); }
+
+.bg-el-solid-wood  { background-color: var(--color-wood); color: #fff; }
+.bg-el-solid-fire  { background-color: var(--color-fire); color: #fff; }
+.bg-el-solid-earth { background-color: var(--color-earth); color: #1a1a1a; }
+.bg-el-solid-metal { background-color: var(--color-metal); color: #1a1a1a; }
+.bg-el-solid-water { background-color: var(--color-water); color: #fff; }

@@ -3,7 +3,7 @@
  */
 import {
   getFourPillars, getDaewoon, getRelation, getJeonggi,
-  getTwelveMeteor, getHiddenStems, analyzeAllRelations, getSpecialSals,
+  getTwelveMeteor, getTwelveSpirit, getHiddenStems, analyzeAllRelations, getSpecialSals,
 } from './pillars.ts';
 import { STEM_INFO } from './constants.ts';
 import type {
@@ -48,6 +48,9 @@ export function calculateSaju(input: BirthInput): SajuResult {
     // 12운성
     const unseong = getTwelveMeteor(dayStem, branch);
 
+    // 12신살 (연지 기준)
+    const sinsal = getTwelveSpirit(yp[1], branch);
+
     // 지장간
     const jigang = getHiddenStems(branch);
 
@@ -58,6 +61,7 @@ export function calculateSaju(input: BirthInput): SajuResult {
       stemSipsin,
       branchSipsin,
       unseong,
+      sinsal,
       jigang,
     };
   });
@@ -67,11 +71,17 @@ export function calculateSaju(input: BirthInput): SajuResult {
     ? []
     : getDaewoon(isMale, year, month, day, hour, minute);
 
+  const yearBranch = yp[1];
+
   const daewoon: DaewoonItem[] = rawDaewoon.map((dw, i) => {
     const age = dw.startDate.getFullYear() - year;
-    const dwStemSipsin = getSipsin(dayStem, dw.ganzi[0]);
-    const dwBranchJeonggi = getJeonggi(dw.ganzi[1]);
+    const dwStem = dw.ganzi[0];
+    const dwBranch = dw.ganzi[1];
+    const dwStemSipsin = getSipsin(dayStem, dwStem);
+    const dwBranchJeonggi = getJeonggi(dwBranch);
     const dwBranchSipsin = getSipsin(dayStem, dwBranchJeonggi);
+    const unseong = getTwelveMeteor(dayStem, dwBranch);
+    const sinsal = getTwelveSpirit(yearBranch, dwBranch);
 
     return {
       index: i + 1,
@@ -80,6 +90,8 @@ export function calculateSaju(input: BirthInput): SajuResult {
       age,
       stemSipsin: dwStemSipsin,
       branchSipsin: dwBranchSipsin,
+      unseong,
+      sinsal,
     };
   });
 

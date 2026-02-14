@@ -536,6 +536,24 @@ export function getTwelveMeteor(stem: string, branch: string): string {
   return '?';
 }
 
+/** 12신살 시작 지지 (삼합 그룹별 劫殺 위치) */
+const SPIRIT_START: Record<string, number> = {
+  '寅': 11, '午': 11, '戌': 11,  // 亥
+  '巳': 2,  '酉': 2,  '丑': 2,   // 寅
+  '申': 5,  '子': 5,  '辰': 5,   // 巳
+  '亥': 8,  '卯': 8,  '未': 8,   // 申
+};
+
+/** 12신살 계산 (년지 기준) */
+export function getTwelveSpirit(yearBranch: string, targetBranch: string): string {
+  const start = SPIRIT_START[yearBranch];
+  if (start === undefined) return '?';
+  const targetIdx = EARTH.indexOf(targetBranch);
+  if (targetIdx < 0) return '?';
+  const offset = ((targetIdx - start) % 12 + 12) % 12;
+  return SPIRITS_12[offset].hanja;
+}
+
 // =============================================
 // 합충형파해 관계
 // =============================================

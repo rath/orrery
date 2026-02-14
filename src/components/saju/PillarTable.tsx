@@ -1,23 +1,16 @@
 import type { PillarDetail } from '../../core/types.ts'
-import { stemColorClass } from '../../utils/format.ts'
-import { STEM_INFO } from '../../core/constants.ts'
+import {
+  stemColorClass,
+  branchColorClass,
+  stemSolidBgClass,
+  branchSolidBgClass,
+  elementSolidBgClass,
+  stemElement,
+} from '../../utils/format.ts'
 
 interface Props {
   pillars: PillarDetail[]  // [시, 일, 월, 년]
   unknownTime?: boolean
-}
-
-const BRANCH_ELEMENT: Record<string, string> = {
-  '寅': 'tree', '卯': 'tree',
-  '巳': 'fire', '午': 'fire',
-  '辰': 'earth', '未': 'earth', '丑': 'earth', '戌': 'earth',
-  '申': 'metal', '酉': 'metal',
-  '子': 'water', '亥': 'water',
-}
-
-function branchColorClass(branch: string): string {
-  const el = BRANCH_ELEMENT[branch]
-  return el ? `el-${el}` : ''
 }
 
 export default function PillarTable({ pillars, unknownTime }: Props) {
@@ -41,7 +34,7 @@ export default function PillarTable({ pillars, unknownTime }: Props) {
           <tr className="text-xs text-gray-600">
             <td className="pr-2 text-right text-gray-400">십신</td>
             {displayPillars.map((p, i) => (
-              <td key={i} className="py-0.5 px-3">{p.stemSipsin}</td>
+              <td key={i} className={`py-0.5 px-3 ${stemColorClass(p.pillar.stem)}`}>{p.stemSipsin}</td>
             ))}
           </tr>
 
@@ -49,8 +42,10 @@ export default function PillarTable({ pillars, unknownTime }: Props) {
           <tr className="text-2xl">
             <td className="pr-2 text-right text-xs text-gray-400">천간</td>
             {displayPillars.map((p, i) => (
-              <td key={i} className={`py-1 px-3 ${stemColorClass(p.pillar.stem)}`}>
-                {p.pillar.stem}
+              <td key={i} className="py-1 px-3">
+                <span className={`inline-block w-10 h-10 leading-10 rounded ${stemSolidBgClass(p.pillar.stem)}`}>
+                  {p.pillar.stem}
+                </span>
               </td>
             ))}
           </tr>
@@ -59,8 +54,10 @@ export default function PillarTable({ pillars, unknownTime }: Props) {
           <tr className="text-2xl">
             <td className="pr-2 text-right text-xs text-gray-400">지지</td>
             {displayPillars.map((p, i) => (
-              <td key={i} className={`py-1 px-3 ${branchColorClass(p.pillar.branch)}`}>
-                {p.pillar.branch}
+              <td key={i} className="py-1 px-3">
+                <span className={`inline-block w-10 h-10 leading-10 rounded ${branchSolidBgClass(p.pillar.branch)}`}>
+                  {p.pillar.branch}
+                </span>
               </td>
             ))}
           </tr>
@@ -69,7 +66,7 @@ export default function PillarTable({ pillars, unknownTime }: Props) {
           <tr className="text-xs text-gray-600">
             <td className="pr-2 text-right text-gray-400">십신</td>
             {displayPillars.map((p, i) => (
-              <td key={i} className="py-0.5 px-3">{p.branchSipsin}</td>
+              <td key={i} className={`py-0.5 px-3 ${branchColorClass(p.pillar.branch)}`}>{p.branchSipsin}</td>
             ))}
           </tr>
 
@@ -88,11 +85,27 @@ export default function PillarTable({ pillars, unknownTime }: Props) {
             ))}
           </tr>
 
+          {/* 신살 */}
+          <tr className="text-xs text-gray-600">
+            <td className="pr-2 text-right text-gray-400">신살</td>
+            {displayPillars.map((p, i) => (
+              <td key={i} className="py-0.5 px-3">{p.sinsal}</td>
+            ))}
+          </tr>
+
           {/* 지장간 */}
-          <tr className="text-xs text-gray-500">
+          <tr className="text-xs">
             <td className="pr-2 text-right text-gray-400">장간</td>
             {displayPillars.map((p, i) => (
-              <td key={i} className="py-0.5 px-3 tracking-wider">{p.jigang}</td>
+              <td key={i} className="py-0.5 px-3">
+                <span className="inline-flex gap-0.5 justify-center">
+                  {[...p.jigang].map((ch, j) =>
+                    ch === ' '
+                      ? <span key={j} className="inline-block w-4" />
+                      : <span key={j} className={`inline-block w-4 text-center rounded-sm ${elementSolidBgClass(stemElement(ch))}`}>{ch}</span>
+                  )}
+                </span>
+              </td>
             ))}
           </tr>
         </tbody>

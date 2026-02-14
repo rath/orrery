@@ -1,4 +1,4 @@
-import { STEM_INFO, ELEMENT_HANJA } from '../core/constants.ts'
+import { STEM_INFO, BRANCH_ELEMENT, ELEMENT_HANJA } from '../core/constants.ts'
 import type { Element, RelationResult } from '../core/types.ts'
 
 /** 천간의 오행 반환 */
@@ -21,6 +21,32 @@ export function elementBgClass(element: Element | undefined): string {
 /** 천간에 대한 오행 색상 CSS 클래스 */
 export function stemColorClass(stem: string): string {
   return elementClass(stemElement(stem))
+}
+
+/** 지지의 오행 반환 */
+export function branchElement(branch: string): Element | undefined {
+  return BRANCH_ELEMENT[branch]
+}
+
+/** 지지에 대한 오행 색상 CSS 클래스 */
+export function branchColorClass(branch: string): string {
+  return elementClass(branchElement(branch))
+}
+
+/** 오행에 대응하는 solid 배경 CSS 클래스 */
+export function elementSolidBgClass(element: Element | undefined): string {
+  if (!element) return ''
+  return `bg-el-solid-${element}`
+}
+
+/** 천간에 대한 solid 배경 CSS 클래스 */
+export function stemSolidBgClass(stem: string): string {
+  return elementSolidBgClass(stemElement(stem))
+}
+
+/** 지지에 대한 solid 배경 CSS 클래스 */
+export function branchSolidBgClass(branch: string): string {
+  return elementSolidBgClass(branchElement(branch))
 }
 
 /** 관계 결과를 문자열로 포맷 */

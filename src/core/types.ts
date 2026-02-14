@@ -63,6 +63,8 @@ export interface PillarDetail {
   branchSipsin: string;
   /** 12운성 */
   unseong: string;
+  /** 12신살 (연지 기준) */
+  sinsal: string;
   /** 지장간 */
   jigang: string;
 }
@@ -75,6 +77,10 @@ export interface DaewoonItem {
   age: number;
   stemSipsin: string;
   branchSipsin: string;
+  /** 12운성 (일간 기준) */
+  unseong: string;
+  /** 12신살 (연지 기준) */
+  sinsal: string;
 }
 
 /** 관계 분석 결과 */
