@@ -4,6 +4,8 @@ export interface City {
   name: string
   /** 한국어 국가명 (국내 도시는 생략) */
   country?: string
+  /** 한국어 광역 지역명 (예: '경기도', '강원도') */
+  region?: string
   lat: number
   lon: number
 }
@@ -63,60 +65,75 @@ function matchChosung(name: string, query: string): boolean {
 
 export const KOREAN_CITIES: readonly City[] = [
   // 특별/광역시
-  { name: '서울', lat: 37.5665, lon: 126.9780 },
-  { name: '부산', lat: 35.1796, lon: 129.0756 },
-  { name: '인천', lat: 37.4563, lon: 126.7052 },
-  { name: '대구', lat: 35.8714, lon: 128.6014 },
-  { name: '대전', lat: 36.3504, lon: 127.3845 },
-  { name: '광주', lat: 35.1595, lon: 126.8526 },
-  { name: '울산', lat: 35.5384, lon: 129.3114 },
-  { name: '세종', lat: 36.4800, lon: 127.2590 },
+  { name: '서울', region: '서울특별시', lat: 37.5665, lon: 126.9780 },
+  { name: '부산', region: '부산광역시', lat: 35.1796, lon: 129.0756 },
+  { name: '인천', region: '인천광역시', lat: 37.4563, lon: 126.7052 },
+  { name: '대구', region: '대구광역시', lat: 35.8714, lon: 128.6014 },
+  { name: '대전', region: '대전광역시', lat: 36.3504, lon: 127.3845 },
+  { name: '광주', region: '광주광역시', lat: 35.1595, lon: 126.8526 },
+  { name: '울산', region: '울산광역시', lat: 35.5384, lon: 129.3114 },
+  { name: '세종', region: '세종특별자치시', lat: 36.4800, lon: 127.2590 },
   // 경기도
-  { name: '수원', lat: 37.2636, lon: 127.0286 },
-  { name: '고양', lat: 37.6584, lon: 126.8320 },
-  { name: '용인', lat: 37.2411, lon: 127.1776 },
-  { name: '성남', lat: 37.4386, lon: 127.1378 },
-  { name: '부천', lat: 37.5034, lon: 126.7660 },
-  { name: '안산', lat: 37.3219, lon: 126.8309 },
-  { name: '안양', lat: 37.3943, lon: 126.9568 },
-  { name: '남양주', lat: 37.6360, lon: 127.2165 },
-  { name: '화성', lat: 37.1996, lon: 126.8312 },
-  { name: '평택', lat: 36.9921, lon: 127.0857 },
-  { name: '의정부', lat: 37.7381, lon: 127.0338 },
-  { name: '시흥', lat: 37.3801, lon: 126.8032 },
-  { name: '파주', lat: 37.7590, lon: 126.7802 },
-  { name: '김포', lat: 37.6153, lon: 126.7156 },
-  { name: '광명', lat: 37.4786, lon: 126.8646 },
-  { name: '이천', lat: 37.2720, lon: 127.4350 },
+  { name: '수원', region: '경기도', lat: 37.2636, lon: 127.0286 },
+  { name: '고양', region: '경기도', lat: 37.6584, lon: 126.8320 },
+  { name: '용인', region: '경기도', lat: 37.2411, lon: 127.1776 },
+  { name: '성남', region: '경기도', lat: 37.4386, lon: 127.1378 },
+  { name: '부천', region: '경기도', lat: 37.5034, lon: 126.7660 },
+  { name: '안산', region: '경기도', lat: 37.3219, lon: 126.8309 },
+  { name: '안양', region: '경기도', lat: 37.3943, lon: 126.9568 },
+  { name: '남양주', region: '경기도', lat: 37.6360, lon: 127.2165 },
+  { name: '화성', region: '경기도', lat: 37.1996, lon: 126.8312 },
+  { name: '평택', region: '경기도', lat: 36.9921, lon: 127.0857 },
+  { name: '의정부', region: '경기도', lat: 37.7381, lon: 127.0338 },
+  { name: '시흥', region: '경기도', lat: 37.3801, lon: 126.8032 },
+  { name: '파주', region: '경기도', lat: 37.7590, lon: 126.7802 },
+  { name: '김포', region: '경기도', lat: 37.6153, lon: 126.7156 },
+  { name: '광명', region: '경기도', lat: 37.4786, lon: 126.8646 },
+  { name: '이천', region: '경기도', lat: 37.2720, lon: 127.4350 },
+  { name: '군포', region: '경기도', lat: 37.3616, lon: 126.9351 },
+  { name: '하남', region: '경기도', lat: 37.5393, lon: 127.2148 },
+  { name: '오산', region: '경기도', lat: 37.1499, lon: 127.0770 },
+  { name: '양주', region: '경기도', lat: 37.7853, lon: 127.0456 },
+  { name: '구리', region: '경기도', lat: 37.5943, lon: 127.1297 },
+  { name: '안성', region: '경기도', lat: 37.0080, lon: 127.2798 },
+  { name: '포천', region: '경기도', lat: 37.8949, lon: 127.2003 },
+  { name: '의왕', region: '경기도', lat: 37.3449, lon: 126.9685 },
+  { name: '여주', region: '경기도', lat: 37.2984, lon: 127.6373 },
+  { name: '양평', region: '경기도', lat: 37.4914, lon: 127.4875 },
+  { name: '동두천', region: '경기도', lat: 37.9034, lon: 127.0606 },
+  { name: '과천', region: '경기도', lat: 37.4292, lon: 126.9876 },
+  { name: '광주', region: '경기도', lat: 37.4095, lon: 127.2550 },
+  { name: '연천', region: '경기도', lat: 38.0965, lon: 127.0750 },
+  { name: '가평', region: '경기도', lat: 37.8315, lon: 127.5095 },
   // 강원도
-  { name: '춘천', lat: 37.8813, lon: 127.7299 },
-  { name: '원주', lat: 37.3422, lon: 127.9202 },
-  { name: '강릉', lat: 37.7519, lon: 128.8761 },
-  { name: '속초', lat: 38.2070, lon: 128.5918 },
+  { name: '춘천', region: '강원도', lat: 37.8813, lon: 127.7299 },
+  { name: '원주', region: '강원도', lat: 37.3422, lon: 127.9202 },
+  { name: '강릉', region: '강원도', lat: 37.7519, lon: 128.8761 },
+  { name: '속초', region: '강원도', lat: 38.2070, lon: 128.5918 },
   // 충청도
-  { name: '청주', lat: 36.6424, lon: 127.4890 },
-  { name: '천안', lat: 36.8152, lon: 127.1139 },
-  { name: '충주', lat: 36.9910, lon: 127.9259 },
-  { name: '제천', lat: 37.1326, lon: 128.1910 },
-  { name: '아산', lat: 36.7898, lon: 127.0018 },
+  { name: '청주', region: '충청북도', lat: 36.6424, lon: 127.4890 },
+  { name: '천안', region: '충청남도', lat: 36.8152, lon: 127.1139 },
+  { name: '충주', region: '충청북도', lat: 36.9910, lon: 127.9259 },
+  { name: '제천', region: '충청북도', lat: 37.1326, lon: 128.1910 },
+  { name: '아산', region: '충청남도', lat: 36.7898, lon: 127.0018 },
   // 전라도
-  { name: '전주', lat: 35.8242, lon: 127.1480 },
-  { name: '목포', lat: 34.8118, lon: 126.3922 },
-  { name: '여수', lat: 34.7604, lon: 127.6622 },
-  { name: '순천', lat: 34.9505, lon: 127.4873 },
-  { name: '군산', lat: 35.9677, lon: 126.7370 },
-  { name: '익산', lat: 35.9483, lon: 126.9576 },
+  { name: '전주', region: '전라북도', lat: 35.8242, lon: 127.1480 },
+  { name: '목포', region: '전라남도', lat: 34.8118, lon: 126.3922 },
+  { name: '여수', region: '전라남도', lat: 34.7604, lon: 127.6622 },
+  { name: '순천', region: '전라남도', lat: 34.9505, lon: 127.4873 },
+  { name: '군산', region: '전라북도', lat: 35.9677, lon: 126.7370 },
+  { name: '익산', region: '전라북도', lat: 35.9483, lon: 126.9576 },
   // 경상도
-  { name: '포항', lat: 36.0190, lon: 129.3435 },
-  { name: '경주', lat: 35.8562, lon: 129.2247 },
-  { name: '김해', lat: 35.2285, lon: 128.8894 },
-  { name: '창원', lat: 35.2281, lon: 128.6811 },
-  { name: '진주', lat: 35.1798, lon: 128.1076 },
-  { name: '구미', lat: 36.1197, lon: 128.3446 },
-  { name: '안동', lat: 36.5684, lon: 128.7294 },
+  { name: '포항', region: '경상북도', lat: 36.0190, lon: 129.3435 },
+  { name: '경주', region: '경상북도', lat: 35.8562, lon: 129.2247 },
+  { name: '김해', region: '경상남도', lat: 35.2285, lon: 128.8894 },
+  { name: '창원', region: '경상남도', lat: 35.2281, lon: 128.6811 },
+  { name: '진주', region: '경상남도', lat: 35.1798, lon: 128.1076 },
+  { name: '구미', region: '경상북도', lat: 36.1197, lon: 128.3446 },
+  { name: '안동', region: '경상북도', lat: 36.5684, lon: 128.7294 },
   // 제주도
-  { name: '제주', lat: 33.4996, lon: 126.5312 },
-  { name: '서귀포', lat: 33.2542, lon: 126.5600 },
+  { name: '제주', region: '제주특별자치도', lat: 33.4996, lon: 126.5312 },
+  { name: '서귀포', region: '제주특별자치도', lat: 33.2542, lon: 126.5600 },
 ] as const
 
 export const WORLD_CITIES: readonly City[] = [
@@ -326,7 +343,7 @@ export function formatCityName(city: City): string {
   return city.country ? `${city.name}, ${city.country}` : city.name
 }
 
-/** 쿼리로 도시 필터링 (최대 8개, 한국 도시 우선) */
+/** 쿼리로 도시 필터링 (최대 20개, 한국 도시 우선) */
 export function filterCities(query: string): City[] {
   const q = query.trim()
   if (!q) return []
@@ -336,7 +353,10 @@ export function filterCities(query: string): City[] {
   const worldResults: City[] = []
 
   for (const city of KOREAN_CITIES) {
-    if (chosung ? matchChosung(city.name, q) : city.name.includes(q)) {
+    if (chosung
+      ? matchChosung(city.name, q) || (city.region != null && matchChosung(city.region, q))
+      : city.name.includes(q) || (city.region != null && city.region.includes(q))
+    ) {
       koreanResults.push(city)
     }
   }
@@ -350,5 +370,5 @@ export function filterCities(query: string): City[] {
     }
   }
 
-  return [...koreanResults, ...worldResults].slice(0, 8)
+  return [...koreanResults, ...worldResults].slice(0, 20)
 }
