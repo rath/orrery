@@ -10,7 +10,7 @@ import {
   HALF_COMPOSES, DIRECTIONAL_COMPOSES, DIRECTIONAL_COMPOSE_ELEMENTS,
   STEM_COMBINES, STEM_CLASHES,
   BRANCH_COMBINES_6, BRANCH_CLASHES, BRANCH_BREAKS, BRANCH_HARMS,
-  BRANCH_PUNISHMENTS, BRANCH_SELF_PUNISHMENTS,
+  BRANCH_PUNISHMENTS, BRANCH_SELF_PUNISHMENTS, BRANCH_WONJIN, BRANCH_GWIMUN,
   YANGIN_MAP, BAEKHO_PILLARS, GOEGANG_PILLARS,
   DOHWA_MAP, CHEONUL_MAP, CHEONDUK_MAP, WOLDUK_MAP,
   MUNCHANG_MAP, HONGYEOM_PILLARS, GEUMYEO_MAP,
@@ -611,6 +611,14 @@ export function getBranchRelation(branch1: string, branch2: string): RelationRes
   if (branch1 === branch2 && BRANCH_SELF_PUNISHMENTS.has(branch1)) {
     results.push({ type: '刑', detail: '自刑' });
   }
+
+  // 원진
+  const wonjin = lookupPair(BRANCH_WONJIN, branch1, branch2) as string | undefined;
+  if (wonjin) results.push({ type: wonjin, detail: null });
+
+  // 귀문관살
+  const gwimun = lookupPair(BRANCH_GWIMUN, branch1, branch2) as string | undefined;
+  if (gwimun) results.push({ type: gwimun, detail: null });
 
   return results;
 }

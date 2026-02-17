@@ -221,6 +221,26 @@ export const BRANCH_PUNISHMENTS: Record<string, [string, string]> = {
 // 자형 (自刑)
 export const BRANCH_SELF_PUNISHMENTS = new Set(['辰', '午', '酉', '亥']);
 
+// 원진 (怨嗔) - 7/5위 간격 쌍
+export const BRANCH_WONJIN: Record<string, string> = {
+  '子,未': '怨嗔',
+  '丑,午': '怨嗔',
+  '寅,酉': '怨嗔',
+  '卯,申': '怨嗔',
+  '辰,亥': '怨嗔',
+  '巳,戌': '怨嗔',
+};
+
+// 귀문관살 (鬼門關殺) - 지지 쌍
+export const BRANCH_GWIMUN: Record<string, string> = {
+  '子,酉': '鬼門',
+  '丑,午': '鬼門',
+  '寅,未': '鬼門',
+  '卯,申': '鬼門',
+  '辰,亥': '鬼門',
+  '巳,戌': '鬼門',
+};
+
 // =============================================
 // 신살 (神殺)
 // =============================================
