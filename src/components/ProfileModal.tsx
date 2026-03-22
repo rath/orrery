@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import type { SavedFormState } from './BirthForm.tsx'
 import { loadProfiles, addProfile, updateProfile, deleteProfile, exportProfiles, importProfiles } from '../utils/profiles.ts'
 import type { Profile } from '../utils/profiles.ts'
+import { getFourPillars, toHangul } from '@orrery/core/pillars'
 
 interface Props {
   open: boolean
@@ -17,7 +18,9 @@ function formatSummary(data: SavedFormState): string {
     : `${String(data.hour).padStart(2, '0')}:${String(data.minute).padStart(2, '0')}`
   const gender = data.gender === 'M' ? '남' : '여'
   const city = data.city?.name ?? '직접입력'
-  return `${date} ${time} ${gender} ${city}`
+  const [, , dp] = getFourPillars(data.year, data.month, data.day, data.hour, data.minute)
+  const ilju = toHangul(dp[0]) + toHangul(dp[1]) + '일주'
+  return `${date} ${time} ${gender} ${city} ${ilju}`
 }
 
 export default function ProfileModal({ open, onClose, getCurrentFormState, onSelect }: Props) {
