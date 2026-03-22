@@ -211,7 +211,7 @@ export default function ProfileModal({ open, onClose, getCurrentFormState, onSel
           onClick={() => setSavingNew(true)}
           className="w-full mb-4 py-2.5 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
         >
-          <span>+ 아래 정보로 새 프로필 추가</span>
+          <span>+ 입력한 정보로 새 프로필 추가</span>
           <span className="block text-xs text-gray-400 dark:text-gray-500 mt-0.5">
             {formatSummary(getCurrentFormState())}
           </span>

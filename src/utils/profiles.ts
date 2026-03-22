@@ -35,7 +35,7 @@ export function addProfile(name: string, data: SavedFormState): Profile {
     updatedAt: Date.now(),
     data,
   }
-  profiles.unshift(profile)
+  profiles.push(profile)
   saveProfiles(profiles)
   return profile
 }
