@@ -1,5 +1,7 @@
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import BirthForm from './BirthForm.tsx'
+import type { BirthFormHandle, SavedFormState } from './BirthForm.tsx'
+import ProfileModal from './ProfileModal.tsx'
 import Guide from './Guide.tsx'
 import CopyButton from './CopyButton.tsx'
 import ThemeToggle from './ThemeToggle.tsx'
@@ -17,7 +19,10 @@ type Tab = 'saju' | 'ziwei' | 'natal'
 export default function App() {
   const [tab, setTab] = useState<Tab>('saju')
   const [birthInput, setBirthInput] = useState<BirthInput | null>(null)
+  const [profileModalOpen, setProfileModalOpen] = useState(false)
+  const [externalFormState, setExternalFormState] = useState<SavedFormState | null>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
+  const birthFormRef = useRef<BirthFormHandle>(null)
 
   function handleSubmit(input: BirthInput) {
     setBirthInput(input)
@@ -25,6 +30,10 @@ export default function App() {
       resultsRef.current?.scrollIntoView({ behavior: 'smooth' })
     })
   }
+
+  const getCurrentFormState = useCallback(() => {
+    return birthFormRef.current!.getCurrentState()
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 relative">
@@ -49,7 +58,24 @@ export default function App() {
           </p>
           <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">십신, 대운, 명반, 사화, 출생차트까지 한 번에</p>
         </div>
-        <BirthForm onSubmit={handleSubmit} />
+        <BirthForm
+          ref={birthFormRef}
+          onSubmit={handleSubmit}
+          externalState={externalFormState}
+          onExternalStateConsumed={() => setExternalFormState(null)}
+        />
+        <div className="flex justify-end mt-2">
+          <button
+            type="button"
+            onClick={() => setProfileModalOpen(true)}
+            className="flex items-center gap-1 text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+            </svg>
+            프로필 관리
+          </button>
+        </div>
 
         {birthInput && (
           <>
@@ -114,6 +140,12 @@ export default function App() {
       <footer className="text-center text-xs text-gray-400 dark:text-gray-500 py-6">
         <p>&copy; 2026 Jang-Ho Hwang &middot; <a href="https://x.com/xrath" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 dark:hover:text-gray-300">@xrath</a> &middot; <a href="https://x.com/xrath/status/2022548658562937028" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 dark:hover:text-gray-300">소개글</a></p>
       </footer>
+      <ProfileModal
+        open={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        getCurrentFormState={getCurrentFormState}
+        onSelect={setExternalFormState}
+      />
     </div>
   )
 }

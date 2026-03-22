@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useImperativeHandle, forwardRef } from 'react'
 import type { BirthInput, Gender, JasiMethod } from '@orrery/core/types'
 import { isKoreanDaylightTime } from '@orrery/core/natal'
 import type { City } from '@orrery/core/cities'
@@ -6,13 +6,19 @@ import { SEOUL } from '@orrery/core/cities'
 import CityCombobox from './CityCombobox.tsx'
 import logo from '../assets/icon-512.png'
 
+export interface BirthFormHandle {
+  getCurrentState(): SavedFormState
+}
+
 interface Props {
   onSubmit: (input: BirthInput) => void
+  externalState?: SavedFormState | null
+  onExternalStateConsumed?: () => void
 }
 
 const STORAGE_KEY = 'orrery-birth-input'
 
-interface SavedFormState {
+export interface SavedFormState {
   year: number
   month: number
   day: number
@@ -49,7 +55,7 @@ const selectClass =
   'transition-all disabled:opacity-40 disabled:bg-gray-50 dark:disabled:bg-gray-800'
 
 
-export default function BirthForm({ onSubmit }: Props) {
+const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubmit, externalState, onExternalStateConsumed }, ref) {
   const [year, setYear] = useState(saved?.year ?? currentYear - 20)
   const [month, setMonth] = useState(saved?.month ?? now.getMonth() + 1)
   const [day, setDay] = useState(saved?.day ?? now.getDate())
@@ -63,6 +69,42 @@ export default function BirthForm({ onSubmit }: Props) {
   const [manualCoords, setManualCoords] = useState(saved?.manualCoords ?? false)
   const [latitude, setLatitude] = useState(saved?.latitude ?? SEOUL.lat)
   const [longitude, setLongitude] = useState(saved?.longitude ?? SEOUL.lon)
+
+  useImperativeHandle(ref, () => ({
+    getCurrentState: (): SavedFormState => ({
+      year, month, day, hour, minute, gender, unknownTime, jasiMethod,
+      city: selectedCity, manualCoords, latitude, longitude,
+    }),
+  }))
+
+  useEffect(() => {
+    if (!externalState) return
+    const s = externalState
+    setYear(s.year)
+    setMonth(s.month)
+    setDay(s.day)
+    setHour(s.hour)
+    setMinute(s.minute)
+    setGender(s.gender)
+    setUnknownTime(s.unknownTime)
+    setJasiMethod(s.jasiMethod)
+    setSelectedCity(s.city)
+    setManualCoords(s.manualCoords)
+    setLatitude(s.latitude)
+    setLongitude(s.longitude)
+    onExternalStateConsumed?.()
+    // 프로필 선택 시 자동 계산
+    onSubmit({
+      year: s.year, month: s.month, day: s.day,
+      hour: s.unknownTime ? 12 : s.hour,
+      minute: s.unknownTime ? 0 : s.minute,
+      gender: s.gender,
+      unknownTime: s.unknownTime,
+      ...(!s.unknownTime && { jasiMethod: s.jasiMethod }),
+      latitude: s.latitude,
+      longitude: s.longitude,
+    })
+  }, [externalState]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isKDT = useMemo(() => isKoreanDaylightTime(year, month, day), [year, month, day])
 
@@ -322,4 +364,6 @@ export default function BirthForm({ onSubmit }: Props) {
       </div>
     </form>
   )
-}
+})
+
+export default BirthForm

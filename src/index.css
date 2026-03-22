@@ -67,3 +67,7 @@ body {
 /* Dark mode: water element border for visibility */
 .dark .bg-el-solid-water { box-shadow: inset 0 0 0 1px #6b7280; }
 
+/* Dialog */
+dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
+dialog[open] { border: none; }
+
