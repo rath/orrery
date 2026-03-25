@@ -21,7 +21,7 @@ export {
   analyzePillarRelations, analyzeAllRelations,
   checkTripleCompose, checkDirectionalCompose,
   getSpecialSals, findTransits, calculateJwabeop, calculateInjongbeop,
-  calcPillarIndices, calcSolarTerms, getGongmang,
+  calcPillarIndices, calcSolarTerms, getGongmang, getYearGanzi,
 } from './pillars.ts'
 
 // 상수/심볼

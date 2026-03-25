@@ -50,7 +50,14 @@ export default function SajuView({ input }: Props) {
 
       {/* 대운 */}
       <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-        <DaewoonTable daewoon={result.daewoon} unknownTime={input.unknownTime} />
+        <DaewoonTable
+          daewoon={result.daewoon}
+          unknownTime={input.unknownTime}
+          birthYear={input.year}
+          dayStem={result.pillars[1].pillar.stem}
+          yearBranch={result.pillars[3].pillar.branch}
+          gongmangBranches={result.gongmang.branches}
+        />
       </div>
 
       {/* 트랜짓 */}
