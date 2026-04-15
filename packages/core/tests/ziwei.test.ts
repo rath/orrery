@@ -88,4 +88,31 @@ describe('timezone handling', () => {
     expect(parisLike.mingGongZhi).not.toBe(seoulLike.mingGongZhi)
     expect(parisLike.shenGongZhi).not.toBe(seoulLike.shenGongZhi)
   })
+
+  it('converts LA winter births (PST -8) to local solar time — equivalence with no-timezone path', () => {
+    // Pair to the 1990-07 PDT test above, locking the PST branch of resolveLocalDateTimeToUtc.
+    const solar = adjustBirthInputToSolarTime({
+      year: 1990, month: 1, day: 15, hour: 9, minute: 0,
+      gender: 'M', longitude: -118.2437, timezone: 'America/Los_Angeles',
+    })
+    const dst = createChart(1990, 1, 15, 9, 0, true, 'America/Los_Angeles', -118.2437)
+    const solarInput = createChart(solar.year, solar.month, solar.day, solar.hour, solar.minute, true)
+
+    expect(dst.lunarYear).toBe(solarInput.lunarYear)
+    expect(dst.lunarMonth).toBe(solarInput.lunarMonth)
+    expect(dst.lunarDay).toBe(solarInput.lunarDay)
+    expect(dst.mingGongZhi).toBe(solarInput.mingGongZhi)
+    expect(dst.shenGongZhi).toBe(solarInput.shenGongZhi)
+  })
+
+  it('Korean 1956-07 +9:30 historical DST: KST wall-clock normalization shifts ziwei hour block', () => {
+    // Asia/Seoul was +9:30 in July 1956. ziwei uses integer hour for hourZhiIndex, so crossing the
+    // 11:00 integer boundary yields a different palace assignment.
+    //   createChart(11, 0) → normalized to 10:30 → hourZhiIndex(10) = 5 = 巳
+    //   createChart(11, 30) → normalized to 11:00 → hourZhiIndex(11) = 6 = 午
+    // Without correction, both raw inputs have integer hour 11 and would produce the same mingGong.
+    const chart1100 = createChart(1956, 7, 15, 11, 0, true)
+    const chart1130 = createChart(1956, 7, 15, 11, 30, true)
+    expect(chart1100.mingGongZhi).not.toBe(chart1130.mingGongZhi)
+  })
 })

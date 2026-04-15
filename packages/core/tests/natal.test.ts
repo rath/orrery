@@ -127,4 +127,76 @@ describe('calculateNatal', () => {
     expect(losAngeles.angles!.asc.longitude).toBeCloseTo(utc.angles!.asc.longitude, 6)
     expect(losAngeles.angles!.mc.longitude).toBeCloseTo(utc.angles!.mc.longitude, 6)
   })
+
+  it('applies PST (-8) for LA winter births — pairs PDT test above to lock the non-DST branch', async () => {
+    const losAngeles = await calculateNatal({
+      year: 1990, month: 1, day: 15, hour: 12, minute: 0,
+      gender: 'M', latitude: 34.0522, longitude: -118.2437,
+      timezone: 'America/Los_Angeles',
+    })
+    // 12:00 PST (UTC-8) → 20:00Z
+    const utc = await calculateNatal({
+      year: 1990, month: 1, day: 15, hour: 20, minute: 0,
+      gender: 'M', latitude: 34.0522, longitude: -118.2437,
+      timezone: 'UTC',
+    })
+    expect(losAngeles.planets.find(p => p.id === 'Sun')!.longitude)
+      .toBeCloseTo(utc.planets.find(p => p.id === 'Sun')!.longitude, 6)
+    expect(losAngeles.angles!.asc.longitude).toBeCloseTo(utc.angles!.asc.longitude, 6)
+    expect(losAngeles.angles!.mc.longitude).toBeCloseTo(utc.angles!.mc.longitude, 6)
+  })
+
+  it('1974 Nixon emergency DST: LA January resolves to PDT (-7) not PST (-8)', async () => {
+    const nixon = await calculateNatal({
+      year: 1974, month: 1, day: 15, hour: 12, minute: 0,
+      gender: 'M', latitude: 34.0522, longitude: -118.2437,
+      timezone: 'America/Los_Angeles',
+    })
+    // 12:00 PDT (UTC-7) → 19:00Z
+    const utc = await calculateNatal({
+      year: 1974, month: 1, day: 15, hour: 19, minute: 0,
+      gender: 'M', latitude: 34.0522, longitude: -118.2437,
+      timezone: 'UTC',
+    })
+    expect(nixon.planets.find(p => p.id === 'Sun')!.longitude)
+      .toBeCloseTo(utc.planets.find(p => p.id === 'Sun')!.longitude, 6)
+    expect(nixon.angles!.asc.longitude).toBeCloseTo(utc.angles!.asc.longitude, 6)
+  })
+
+  it('Sydney austral winter AEST (+10) gives different UTC than austral summer AEDT (+11) at same wall-clock', async () => {
+    const summer = await calculateNatal({
+      year: 2024, month: 1, day: 15, hour: 12, minute: 0,
+      gender: 'M', latitude: -33.8688, longitude: 151.2093,
+      timezone: 'Australia/Sydney',
+    })
+    const summerUtc = await calculateNatal({
+      year: 2024, month: 1, day: 15, hour: 1, minute: 0,
+      gender: 'M', latitude: -33.8688, longitude: 151.2093,
+      timezone: 'UTC',
+    })
+    expect(summer.planets.find(p => p.id === 'Sun')!.longitude)
+      .toBeCloseTo(summerUtc.planets.find(p => p.id === 'Sun')!.longitude, 6)
+
+    const winter = await calculateNatal({
+      year: 2024, month: 7, day: 15, hour: 12, minute: 0,
+      gender: 'M', latitude: -33.8688, longitude: 151.2093,
+      timezone: 'Australia/Sydney',
+    })
+    const winterUtc = await calculateNatal({
+      year: 2024, month: 7, day: 15, hour: 2, minute: 0,
+      gender: 'M', latitude: -33.8688, longitude: 151.2093,
+      timezone: 'UTC',
+    })
+    expect(winter.planets.find(p => p.id === 'Sun')!.longitude)
+      .toBeCloseTo(winterUtc.planets.find(p => p.id === 'Sun')!.longitude, 6)
+  })
+
+  it('rejects DST spring-forward gap input with a DST gap RangeError', async () => {
+    // Europe/Berlin 2024-03-31 02:30 is inside the spring-forward gap (clocks jump 02:00 → 03:00 CEST).
+    await expect(calculateNatal({
+      year: 2024, month: 3, day: 31, hour: 2, minute: 30,
+      gender: 'M', latitude: 52.52, longitude: 13.405,
+      timezone: 'Europe/Berlin',
+    })).rejects.toThrow(/^DST gap/)
+  })
 })

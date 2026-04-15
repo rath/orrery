@@ -1,16 +1,15 @@
 import { describe, it, expect } from 'vitest'
 import { getFourPillars } from '../src/pillars.ts'
 import { calculateSaju } from '../src/saju.ts'
-import { adjustKdtToKst } from '../src/kdt.ts'
-import { adjustBirthInputToSolarTime } from '../src/timezone.ts'
+import { adjustBirthInputToKstWallClock, adjustBirthInputToSolarTime } from '../src/timezone.ts'
 import { PILLAR_FIXTURES } from './fixtures.ts'
 
 describe('getFourPillars', () => {
   for (const fixture of PILLAR_FIXTURES) {
     const { year, month, day, hour, minute, expected } = fixture
     it(`${year}-${month}-${day} ${hour}:${minute}`, () => {
-      // getFourPillars는 KST 기준이므로, KDT 기간 입력은 보정 후 전달
-      const kst = adjustKdtToKst(year, month, day, hour, minute)
+      // getFourPillars는 KST 벽시계 기준이므로, 한국 역사적 편차 구간 입력은 보정 후 전달
+      const kst = adjustBirthInputToKstWallClock({ year, month, day, hour, minute, gender: 'M' })
       const [yp, mp, dp, hp] = getFourPillars(kst.year, kst.month, kst.day, kst.hour, kst.minute)
       expect(yp).toBe(expected.year)
       expect(mp).toBe(expected.month)
@@ -162,5 +161,67 @@ describe('timezone handling', () => {
     })
 
     expect(left.hour).not.toBe(right.hour)
+  })
+
+  it('converts LA winter births (PST -8) to local solar time — equivalence with no-timezone path', () => {
+    // Pair to the 1990-07 PDT test above, locking the PST (non-DST) branch of resolveLocalDateTimeToUtc.
+    const solar = adjustBirthInputToSolarTime({
+      year: 1990, month: 1, day: 15, hour: 9, minute: 0,
+      gender: 'M', longitude: -118.2437, timezone: 'America/Los_Angeles',
+    })
+    const dst = calculateSaju({
+      year: 1990, month: 1, day: 15, hour: 9, minute: 0,
+      gender: 'M', longitude: -118.2437, timezone: 'America/Los_Angeles',
+    })
+    const solarInput = calculateSaju({
+      year: solar.year, month: solar.month, day: solar.day,
+      hour: solar.hour, minute: solar.minute, gender: 'M',
+    })
+    expect(dst.pillars.map(p => p.pillar.ganzi)).toEqual(solarInput.pillars.map(p => p.pillar.ganzi))
+  })
+
+  it('1974 Nixon emergency DST: LA January uses PDT (-7), shifting hour branch from 午 to 巳', () => {
+    // 1974 Jan LA was under Nixon's year-round DST order (-7, not standard PST -8).
+    // With correct DST: UTC = 19:00, solar ≈ 10:57 → hour branch 巳.
+    // Regression (using -8): UTC = 20:00, solar ≈ 11:57 → hour branch 午.
+    const nixon = calculateSaju({
+      year: 1974, month: 1, day: 15, hour: 12, minute: 0,
+      gender: 'M', timezone: 'America/Los_Angeles', longitude: -118.2437,
+    })
+    expect(nixon.pillars[0].pillar.branch).toBe('巳')
+
+    const control1973 = calculateSaju({
+      year: 1973, month: 1, day: 15, hour: 12, minute: 0,
+      gender: 'M', timezone: 'America/Los_Angeles', longitude: -118.2437,
+    })
+    expect(control1973.pillars[0].pillar.branch).toBe('午')
+  })
+
+  it('Sydney austral DST: same local 12:00 but hour branch differs across Jan/Jul (+11/+10)', () => {
+    // Jan = AEDT +11 → UTC 01:00 → solar ≈ 10:55 (branch 巳)
+    // Jul = AEST +10 → UTC 02:00 → solar ≈ 11:59 (branch 午)
+    // Without the 1-hour DST offset, both would fall in the same hour branch.
+    const summer = calculateSaju({
+      year: 2000, month: 1, day: 15, hour: 12, minute: 0,
+      gender: 'M', timezone: 'Australia/Sydney', longitude: 151.2093,
+    })
+    const winter = calculateSaju({
+      year: 2000, month: 7, day: 15, hour: 12, minute: 0,
+      gender: 'M', timezone: 'Australia/Sydney', longitude: 151.2093,
+    })
+    expect(summer.pillars[0].pillar.branch).toBe('巳')
+    expect(winter.pillars[0].pillar.branch).toBe('午')
+  })
+
+  it('Korean 1956-07 +9:30 historical DST: KST wall-clock normalization flips hour branch 午 → 巳', () => {
+    // Asia/Seoul was +9:30 in July 1956. Input 11:30 local → 11:00 KST wall-clock.
+    // getFourPillars on the normalized 11:00 should match calculateSaju on the raw 11:30.
+    const saju = calculateSaju({
+      year: 1956, month: 7, day: 15, hour: 11, minute: 30, gender: 'M',
+    })
+    const [yp, mp, dp, hp] = getFourPillars(1956, 7, 15, 11, 0)
+    expect(saju.pillars.map(p => p.pillar.ganzi)).toEqual([hp, dp, mp, yp])
+    // Without the correction, 11:30 raw would produce hour 午 (戊午). With correction, hour 巳 (丁巳).
+    expect(saju.pillars[0].pillar.ganzi).toBe('丁巳')
   })
 })
