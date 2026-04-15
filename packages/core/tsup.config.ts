@@ -10,6 +10,7 @@ export default defineConfig({
     types: 'src/types.ts',
     constants: 'src/constants.ts',
     cities: 'src/cities.ts',
+    timezone: 'src/timezone.ts',
   },
   format: ['esm'],
   dts: true,
