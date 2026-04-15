@@ -8,6 +8,7 @@ import { useLocale } from '../i18n/index.ts'
 import {
   getTimeZoneDisplayLabelAtLocalTime,
   inferTimeZoneFromCoordinates,
+  isDaylightSavingInEffect,
   validateBirthLocalTime,
 } from '../utils/timezones.ts'
 import {
@@ -228,6 +229,18 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
     () => isKoreanHistoricalTimeAnomaly(year, month, day),
     [year, month, day],
   )
+  const isDstActive = useMemo(() => {
+    if (!inferredTimezone) return false
+    if (isKDT || isKstHistoricalAnomaly) return false
+    return isDaylightSavingInEffect(
+      inferredTimezone,
+      year,
+      month,
+      day,
+      unknownTime ? 12 : hour,
+      unknownTime ? 0 : minute,
+    )
+  }, [inferredTimezone, isKDT, isKstHistoricalAnomaly, year, month, day, hour, minute, unknownTime])
 
   function handleCitySelect(city: City) {
     setSelectedCity(city)
@@ -467,6 +480,11 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
             {timezoneDisplayLabel && (
               <p className="mt-1.5 text-sm text-gray-400 dark:text-gray-500 leading-relaxed">
                 {t('form.timezoneDefault')} {timezoneDisplayLabel}
+                {isDstActive && (
+                  <span className="block text-xs mt-0.5">
+                    ↳ {t('form.dstActive')}
+                  </span>
+                )}
               </p>
             )}
             {timezoneError && (

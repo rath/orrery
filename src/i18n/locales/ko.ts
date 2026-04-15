@@ -35,6 +35,7 @@ const ko: Record<string, string> = {
   'form.coordinateInvalid': '좌표를 올바른 숫자로 입력해주세요.',
   'form.timezoneDefault': '자동 추론 시간대:',
   'form.timezoneAutoDetectFailed': '현재 좌표로 시간대를 자동 추론하지 못했습니다. 좌표를 확인해주세요.',
+  'form.dstActive': '서머타임(DST) 적용 중',
   'form.advanced': '고급 설정',
   'form.jasiMethod': '자시법 (子時法)',
   'form.unified': '통자시',

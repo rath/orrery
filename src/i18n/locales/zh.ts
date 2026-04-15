@@ -35,6 +35,7 @@ const zh: Record<string, string> = {
   'form.coordinateInvalid': '请输入有效的数字坐标。',
   'form.timezoneDefault': '自动推断时区：',
   'form.timezoneAutoDetectFailed': '无法根据当前坐标自动推断时区，请检查坐标。',
+  'form.dstActive': '夏令时(DST)适用中',
   'form.advanced': '高级设置',
   'form.jasiMethod': '子时法（子時法）',
   'form.unified': '统子时',

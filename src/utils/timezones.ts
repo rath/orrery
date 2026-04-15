@@ -32,6 +32,27 @@ export function inferTimeZoneFromCoordinates(latitude: number, longitude: number
   }
 }
 
+function getOffsetMinutesAtLocalTime(
+  timezone: string,
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number,
+): number | null {
+  const value = timezone.trim()
+  if (!value) return null
+
+  try {
+    const utcDate = resolveLocalDateTimeToUtc(year, month, day, hour, minute, value)
+    // Local wall-clock interpreted as UTC minus the real UTC moment = the applied offset in ms.
+    const localAsNaiveUtcMs = Date.UTC(year, month - 1, day, hour, minute)
+    return Math.round((localAsNaiveUtcMs - utcDate.getTime()) / 60_000)
+  } catch {
+    return null
+  }
+}
+
 function getTimeZoneOffsetLabelAtLocalTime(
   timezone: string,
   year: number,
@@ -40,18 +61,31 @@ function getTimeZoneOffsetLabelAtLocalTime(
   hour: number,
   minute: number,
 ): string | null {
-  const value = timezone.trim()
-  if (!value) return null
+  const offsetMinutes = getOffsetMinutesAtLocalTime(timezone, year, month, day, hour, minute)
+  if (offsetMinutes == null) return null
+  return formatUtcOffsetMinutes(offsetMinutes)
+}
 
-  try {
-    const utcDate = resolveLocalDateTimeToUtc(year, month, day, hour, minute, value)
-    // Local wall-clock interpreted as UTC minus the real UTC moment = the applied offset in ms.
-    const localAsNaiveUtcMs = Date.UTC(year, month - 1, day, hour, minute)
-    const offsetMinutes = Math.round((localAsNaiveUtcMs - utcDate.getTime()) / 60_000)
-    return formatUtcOffsetMinutes(offsetMinutes)
-  } catch {
-    return null
-  }
+export function isDaylightSavingInEffect(
+  timezone: string,
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number,
+): boolean {
+  const actual = getOffsetMinutesAtLocalTime(timezone, year, month, day, hour, minute)
+  if (actual == null) return false
+
+  const january = getOffsetMinutesAtLocalTime(timezone, year, 1, 15, 12, 0)
+  const july = getOffsetMinutesAtLocalTime(timezone, year, 7, 15, 12, 0)
+  if (january == null || july == null) return false
+
+  const standard = Math.min(january, july)
+  const dst = Math.max(january, july)
+  if (standard === dst) return false
+
+  return actual === dst
 }
 
 export function getTimeZoneDisplayLabelAtLocalTime(

@@ -35,6 +35,7 @@ const en: Record<string, string> = {
   'form.coordinateInvalid': 'Please enter valid numeric coordinates.',
   'form.timezoneDefault': 'Inferred time zone:',
   'form.timezoneAutoDetectFailed': 'The time zone could not be inferred from the current coordinates. Please check the coordinates.',
+  'form.dstActive': 'Daylight saving time (DST) in effect',
   'form.advanced': 'Advanced Settings',
   'form.jasiMethod': 'Ja-si Method (子時法)',
   'form.unified': 'Unified Ja-si',
