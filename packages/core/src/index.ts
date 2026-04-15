@@ -7,11 +7,23 @@ export { createChart, calculateLiunian, getDaxianList } from './ziwei.ts'
 // 서양 점성술 (Natal Chart)
 export {
   calculateNatal, lonToSign, normalizeDeg, formatDegree,
-  isKoreanDaylightTime,
+  isKoreanDaylightTime, isKoreanHistoricalTimeAnomaly,
   ZODIAC_SIGNS, ZODIAC_SYMBOLS, ZODIAC_KO,
   PLANET_SYMBOLS, PLANET_KO, ASPECT_SYMBOLS,
   ROMAN, HOUSE_SYSTEMS,
 } from './natal.ts'
+
+// 타임존 · DST 유틸리티
+export {
+  DEFAULT_TIMEZONE,
+  resolveLocalDateTimeToUtc,
+  resolveLocalDateTimeToUtcSafe,
+  adjustBirthInputToSolarTime,
+  adjustBirthInputToKstWallClock,
+  getBirthTimezone,
+  birthInputToUtcDate,
+} from './timezone.ts'
+export type { ResolveLocalDateTimeToUtcResult } from './timezone.ts'
 
 // 사주 저수준 API
 export {

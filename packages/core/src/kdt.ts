@@ -1,11 +1,16 @@
 /**
- * 한국 하계표준시(KDT) 유틸리티
+ * 한국 하계표준시(KDT) 1987-88 탐지 유틸리티
  *
- * 1987~1988년 88올림픽 준비를 위해 시행된 하계표준시(UTC+10) 보정.
- * SwissEph 등 무거운 의존성 없이 saju/ziwei/natal 모두에서 사용 가능.
+ * 1987~1988년 88올림픽 준비를 위해 시행된 하계표준시(UTC+10) 구간 판정 전용.
+ * `BirthForm`이 "88올림픽 KDT" 특정 안내 메시지를 렌더링하는 UI 경로에서만 쓰인다.
+ *
+ * 한국 표준시 편차 전반(1948-1951, 1954-1961 UTC+8:30/+9:30 등)에 대한 일반
+ * 검출은 `timezone.ts::isKoreanHistoricalTimeAnomaly`를 사용할 것. 실제 saju/
+ * ziwei 계산은 `adjustBirthInputToKstWallClock`이 IANA 오프셋을 이용해 모든
+ * 편차 구간을 자동 커버하므로 이 파일의 판정 함수에 의존하지 않는다.
  */
 
-/** 한국 하계표준시(KDT) 기간인지 판정 (1987~1988 88올림픽) */
+/** 한국 하계표준시(KDT) 기간인지 판정 (1987~1988 88올림픽 UI 메시지 전용) */
 export function isKoreanDaylightTime(year: number, month: number, day: number): boolean {
   if (year === 1987) {
     // 1987-05-10 ~ 1987-10-11
@@ -20,23 +25,4 @@ export function isKoreanDaylightTime(year: number, month: number, day: number): 
     if (month === 10 && day <= 9) return true
   }
   return false
-}
-
-/** KDT 시각 → KST로 보정 (1시간 감산). 날짜 롤백 포함. */
-export function adjustKdtToKst(
-  year: number, month: number, day: number,
-  hour: number, minute: number,
-): { year: number; month: number; day: number; hour: number; minute: number } {
-  if (!isKoreanDaylightTime(year, month, day)) {
-    return { year, month, day, hour, minute }
-  }
-  hour -= 1
-  if (hour < 0) {
-    hour += 24
-    const d = new Date(year, month - 1, day - 1)
-    year = d.getFullYear()
-    month = d.getMonth() + 1
-    day = d.getDate()
-  }
-  return { year, month, day, hour, minute }
 }

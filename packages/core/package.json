@@ -34,6 +34,10 @@
       "import": "./dist/natal.js",
       "types": "./dist/natal.d.ts"
     },
+    "./timezone": {
+      "import": "./dist/timezone.js",
+      "types": "./dist/timezone.d.ts"
+    },
     "./pillars": {
       "import": "./dist/pillars.js",
       "types": "./dist/pillars.d.ts"

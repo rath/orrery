@@ -7,8 +7,11 @@ import {
   calculateJwabeop, calculateInjongbeop, getGongmang,
 } from './pillars.ts';
 import { STEM_INFO } from './constants.ts';
-import { adjustKdtToKst } from './kdt.ts';
-import { adjustBirthInputToSolarTime, DEFAULT_TIMEZONE } from './timezone.ts';
+import {
+  adjustBirthInputToSolarTime,
+  adjustBirthInputToKstWallClock,
+  DEFAULT_TIMEZONE,
+} from './timezone.ts';
 import type {
   BirthInput, SajuResult, PillarDetail, Pillar, DaewoonItem, Gongmang,
 } from './types.ts';
@@ -21,12 +24,14 @@ function getSipsin(dayStem: string, targetStem: string): string {
 
 /** BirthInput → SajuResult */
 export function calculateSaju(input: BirthInput): SajuResult {
-  // Asia/Seoul(또는 미지정) 출생은 KST 벽시계를 기준으로 하는 한국 사주 관례를 유지하기 위해
-  // 경도 기반 진태양시 보정을 건너뛰고 KDT→KST 보정만 적용한다.
+  // Asia/Seoul(또는 미지정) 출생은 KST(+9) 벽시계를 기준으로 하는 한국 사주 관례를 유지하기 위해
+  // 경도 기반 진태양시 보정을 건너뛰고, IANA Asia/Seoul 오프셋을 이용한 KST 벽시계 정규화만
+  // 적용한다. 이 경로는 1948-1951 KDT, 1954-1961 UTC+8:30/+9:30, 1987-1988 KDT 등
+  // 한국 표준시 역사적 편차를 ICU/tzdb 기반으로 모두 자동 흡수한다.
   const useSolarTime = input.timezone != null && input.timezone !== DEFAULT_TIMEZONE;
   const { year, month, day, hour, minute } = useSolarTime
     ? adjustBirthInputToSolarTime(input)
-    : adjustKdtToKst(input.year, input.month, input.day, input.hour, input.minute);
+    : adjustBirthInputToKstWallClock(input);
   const { gender } = input;
   const isMale = gender === 'M';
 

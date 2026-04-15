@@ -12,6 +12,7 @@ import { julday, calcPlanet, calcHouses } from './ephemeris/index.ts'
 import { birthInputToUtcDate, getBirthTimezone } from './timezone.ts'
 
 export { isKoreanDaylightTime } from './kdt.ts'
+export { isKoreanHistoricalTimeAnomaly } from './timezone.ts'
 
 // =============================================
 // 상수
