@@ -28,7 +28,13 @@ export interface BirthInput {
   latitude?: number;
   /** 경도 (기본값: 127.0992 서울) */
   longitude?: number;
-  /** IANA 타임존 ID (예: 'Asia/Seoul', 'America/Los_Angeles') */
+  /**
+   * IANA 타임존 ID (예: 'Asia/Seoul', 'America/Los_Angeles').
+   * 생략 시 'Asia/Seoul'로 폴백되므로 한국 이외 출생지는 반드시 명시할 것
+   * (누락 시 natal/saju/ziwei 전부 서울 기준으로 계산됨).
+   * 'Asia/Seoul'(또는 미지정)은 KST 벽시계 기반 한국 사주 관례를 유지하고,
+   * 그 외 타임존은 경도·균시차 기반 진태양시 보정을 적용한다.
+   */
   timezone?: string;
 }
 

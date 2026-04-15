@@ -102,3 +102,11 @@ Python에서 TypeScript로 포팅 시 주의:
 - '혼천의(渾天儀)' 앱 제목은 번역하지 않음 (고정값)
 - 새 문자열 추가 시 4개 언어 파일 모두에 키를 추가할 것
 - 브라우저 언어 자동 감지, 폴백은 영어(en)
+
+## @orrery/core 사용 시 주의
+
+`BirthInput.timezone`은 선택 필드지만 생략하면 `Asia/Seoul`로 폴백된다. 한국 이외 출생지를 계산할 때는 반드시 IANA 타임존 ID(예: `America/Los_Angeles`)를 명시할 것 — 누락하면 natal/saju/ziwei 모두가 서울 기준으로 계산된다. 웹 폼(`BirthForm.tsx::buildBirthInput`)은 좌표에서 자동 추론해 주입하므로 문제없지만, 테스트·스크립트·외부 소비자가 `BirthInput`을 직접 구성할 때는 `timezone` 필드를 빠뜨리지 않도록 주의해야 한다.
+
+동작 규칙:
+- `'Asia/Seoul'` 또는 미지정: KDT→KST 보정 후 KST 벽시계로 계산 (한국 사주 관례 유지)
+- 그 외 타임존: IANA → UTC 변환 후 경도·균시차 기반 진태양시 보정
