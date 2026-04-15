@@ -224,10 +224,13 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
     if (birthInput) onSubmit(birthInput)
   }, [externalState]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isKDT = useMemo(() => isKoreanDaylightTime(year, month, day), [year, month, day])
+  const isKDT = useMemo(
+    () => inferredTimezone === 'Asia/Seoul' && isKoreanDaylightTime(year, month, day),
+    [inferredTimezone, year, month, day],
+  )
   const isKstHistoricalAnomaly = useMemo(
-    () => isKoreanHistoricalTimeAnomaly(year, month, day),
-    [year, month, day],
+    () => inferredTimezone === 'Asia/Seoul' && isKoreanHistoricalTimeAnomaly(year, month, day),
+    [inferredTimezone, year, month, day],
   )
   const isDstActive = useMemo(() => {
     if (!inferredTimezone) return false
