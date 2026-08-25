@@ -62,7 +62,7 @@ for (const [key, pair] of result.relations.pairs) {
 ### 紫微斗數 (Purple Star Astrology)
 
 ```typescript
-import { createChart, calculateLiunian, getDaxianList } from '@orrery/core/ziwei'
+import { createChart, calculateLiunian, getDaxianIndex, getDaxianList } from '@orrery/core/ziwei'
 
 // Generate 命盤
 const chart = createChart(1993, 3, 12, 9, 45, true)
@@ -85,6 +85,7 @@ const daxianList = getDaxianList(chart)
 for (const dx of daxianList) {
   console.log(`${dx.ageStart}~${dx.ageEnd}세: ${dx.palaceName} ${dx.ganZhi}`)
 }
+const currentDaxianIndex = getDaxianIndex(chart, new Date().getFullYear())
 
 // 流年 (Annual Fortune) — Fortune for a specific year
 const liunian = calculateLiunian(chart, 2026)
@@ -194,7 +195,7 @@ You can selectively import only the modules you need:
 |------|-------------|
 | `@orrery/core` | Full barrel export |
 | `@orrery/core/saju` | `calculateSaju()` |
-| `@orrery/core/ziwei` | `createChart()`, `calculateLiunian()`, `getDaxianList()` |
+| `@orrery/core/ziwei` | `createChart()`, `calculateLiunian()`, `getDaxianIndex()`, `getDaxianList()` |
 | `@orrery/core/natal` | `calculateNatal()`, zodiac/planet symbols, format functions |
 | `@orrery/core/pillars` | `getFourPillars()`, `getDaewoon()`, and other low-level APIs |
 | `@orrery/core/types` | All TypeScript types/interfaces |

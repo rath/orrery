@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createChart } from '../src/ziwei.ts'
+import { calculateLiunian, createChart, getDaxianIndex, getDaxianList } from '../src/ziwei.ts'
 import { adjustBirthInputToSolarTime } from '../src/timezone.ts'
 import { ZIWEI_FIXTURES } from './fixtures.ts'
 
@@ -44,6 +44,29 @@ describe('palace structure', () => {
   it('命宮 contains 天機', () => {
     const mingStars = chart.palaces['命宮'].stars.map(s => s.name)
     expect(mingStars).toContain('天機')
+  })
+})
+
+describe('daxian age boundaries', () => {
+  const chart = createChart(1993, 3, 12, 9, 45, true)
+  const daxianList = getDaxianList(chart)
+
+  it('uses nominal age consistently at the first decade boundary', () => {
+    expect(chart.daXianStartAge).toBe(2)
+    expect(getDaxianIndex(chart, 2003)).toBe(0) // 11歲
+    expect(getDaxianIndex(chart, 2004)).toBe(1) // 12歲
+    expect(calculateLiunian(chart, 2004)).toMatchObject({
+      daxianAgeStart: 12,
+      daxianAgeEnd: 21,
+      daxianPalaceName: daxianList[1].palaceName,
+    })
+  })
+
+  it('keeps later boundaries and out-of-range years aligned with the core list', () => {
+    expect(getDaxianIndex(chart, 2013)).toBe(1) // 21歲
+    expect(getDaxianIndex(chart, 2014)).toBe(2) // 22歲
+    expect(getDaxianIndex(chart, 1900)).toBe(0)
+    expect(getDaxianIndex(chart, 2200)).toBe(11)
   })
 })
 

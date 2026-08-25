@@ -384,17 +384,24 @@ function getPalaceByZhi(chart: ZiweiChart, zhi: string): ZiweiPalace | null {
   return null
 }
 
-function getCurrentDaxian(chart: ZiweiChart, year: number): [string, number, number] {
+/** 특정 연도의 대한 인덱스. 자미두수의 세는나이(출생년=1세)를 사용한다. */
+export function getDaxianIndex(chart: ZiweiChart, year: number): number {
   const age = year - chart.solarYear + 1
+  const startAge = chart.daXianStartAge
+
+  let daxianNum = Math.floor((age - startAge) / 10)
+  if (daxianNum < 0) daxianNum = 0
+  if (daxianNum > 11) daxianNum = 11
+  return daxianNum
+}
+
+function getCurrentDaxian(chart: ZiweiChart, year: number): [string, number, number] {
   const startAge = chart.daXianStartAge
   const mingIdx = zhiIndex(chart.mingGongZhi)
 
   const isYangGan = ganIndex(chart.yearGan) % 2 === 0
   const direction = (isYangGan && chart.isMale) || (!isYangGan && !chart.isMale) ? 1 : -1
-
-  let daxianNum = Math.floor((age - startAge) / 10)
-  if (daxianNum < 0) daxianNum = 0
-  if (daxianNum > 11) daxianNum = 11
+  const daxianNum = getDaxianIndex(chart, year)
 
   const daxianStart = startAge + daxianNum * 10
   const daxianEnd = daxianStart + 9

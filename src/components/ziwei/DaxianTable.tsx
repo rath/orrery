@@ -1,26 +1,15 @@
 import { useRef, useEffect } from 'react'
 import type { ZiweiChart } from '@orrery/core/types'
-import { getDaxianList } from '@orrery/core/ziwei'
+import { getDaxianIndex, getDaxianList } from '@orrery/core/ziwei'
 import { stemSolidBgClass, branchSolidBgClass } from '../../utils/format.ts'
 
 interface Props {
   chart: ZiweiChart
 }
 
-function findActiveDaxianIndex(
-  daxianList: Array<{ ageStart: number; ageEnd: number }>,
-  birthYear: number,
-): number {
-  const currentAge = new Date().getFullYear() - birthYear
-  for (let i = daxianList.length - 1; i >= 0; i--) {
-    if (currentAge >= daxianList[i].ageStart) return i
-  }
-  return -1
-}
-
 export default function DaxianTable({ chart }: Props) {
   const daxianList = getDaxianList(chart)
-  const activeIdx = findActiveDaxianIndex(daxianList, chart.solarYear)
+  const activeIdx = getDaxianIndex(chart, new Date().getFullYear())
   const activeRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
 

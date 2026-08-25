@@ -2,7 +2,7 @@
 export { calculateSaju } from './saju.ts'
 
 // 자미두수 (紫微斗數)
-export { createChart, calculateLiunian, getDaxianList } from './ziwei.ts'
+export { createChart, calculateLiunian, getDaxianIndex, getDaxianList } from './ziwei.ts'
 
 // 서양 점성술 (Natal Chart)
 export {
