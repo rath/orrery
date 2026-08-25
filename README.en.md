@@ -7,7 +7,7 @@
 
 A browser-based divination tool. Computes 사주팔자(四柱八字), 자미두수(紫微斗數), and Western astrology natal charts entirely on the client — no backend required.
 
-**[Live Demo →](https://rath.github.io/orrery/)**
+**[Live Demo →](https://sky.told.me/)**
 
 ## Credits
 

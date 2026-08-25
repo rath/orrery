@@ -10,7 +10,7 @@
 
 无需后端。所有计算均在客户端完成。
 
-**[在线演示 →](https://rath.github.io/orrery/)**
+**[在线演示 →](https://sky.told.me/)**
 
 ## 致谢
 

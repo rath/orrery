@@ -7,7 +7,7 @@
 
 基于浏览器的命理学工具。无需后端，在客户端直接计算四柱八字、紫微斗數以及西方占星术出生星盘（Natal Chart）。
 
-**[在线演示 →](https://rath.github.io/orrery/)**
+**[在线演示 →](https://sky.told.me/)**
 
 ## 致谢
 

@@ -10,7 +10,7 @@ A calculation engine for Eastern and Western divination that runs in browser and
 
 No backend required. All calculations are performed on the client.
 
-**[Live Demo →](https://rath.github.io/orrery/)**
+**[Live Demo →](https://sky.told.me/)**
 
 ## Credits
 
