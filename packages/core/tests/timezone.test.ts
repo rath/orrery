@@ -140,6 +140,11 @@ describe('resolveLocalDateTimeToUtc — Australia/Sydney (southern hemisphere)',
 })
 
 describe('resolveLocalDateTimeToUtc — Asia/Seoul historical', () => {
+  it('1900 Seoul local mean time (+8:27:52) preserves the second-level offset', () => {
+    expect(resolveLocalDateTimeToUtc(1900, 1, 15, 12, 0, 'Asia/Seoul').toISOString())
+      .toBe('1900-01-15T03:32:08.000Z')
+  })
+
   it('modern 1995 noon → +9', () => {
     expect(resolveLocalDateTimeToUtc(1995, 7, 15, 12, 0, 'Asia/Seoul').toISOString())
       .toBe('1995-07-15T03:00:00.000Z')
@@ -158,6 +163,18 @@ describe('resolveLocalDateTimeToUtc — Asia/Seoul historical', () => {
   it('1956-07 DST on +8:30 base → +9:30', () => {
     expect(resolveLocalDateTimeToUtc(1956, 7, 15, 12, 0, 'Asia/Seoul').toISOString())
       .toBe('1956-07-15T02:30:00.000Z')
+  })
+})
+
+describe('resolveLocalDateTimeToUtc — historical local mean time', () => {
+  it('1900 Paris local mean time (+0:09:21) resolves without rejecting the timezone', () => {
+    expect(resolveLocalDateTimeToUtc(1900, 1, 15, 12, 0, 'Europe/Paris').toISOString())
+      .toBe('1900-01-15T11:50:39.000Z')
+  })
+
+  it('1900 Kolkata local mean time (+5:21:10) resolves without rejecting the timezone', () => {
+    expect(resolveLocalDateTimeToUtc(1900, 1, 15, 12, 0, 'Asia/Kolkata').toISOString())
+      .toBe('1900-01-15T06:38:50.000Z')
   })
 })
 

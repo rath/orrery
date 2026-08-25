@@ -92,13 +92,14 @@ function getTimezoneOffsetMinutes(date: Date, timezone: string): number {
     .find(part => part.type === 'timeZoneName')
     ?.value;
 
-  const match = tzName?.match(/^GMT(?:(\+|-)(\d{1,2})(?::(\d{2}))?)?$/);
+  const match = tzName?.match(/^GMT(?:(\+|-)(\d{1,2})(?::(\d{2})(?::(\d{2}))?)?)?$/);
   if (!match) throw new RangeError(`Unsupported time zone: ${timezone}`);
 
   const sign = match[1] === '-' ? -1 : 1;
   const hours = Number(match[2] ?? 0);
   const minutes = Number(match[3] ?? 0);
-  return sign * (hours * 60 + minutes);
+  const seconds = Number(match[4] ?? 0);
+  return sign * (hours * 60 + minutes + seconds / 60);
 }
 
 function sameLocalDateTime(a: LocalDateTimeParts, b: LocalDateTimeParts): boolean {
