@@ -34,6 +34,73 @@ describe('edge cases', () => {
   })
 })
 
+describe('unknown birth time', () => {
+  it('represents the hour pillar as unknown and excludes it from derived analysis', () => {
+    const result = calculateSaju({
+      year: 1993, month: 3, day: 12, hour: 12, minute: 0,
+      gender: 'M', unknownTime: true,
+    })
+
+    expect(result.pillars[0]).toEqual({
+      pillar: { ganzi: '??', stem: '?', branch: '?' },
+      stemSipsin: '?',
+      branchSipsin: '?',
+      unseong: '?',
+      sinsal: '?',
+      jigang: '?',
+    })
+    expect([...result.relations.pairs.keys()].every(key => !key.startsWith('0,') && !key.endsWith(',0'))).toBe(true)
+    expect(result.gongmang.pillarIndices).not.toContain(0)
+    expect(result.jwabeop[0]).toEqual([])
+
+    const positionalSals = [
+      result.specialSals.yangin,
+      result.specialSals.dohwa,
+      result.specialSals.cheonul,
+      result.specialSals.cheonduk,
+      result.specialSals.wolduk,
+      result.specialSals.munchang,
+      result.specialSals.geumyeo,
+    ]
+    expect(positionalSals.every(indices => !indices.includes(0))).toBe(true)
+  })
+
+  it('does not create a directional composition from the placeholder noon pillar', () => {
+    const result = calculateSaju({
+      year: 1980, month: 1, day: 9, hour: 12, minute: 0,
+      gender: 'M', unknownTime: true,
+    })
+
+    expect(result.relations.directional).toEqual([])
+  })
+
+  it('does not report a special sal from the placeholder noon pillar', () => {
+    const result = calculateSaju({
+      year: 1980, month: 1, day: 1, hour: 12, minute: 0,
+      gender: 'M', unknownTime: true,
+    })
+
+    expect(result.specialSals.dohwa).toEqual([])
+  })
+
+  it('produces identical known-pillar analysis regardless of the supplied ignored time', () => {
+    const morning = calculateSaju({
+      year: 2000, month: 1, day: 1, hour: 1, minute: 15,
+      gender: 'F', unknownTime: true,
+    })
+    const lateNight = calculateSaju({
+      year: 2000, month: 1, day: 1, hour: 23, minute: 45,
+      gender: 'F', unknownTime: true,
+    })
+
+    expect(morning.pillars).toEqual(lateNight.pillars)
+    expect(morning.relations).toEqual(lateNight.relations)
+    expect(morning.specialSals).toEqual(lateNight.specialSals)
+    expect(morning.gongmang).toEqual(lateNight.gongmang)
+    expect(morning.jwabeop).toEqual(lateNight.jwabeop)
+  })
+})
+
 describe('자시법 (JasiMethod)', () => {
   it('통자시: 23:30에 子시 + 일주 다음날', () => {
     const [, , dp, hp] = getFourPillars(2000, 1, 1, 23, 30, 'unified')

@@ -24,14 +24,20 @@ function getSipsin(dayStem: string, targetStem: string): string {
 
 /** BirthInput → SajuResult */
 export function calculateSaju(input: BirthInput): SajuResult {
+  // 시간 미상은 날짜 경계의 영향을 받지 않는 정오로 정규화하되, 정오 시주 자체는
+  // 아래의 관계·신살 분석에 포함하지 않는다.
+  const calculationInput = input.unknownTime
+    ? { ...input, hour: 12, minute: 0 }
+    : input;
+
   // Asia/Seoul(또는 미지정) 출생은 KST(+9) 벽시계를 기준으로 하는 한국 사주 관례를 유지하기 위해
   // 경도 기반 진태양시 보정을 건너뛰고, IANA Asia/Seoul 오프셋을 이용한 KST 벽시계 정규화만
   // 적용한다. 이 경로는 1948-1951 KDT, 1954-1961 UTC+8:30/+9:30, 1987-1988 KDT 등
   // 한국 표준시 역사적 편차를 ICU/tzdb 기반으로 모두 자동 흡수한다.
-  const useSolarTime = input.timezone != null && input.timezone !== DEFAULT_TIMEZONE;
+  const useSolarTime = calculationInput.timezone != null && calculationInput.timezone !== DEFAULT_TIMEZONE;
   const { year, month, day, hour, minute } = useSolarTime
-    ? adjustBirthInputToSolarTime(input)
-    : adjustBirthInputToKstWallClock(input);
+    ? adjustBirthInputToSolarTime(calculationInput)
+    : adjustBirthInputToKstWallClock(calculationInput);
   const { gender } = input;
   const isMale = gender === 'M';
 
@@ -46,10 +52,27 @@ export function calculateSaju(input: BirthInput): SajuResult {
   const branches = [hp[1], dp[1], mp[1], yp[1]];
   const ganzis = [hp, dp, mp, yp];
 
+  if (input.unknownTime) {
+    stems[0] = '?';
+    branches[0] = '?';
+    ganzis[0] = '??';
+  }
+
   // 주별 상세 정보 조립
   const pillars: PillarDetail[] = ganzis.map((ganzi, i) => {
     const stem = stems[i];
     const branch = branches[i];
+
+    if (i === 0 && input.unknownTime) {
+      return {
+        pillar: { ganzi, stem, branch },
+        stemSipsin: '?',
+        branchSipsin: '?',
+        unseong: '?',
+        sinsal: '?',
+        jigang: '?',
+      };
+    }
 
     // 천간 십신
     let stemSipsin = getSipsin(dayStem, stem);
@@ -80,10 +103,8 @@ export function calculateSaju(input: BirthInput): SajuResult {
     };
   });
 
-  // 대운 계산 (시간 모름이면 정오 기준)
-  const dwHour = input.unknownTime ? 12 : hour;
-  const dwMinute = input.unknownTime ? 0 : minute;
-  const rawDaewoon = getDaewoon(isMale, year, month, day, dwHour, dwMinute, input.jasiMethod);
+  // 대운 계산 (시간 미상 입력은 위에서 정오로 정규화됨)
+  const rawDaewoon = getDaewoon(isMale, year, month, day, hour, minute, input.jasiMethod);
 
   const yearBranch = yp[1];
 
@@ -93,7 +114,8 @@ export function calculateSaju(input: BirthInput): SajuResult {
   const gongmang: Gongmang = {
     branches: gmBranches,
     pillarIndices: branches.reduce<number[]>((acc, b, i) => {
-      if (i !== 1 && gmSet.has(b)) acc.push(i);  // 일주 자신은 제외
+      const isUnknownHour = input.unknownTime && i === 0;
+      if (!isUnknownHour && i !== 1 && gmSet.has(b)) acc.push(i);  // 시간 미상 시주·일주 자신은 제외
       return acc;
     }, []),
   };
