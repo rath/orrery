@@ -31,6 +31,8 @@ export interface HousesResult {
 // ---------------------------------------------------------------------------
 
 const VERY_SMALL = 1e-10
+const PLACIDUS_CONVERGENCE = 1 / 360000
+const PLACIDUS_MAX_ITERATIONS = 100
 
 // ---------------------------------------------------------------------------
 // Trigonometric helpers (degree-based)
@@ -217,14 +219,27 @@ function housesPlacidus(
   cusps[1] = ac
   cusps[10] = mc
 
-  // Cusp 11: offset 30, fraction 1/3 of semi-diurnal arc (add)
-  cusps[11] = placidusIter(th, fi, sine, cose, 30, 1 / 3, 1)
-  // Cusp 12: offset 60, fraction 2/3 of semi-diurnal arc (add)
-  cusps[12] = placidusIter(th, fi, sine, cose, 60, 2 / 3, 1)
-  // Cusp 2: offset 120, fraction 2/3 of semi-nocturnal arc (subtract)
-  cusps[2] = placidusIter(th, fi, sine, cose, 120, 2 / 3, -1)
-  // Cusp 3: offset 150, fraction 1/3 of semi-nocturnal arc (subtract)
-  cusps[3] = placidusIter(th, fi, sine, cose, 150, 1 / 3, -1)
+  const tane = tand(ekl)
+  const a = asind(clamp1(tand(fi) * tane))
+  const fh1 = atand(sind(a / 3) / tane)
+  const fh2 = atand(sind(a * 2 / 3) / tane)
+
+  const cusp11 = placidusIter(th, fi, sine, cose, 30, fh1, 3)
+  const cusp12 = placidusIter(th, fi, sine, cose, 60, fh2, 1.5)
+  const cusp2 = placidusIter(th, fi, sine, cose, 120, fh2, 1.5)
+  const cusp3 = placidusIter(th, fi, sine, cose, 150, fh1, 3)
+
+  // The Placidus iteration becomes unstable close to the polar circle.
+  // Match Swiss Ephemeris by falling back to Porphyry for the whole chart.
+  if (cusp11 === null || cusp12 === null || cusp2 === null || cusp3 === null) {
+    housesPorphyry(cusps, ac, mc)
+    return
+  }
+
+  cusps[11] = cusp11
+  cusps[12] = cusp12
+  cusps[2] = cusp2
+  cusps[3] = cusp3
 
   computeOpposites(cusps)
 }
@@ -236,29 +251,32 @@ function housesPlacidus(
  * @param fi     geographic latitude (degrees)
  * @param sine   sin(obliquity)
  * @param cose   cos(obliquity)
- * @param offset base ARMC offset (30, 60, 120, 150)
- * @param frac   fraction of semi-arc (1/3 or 2/3)
- * @param sign   +1 for diurnal (cusps 11,12), -1 for nocturnal (cusps 2,3)
+ * @param offset      base ARMC offset (30, 60, 120, 150)
+ * @param initialPole first approximation of the house-circle pole height
+ * @param divisor     semi-arc divisor (3 for one third, 1.5 for two thirds)
  */
 function placidusIter(
   th: number, fi: number,
   sine: number, cose: number,
-  offset: number, frac: number, sign: number,
-): number {
-  let x = Asc1(th + offset, fi, sine, cose)
-  for (let iter = 0; iter < 100; iter++) {
-    // Declination of ecliptic point x
-    const dec = asind(clamp1(sind(x) * sine))
-    // Ascensional difference of point x at latitude fi
-    const ad = asind(clamp1(tand(dec) * tand(fi)))
-    // New ARMC offset adjusted by fraction of ascensional difference
-    const xNew = Asc1(th + offset + sign * ad * frac, fi, sine, cose)
-    if (Math.abs(xNew - x) < VERY_SMALL) {
-      return xNew
+  offset: number, initialPole: number, divisor: number,
+): number | null {
+  const rectasc = degnorm(th + offset)
+  const tanfi = tand(fi)
+  let cusp = Asc1(rectasc, initialPole, sine, cose)
+
+  for (let iter = 0; iter < PLACIDUS_MAX_ITERATIONS; iter++) {
+    const tant = tand(asind(clamp1(sine * sind(cusp))))
+    if (Math.abs(tant) < VERY_SMALL) return rectasc
+
+    const pole = atand(sind(asind(clamp1(tanfi * tant)) / divisor) / tant)
+    const next = Asc1(rectasc, pole, sine, cose)
+    if (iter > 0 && Math.abs(difdeg2n(next, cusp)) < PLACIDUS_CONVERGENCE) {
+      return next
     }
-    x = xNew
+    cusp = next
   }
-  return x
+
+  return null
 }
 
 /** Koch (K) */

@@ -82,6 +82,25 @@ describe('calculateNatal', () => {
     expect(chart.planets).toHaveLength(14) // 10 planets + Chiron + NorthNode + SouthNode + Fortuna
   })
 
+  it('matches Swiss Ephemeris Placidus cusps and derived house assignments', async () => {
+    const chart = await calculateNatal(makeInput(NATAL_FIXTURES[0]))
+    const expectedCusps = [
+      55.89525, 81.57021, 103.16844, 125.66551, 153.45364, 191.21491,
+      235.89525, 261.57021, 283.16844, 305.66551, 333.45364, 11.21491,
+    ]
+
+    expect(chart.houses.map(house => house.cuspLongitude)).toEqual(
+      expectedCusps.map(cusp => expect.closeTo(cusp, 4)),
+    )
+    expect(Object.fromEntries(chart.planets.map(planet => [planet.id, planet.house]))).toMatchObject({
+      Jupiter: 6,
+      Saturn: 10,
+      NorthNode: 7,
+      SouthNode: 1,
+      Fortuna: 9,
+    })
+  })
+
   it('Fortuna = ASC + Moon - Sun (day) or ASC + Sun - Moon (night)', async () => {
     const chart = await calculateNatal(makeInput(NATAL_FIXTURES[0]))
     const fortuna = chart.planets.find(p => p.id === 'Fortuna')!
