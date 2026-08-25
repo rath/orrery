@@ -426,11 +426,13 @@ export function getDaewoon(
   // 절기 시간 계산
   const terms = calcSolarTerms(year, month, day, hour, minute);
 
+  // These are astrological civil timestamps, not instants in the host machine's
+  // timezone. UTC fields keep the arithmetic identical across process TZ/DST rules.
   const d0 = order
-    ? new Date(terms.outgiYear, terms.outgiMonth - 1, terms.outgiDay, terms.outgiHour, terms.outgiMin)
-    : new Date(terms.ingiYear, terms.ingiMonth - 1, terms.ingiDay, terms.ingiHour, terms.ingiMin);
+    ? new Date(Date.UTC(terms.outgiYear, terms.outgiMonth - 1, terms.outgiDay, terms.outgiHour, terms.outgiMin))
+    : new Date(Date.UTC(terms.ingiYear, terms.ingiMonth - 1, terms.ingiDay, terms.ingiHour, terms.ingiMin));
 
-  const birth = new Date(year, month - 1, day, hour, minute);
+  const birth = new Date(Date.UTC(year, month - 1, day, hour, minute));
   const diff = birth.getTime() - d0.getTime();
   const secondsToFirst = Math.abs(diff / 1000 * 365.242196 / 3.0);
 
@@ -449,7 +451,7 @@ export function getDaewoon(
 
     // 다음 대운은 10년 후
     nextDate = new Date(nextDate);
-    nextDate.setFullYear(nextDate.getFullYear() + 10);
+    nextDate.setUTCFullYear(nextDate.getUTCFullYear() + 10);
   }
 
   return ret;

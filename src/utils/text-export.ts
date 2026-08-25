@@ -141,7 +141,7 @@ export function sajuToText(result: SajuResult, locale?: Locale): string {
     lines.push('─────')
     for (const dw of daewoon) {
       const gmMark = dw.isGongmang ? ' 空' : ''
-      lines.push(`${String(dw.index).padStart(2)}運 (${String(dw.age).padStart(2)}${t('saju.ageSuffix')})  ${fmt2(dw.stemSipsin)}  ${dw.ganzi}  ${fmt2(dw.branchSipsin)}  (${dw.startDate.getFullYear()}年)${gmMark}`)
+      lines.push(`${String(dw.index).padStart(2)}運 (${String(dw.age).padStart(2)}${t('saju.ageSuffix')})  ${fmt2(dw.stemSipsin)}  ${dw.ganzi}  ${fmt2(dw.branchSipsin)}  (${dw.startDate.getUTCFullYear()}年)${gmMark}`)
     }
   }
 

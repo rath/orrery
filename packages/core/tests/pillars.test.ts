@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getFourPillars } from '../src/pillars.ts'
+import { getDaewoon, getFourPillars } from '../src/pillars.ts'
 import { calculateSaju } from '../src/saju.ts'
 import { adjustBirthInputToKstWallClock, adjustBirthInputToSolarTime } from '../src/timezone.ts'
 import { PILLAR_FIXTURES } from './fixtures.ts'
@@ -98,6 +98,26 @@ describe('unknown birth time', () => {
     expect(morning.specialSals).toEqual(lateNight.specialSals)
     expect(morning.gongmang).toEqual(lateNight.gongmang)
     expect(morning.jwabeop).toEqual(lateNight.jwabeop)
+  })
+})
+
+describe('daewoon dates', () => {
+  it('stores astrological civil dates in UTC fields for timezone-independent arithmetic', () => {
+    const daewoon = getDaewoon(false, 1990, 4, 1, 12, 0)
+
+    expect(daewoon[0]).toMatchObject({
+      ganzi: '戊寅',
+      startDate: new Date('1999-01-04T00:06:48.000Z'),
+    })
+    expect(daewoon.map(item => item.startDate.getUTCFullYear())).toEqual([
+      1999, 2009, 2019, 2029, 2039, 2049, 2059, 2069, 2079, 2089,
+    ])
+
+    const result = calculateSaju({
+      year: 1990, month: 4, day: 1, hour: 12, minute: 0,
+      gender: 'F', timezone: 'Asia/Seoul',
+    })
+    expect(result.daewoon[0].age).toBe(9)
   })
 })
 

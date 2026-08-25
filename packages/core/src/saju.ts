@@ -121,7 +121,7 @@ export function calculateSaju(input: BirthInput): SajuResult {
   };
 
   const daewoon: DaewoonItem[] = rawDaewoon.map((dw, i) => {
-    const age = dw.startDate.getFullYear() - year;
+    const age = dw.startDate.getUTCFullYear() - year;
     const dwStem = dw.ganzi[0];
     const dwBranch = dw.ganzi[1];
     const dwStemSipsin = getSipsin(dayStem, dwStem);

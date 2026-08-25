@@ -111,9 +111,9 @@ export default function DaewoonTable({
   const sewoonItems = useMemo(() => {
     if (selectedIdx < 0) return []
     const dw = daewoon[selectedIdx]
-    const startYear = dw.startDate.getFullYear()
+    const startYear = dw.startDate.getUTCFullYear()
     const endYear = selectedIdx + 1 < daewoon.length
-      ? daewoon[selectedIdx + 1].startDate.getFullYear()
+      ? daewoon[selectedIdx + 1].startDate.getUTCFullYear()
       : startYear + 10
     return buildSewoonItems(startYear, endYear, birthYear, dayStem, yearBranch, gmSet)
   }, [selectedIdx, daewoon, birthYear, dayStem, yearBranch, gmSet])
