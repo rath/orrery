@@ -16,7 +16,17 @@ interface Props {
 export default function ZiweiView({ input }: Props) {
   const { t } = useLocale()
 
-  if (input.unknownTime) {
+  const chart = useMemo(
+    () => input.unknownTime
+      ? null
+      : createChart(
+          input.year, input.month, input.day,
+          input.hour, input.minute, input.gender === 'M', input.timezone, input.longitude,
+        ),
+    [input],
+  )
+
+  if (input.unknownTime || !chart) {
     return (
       <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
         <p className="text-base text-amber-800 dark:text-amber-300 font-medium">
@@ -28,14 +38,6 @@ export default function ZiweiView({ input }: Props) {
       </div>
     )
   }
-
-  const chart = useMemo(
-    () => createChart(
-      input.year, input.month, input.day,
-      input.hour, input.minute, input.gender === 'M', input.timezone, input.longitude,
-    ),
-    [input],
-  )
 
   return (
     <div className="space-y-6">
