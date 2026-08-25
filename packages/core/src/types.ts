@@ -65,11 +65,11 @@ export interface Spirit {
 
 /** 사주 하나의 주 (柱) */
 export interface Pillar {
-  /** 60갑자 문자열 (예: '甲子') */
+  /** 60갑자 문자열 (예: '甲子'). 시간 미상 시주는 '??' */
   ganzi: string;
-  /** 천간 */
+  /** 천간. 시간 미상 시주는 '?' */
   stem: string;
-  /** 지지 */
+  /** 지지. 시간 미상 시주는 '?' */
   branch: string;
 }
 
@@ -92,6 +92,7 @@ export interface PillarDetail {
 export interface DaewoonItem {
   index: number;
   ganzi: string;
+  /** 실행 타임존과 무관한 역학상 벽시계 날짜. 달력 필드는 UTC getter로 조회 */
   startDate: Date;
   age: number;
   stemSipsin: string;

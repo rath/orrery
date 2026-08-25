@@ -50,7 +50,8 @@ for (const p of result.pillars) {
 
 // 대운
 for (const dw of result.daewoon) {
-  console.log(`${dw.ganzi} (${dw.age}세~)`)
+  const startYear = dw.startDate.getUTCFullYear()
+  console.log(`${dw.ganzi} (${dw.age}세~, ${startYear}년 시작)`)
 }
 
 // 간지 관계 (합, 충, 형, 파, 해)
@@ -58,6 +59,12 @@ for (const [key, pair] of result.relations.pairs) {
   console.log(key, pair.stem, pair.branch)
 }
 ```
+
+### 시간 미상과 타임존
+
+- `unknownTime: true`이면 `hour`와 `minute`은 무시됩니다. `result.pillars[0]`의 간지·천간·지지는 각각 `'??'`, `'?'`, `'?'`이며, 시주는 관계·신살·공망·좌법·트랜짓 분석에서 제외됩니다.
+- `timezone`을 생략하면 `Asia/Seoul`로 처리됩니다. 한국 외 출생지는 반드시 IANA 타임존 ID와 `longitude`를 지정하고, 서양 점성술 하우스 계산에는 `latitude`도 지정하세요.
+- 대운의 `startDate`는 실행 환경의 타임존과 무관한 역학상 벽시계 날짜를 UTC 필드에 저장합니다. 연·월·일을 읽을 때는 `getUTCFullYear()`, `getUTCMonth()`, `getUTCDate()`를 사용하세요.
 
 ### 자미두수 (紫微斗數)
 

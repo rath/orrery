@@ -50,7 +50,8 @@ for (const p of result.pillars) {
 
 // 大運 (Major Life Periods)
 for (const dw of result.daewoon) {
-  console.log(`${dw.ganzi} (age ${dw.age}~)`)
+  const startYear = dw.startDate.getUTCFullYear()
+  console.log(`${dw.ganzi} (age ${dw.age}~, starts in ${startYear})`)
 }
 
 // Stem-Branch Interactions (合, 沖, 刑, 破, 害)
@@ -58,6 +59,12 @@ for (const [key, pair] of result.relations.pairs) {
   console.log(key, pair.stem, pair.branch)
 }
 ```
+
+### Unknown birth times and time zones
+
+- When `unknownTime: true`, `hour` and `minute` are ignored. The Gan-Zhi, stem, and branch of `result.pillars[0]` are `'??'`, `'?'`, and `'?'`; the hour pillar is excluded from relation, special-sal, Gongmang, Jwabeop, and transit analysis.
+- Omitting `timezone` falls back to `Asia/Seoul`. For births outside Korea, always provide an IANA time-zone ID and `longitude`; also provide `latitude` when calculating Western astrology houses.
+- A 大運 `startDate` stores an astrological civil date in UTC fields so that it is independent of the runtime time zone. Read its calendar fields with `getUTCFullYear()`, `getUTCMonth()`, and `getUTCDate()`.
 
 ### 紫微斗數 (Purple Star Astrology)
 

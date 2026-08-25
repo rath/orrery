@@ -50,7 +50,8 @@ for (const p of result.pillars) {
 
 // 大運
 for (const dw of result.daewoon) {
-  console.log(`${dw.ganzi} (${dw.age}세~)`)
+  const startYear = dw.startDate.getUTCFullYear()
+  console.log(`${dw.ganzi} (${dw.age}歳〜、${startYear}年開始)`)
 }
 
 // 干支関係（合、沖、刑、破、害）
@@ -58,6 +59,12 @@ for (const [key, pair] of result.relations.pairs) {
   console.log(key, pair.stem, pair.branch)
 }
 ```
+
+### 出生時刻不明とタイムゾーン
+
+- `unknownTime: true` の場合、`hour` と `minute` は無視されます。`result.pillars[0]` の干支・天干・地支はそれぞれ `'??'`・`'?'`・`'?'` となり、時柱は干支関係・神煞・空亡・坐法・トランジット分析から除外されます。
+- `timezone` を省略すると `Asia/Seoul` が使用されます。韓国以外の出生地では IANA タイムゾーン ID と `longitude` を必ず指定し、西洋占星術のハウス計算では `latitude` も指定してください。
+- 大運の `startDate` は、実行環境のタイムゾーンに依存しない命理上の壁時計日付を UTC フィールドに保存します。年月日の取得には `getUTCFullYear()`・`getUTCMonth()`・`getUTCDate()` を使用してください。
 
 ### 紫微斗數
 

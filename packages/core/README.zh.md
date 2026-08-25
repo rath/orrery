@@ -50,7 +50,8 @@ for (const p of result.pillars) {
 
 // 大運
 for (const dw of result.daewoon) {
-  console.log(`${dw.ganzi} (${dw.age}세~)`)
+  const startYear = dw.startDate.getUTCFullYear()
+  console.log(`${dw.ganzi} (${dw.age}岁起，${startYear}年开始)`)
 }
 
 // 干支关系（合、冲、刑、破、害）
@@ -58,6 +59,12 @@ for (const [key, pair] of result.relations.pairs) {
   console.log(key, pair.stem, pair.branch)
 }
 ```
+
+### 出生时间不详与时区
+
+- 设置 `unknownTime: true` 时，`hour` 和 `minute` 会被忽略。`result.pillars[0]` 的干支、天干、地支分别为 `'??'`、`'?'`、`'?'`，时柱不会参与干支关系、神煞、空亡、坐法和流运分析。
+- 省略 `timezone` 时默认使用 `Asia/Seoul`。韩国以外的出生地点必须指定 IANA 时区 ID 和 `longitude`；计算西洋占星宫位时还应指定 `latitude`。
+- 大運的 `startDate` 使用 UTC 字段保存与运行环境时区无关的命理壁钟日期。读取年月日时请使用 `getUTCFullYear()`、`getUTCMonth()` 和 `getUTCDate()`。
 
 ### 紫微斗數
 

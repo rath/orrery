@@ -410,7 +410,7 @@ export function getFourPillars(
 // 대운 계산
 // =============================================
 
-/** 대운 10개 계산 */
+/** 대운 10개 계산. startDate의 역학상 벽시계 날짜는 UTC 필드에 저장된다. */
 export function getDaewoon(
   isMale: boolean,
   year: number, month: number, day: number, hour: number, minute: number,
