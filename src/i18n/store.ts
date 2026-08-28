@@ -1,22 +1,63 @@
-export type Locale = 'ko' | 'zh' | 'ja' | 'en'
+/** Single source of truth for supported locales (order = display order in the language menu). */
+export const LOCALES = [
+  { code: 'ko', short: '한', name: '한국어' },
+  { code: 'zh', short: '中', name: '中文' },
+  { code: 'ja', short: '日', name: '日本語' },
+  { code: 'en', short: 'EN', name: 'English' },
+  { code: 'de', short: 'DE', name: 'Deutsch' },
+  { code: 'es', short: 'ES', name: 'Español' },
+] as const
+
+export type Locale = (typeof LOCALES)[number]['code']
+
+export const DEFAULT_LOCALE: Locale = 'en'
 
 const STORAGE_KEY = 'orrery-locale'
-const VALID: Set<string> = new Set(['ko', 'zh', 'ja', 'en'])
+const VALID = new Set<string>(LOCALES.map(l => l.code))
+
+function isLocale(v: string | null | undefined): v is Locale {
+  return v != null && VALID.has(v)
+}
 
 function detectBrowserLocale(): Locale {
-  for (const lang of navigator.languages ?? [navigator.language]) {
+  if (typeof navigator === 'undefined') return DEFAULT_LOCALE
+  const candidates = navigator.languages?.length ? navigator.languages : [navigator.language]
+  for (const lang of candidates) {
+    if (typeof lang !== 'string') continue
     const code = lang.split('-')[0].toLowerCase()
-    if (VALID.has(code)) return code as Locale
+    if (isLocale(code)) return code
   }
-  return 'en'
+  return DEFAULT_LOCALE
 }
 
-function getStored(): Locale {
-  const v = localStorage.getItem(STORAGE_KEY)
-  return v && VALID.has(v) ? (v as Locale) : detectBrowserLocale()
+function readStored(): string | null {
+  try {
+    return typeof localStorage === 'undefined' ? null : localStorage.getItem(STORAGE_KEY)
+  } catch {
+    return null
+  }
 }
 
-let currentLocale: Locale = getStored()
+function writeStored(locale: Locale): void {
+  try {
+    if (typeof localStorage !== 'undefined') localStorage.setItem(STORAGE_KEY, locale)
+  } catch {
+    // Storage unavailable (private mode, quota, disabled) — the in-memory value still applies.
+  }
+}
+
+function applyDocumentLang(locale: Locale): void {
+  if (typeof document !== 'undefined') document.documentElement.lang = locale
+}
+
+function getInitial(): Locale {
+  const stored = readStored()
+  return isLocale(stored) ? stored : detectBrowserLocale()
+}
+
+let currentLocale: Locale = getInitial()
+applyDocumentLang(currentLocale)
+
 const listeners = new Set<() => void>()
 
 export const localeStore = {
@@ -26,8 +67,10 @@ export const localeStore = {
     return () => { listeners.delete(listener) }
   },
   setLocale: (locale: Locale) => {
+    if (locale === currentLocale) return
     currentLocale = locale
-    localStorage.setItem(STORAGE_KEY, locale)
+    writeStored(locale)
+    applyDocumentLang(locale)
     listeners.forEach(l => l())
   },
 }

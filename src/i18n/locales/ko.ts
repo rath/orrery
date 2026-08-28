@@ -56,6 +56,12 @@ const ko: Record<string, string> = {
   'theme.light': '라이트 모드',
   'theme.dark': '다크 모드',
 
+  // LanguageMenu
+  'lang.select': '언어 선택',
+
+  // Date formats ({m} = month, {d} = day)
+  'date.monthDay': '{m}월 {d}일',
+
   // CityCombobox
   'city.noResults': '검색 결과 없음',
   'city.korea': '한국',

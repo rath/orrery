@@ -5,7 +5,7 @@ import ProfileModal from './ProfileModal.tsx'
 import Guide from './Guide.tsx'
 import CopyButton from './CopyButton.tsx'
 import ThemeToggle from './ThemeToggle.tsx'
-import LanguageToggle from './LanguageToggle.tsx'
+import LanguageMenu from './LanguageMenu.tsx'
 import { useLocale } from '../i18n/index.ts'
 import SajuView from './saju/SajuView.tsx'
 import ZiweiView from './ziwei/ZiweiView.tsx'
@@ -41,7 +41,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 relative">
       <ThemeToggle />
-      <LanguageToggle />
+      <LanguageMenu />
       <a
         href="https://github.com/rath/orrery"
         target="_blank"

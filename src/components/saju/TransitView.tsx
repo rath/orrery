@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function TransitView({ natalPillars }: Props) {
-  const { t, locale } = useLocale()
+  const { t } = useLocale()
   const [months, setMonths] = useState(1)
   const [backward, setBackward] = useState(false)
 
@@ -53,7 +53,7 @@ export default function TransitView({ natalPillars }: Props) {
             const date = tr.date
             const mm = String(date.getMonth() + 1).padStart(2, ' ')
             const dd = String(date.getDate()).padStart(2, ' ')
-            const dateStr = locale === 'en' ? `${mm}/${dd}` : `${mm}${t('form.monthSuffix')} ${dd}${t('form.daySuffix')}`
+            const dateStr = t('date.monthDay').replace('{m}', mm).replace('{d}', dd)
             const prefixMap: Record<string, string> = { '천간': t('transit.stem'), '지지': t('transit.branch') }
             const relStrs = tr.relations.map(r => `${prefixMap[r.prefix] ?? r.prefix}${formatRelation(r.relation)}`)
 

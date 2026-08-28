@@ -89,10 +89,10 @@ Python에서 TypeScript로 포팅 시 주의:
 
 ## i18n (다국어)
 
-4개 언어 지원: 한국어(ko), 중국어(zh), 일본어(ja), 영어(en).
+6개 언어 지원: 한국어(ko), 중국어(zh), 일본어(ja), 영어(en), 독일어(de), 스페인어(es).
 
-- 번역 파일: `src/i18n/locales/{ko,zh,ja,en}.ts` — 플랫 딕셔너리 (`Record<string, string>`)
-- 스토어: `src/i18n/store.ts` — `useSyncExternalStore` 기반, localStorage 키 `orrery-locale`
+- 번역 파일: `src/i18n/locales/{ko,zh,ja,en,de,es}.ts` — 플랫 딕셔너리 (`Record<string, string>`)
+- 스토어: `src/i18n/store.ts` — `useSyncExternalStore` 기반, localStorage 키 `orrery-locale`. 지원 로케일 목록의 단일 출처는 `LOCALES` 상수(코드·약어·자국어 이름)이며 `Locale` 타입도 여기서 파생
 - Hook: `src/i18n/index.ts` — `useLocale()` → `{ locale, setLocale, t }`
 - 컴포넌트에서 사용: `const { t } = useLocale()` 후 `t('key.name')`
 
@@ -100,7 +100,7 @@ Python에서 TypeScript로 포팅 시 주의:
 - UI에 한국어 문자열을 하드코딩하지 말 것. 반드시 `t('key')` 사용
 - 한자 전문용어(四柱八字, 十神, 空亡, 大運, 天干, 地支 등)는 번역하지 않고 모든 언어에서 그대로 사용
 - '혼천의(渾天儀)' 앱 제목은 번역하지 않음 (고정값)
-- 새 문자열 추가 시 4개 언어 파일 모두에 키를 추가할 것
+- 새 문자열 추가 시 6개 언어 파일 모두에 키를 추가할 것 (`src/i18n/locales.test.ts`가 키 집합 일치를 검증)
 - 브라우저 언어 자동 감지, 폴백은 영어(en)
 
 ## @orrery/core 사용 시 주의

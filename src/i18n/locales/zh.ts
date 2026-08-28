@@ -56,6 +56,12 @@ const zh: Record<string, string> = {
   'theme.light': '浅色模式',
   'theme.dark': '深色模式',
 
+  // LanguageMenu
+  'lang.select': '选择语言',
+
+  // Date formats ({m} = month, {d} = day)
+  'date.monthDay': '{m}月 {d}日',
+
   // CityCombobox
   'city.noResults': '无搜索结果',
   'city.korea': '韩国',

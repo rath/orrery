@@ -56,6 +56,12 @@ const ja: Record<string, string> = {
   'theme.light': 'ライトモード',
   'theme.dark': 'ダークモード',
 
+  // LanguageMenu
+  'lang.select': '言語を選択',
+
+  // Date formats ({m} = month, {d} = day)
+  'date.monthDay': '{m}月 {d}日',
+
   // CityCombobox
   'city.noResults': '検索結果なし',
   'city.korea': '韓国',
