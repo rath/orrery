@@ -30,7 +30,7 @@
     },
     "packages/core": {
       "name": "@orrery/core",
-      "version": "0.4.2",
+      "version": "0.4.5",
       "dependencies": {
         "lunar-javascript": "^1.7.7",
       },
