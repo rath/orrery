@@ -2,21 +2,21 @@
 
 # @orrery/core
 
-可在浏览器和 Node.js 环境下运行的东方与西方命理计算引擎。
+可在浏览器和 Node.js 环境中运行的东西方命理计算引擎。
 
-- **四柱八字** — 六十甲子、十神、十二运星、十二神煞、大運、干支关系分析
-- **紫微斗數** — 命盤生成、大限、流年/流月分析
-- **西方占星术出生星盘（Natal Chart）** — 行星位置、宫位、四轴、相位（纯 TypeScript）
+- **四柱八字** — 六十甲子、十神、十二长生、神煞与十二神煞、空亡、大运、干支关系分析
+- **紫微斗数** — 命盘生成、大限、流年/流月分析
+- **西方占星出生星盘（Natal Chart）** — 行星位置、宫位、四轴、相位、福点（纯 TypeScript）
 
-无需后端。所有计算均在客户端完成。
+无需后端，所有计算均在客户端完成。
 
 **[在线演示 →](https://sky.told.me/)**
 
 ## 致谢
 
-- **四柱万年历** — 由고영창（Ko Young-chang）编写的 Perl [真万年历](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)，经김정균（Kim Jeong-gyun）[移植为 PHP](https://github.com/OOPS-ORG-PHP/Lunar)，2018年11月황장호（Hwang Jang-ho）将其移植为 Java 和 Python 并一直使用，2026年2月使用 Claude Code（Opus 4.6）移植为 TypeScript
-- **紫微斗數命盤** — 基于 [lunar-javascript](https://www.npmjs.com/package/lunar-javascript) 库，由 Claude（Opus 4.5）研究中文文献后实现
-- **占星术出生星盘** — 将 [Swiss Ephemeris](https://www.astro.com/swisseph/) 的 Moshier 星历表移植为纯 TypeScript
+- **四柱万年历** — 고영창（Ko Young-chang）用 Perl 编写了[真万年历](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)，김정균（Kim Jeong-gyun）将其[移植到 PHP](https://github.com/OOPS-ORG-PHP/Lunar)；2018年11月，황장호（Hwang Jang-ho）又将其移植到 Java 和 Python 自用，2026年2月借助 Claude Code（Opus 4.6）移植到 TypeScript
+- **紫微斗数命盘** — 由 Claude（Opus 4.5）参考中文文献，基于 [lunar-javascript](https://www.npmjs.com/package/lunar-javascript) 库实现
+- **占星出生星盘** — 将 [Swiss Ephemeris](https://www.astro.com/swisseph/) 的 Moshier 星历移植为纯 TypeScript
 
 ## 安装
 
@@ -45,10 +45,10 @@ for (const p of result.pillars) {
   console.log(p.pillar.ganzi)     // '乙巳', '壬辰', '乙卯', '癸酉'
   console.log(p.stemSipsin)       // 天干十神
   console.log(p.branchSipsin)     // 地支十神
-  console.log(p.unseong)          // 十二运星
+  console.log(p.unseong)          // 十二长生
 }
 
-// 大運
+// 大运
 for (const dw of result.daewoon) {
   const startYear = dw.startDate.getUTCFullYear()
   console.log(`${dw.ganzi} (${dw.age}岁起，${startYear}年开始)`)
@@ -62,20 +62,21 @@ for (const [key, pair] of result.relations.pairs) {
 
 ### 出生时间不详与时区
 
-- 设置 `unknownTime: true` 时，`hour` 和 `minute` 会被忽略。`result.pillars[0]` 的干支、天干、地支分别为 `'??'`、`'?'`、`'?'`，时柱不会参与干支关系、神煞、空亡、坐法和流运分析。
-- 省略 `timezone` 时默认使用 `Asia/Seoul`。韩国以外的出生地点必须指定 IANA 时区 ID 和 `longitude`；计算西洋占星宫位时还应指定 `latitude`。
-- 大運的 `startDate` 使用 UTC 字段保存与运行环境时区无关的命理壁钟日期。读取年月日时请使用 `getUTCFullYear()`、`getUTCMonth()` 和 `getUTCDate()`。
+- 设置 `unknownTime: true` 时，`hour` 和 `minute` 会被忽略，并按正午（12:00）计算，因此大运起运时间可能有数月误差。`result.pillars[0]` 的干支、天干、地支分别为 `'??'`、`'?'`、`'?'`，时柱不参与干支关系、神煞、空亡、坐法和流运分析。`calculateNatal()` 不计算宫位、四轴和福点（`houses` 为空数组，`angles` 为 `null`）。
+- 省略 `timezone` 时默认使用 `Asia/Seoul`。出生地在韩国以外时，必须指定 IANA 时区 ID 和 `longitude`；计算西方占星宫位时还需指定 `latitude`。紫微斗数的 `createChart()` 不接收 `BirthInput`，而是接收逐个参数，请通过第 7、8 个参数传入 `timezone` 和 `longitude`。
+- 大运的 `startDate` 把命理计算所用的当地日期存放在 UTC 字段中，因此不受运行环境时区的影响。读取年月日时请使用 `getUTCFullYear()`、`getUTCMonth()` 和 `getUTCDate()`。
 
-### 紫微斗數
+### 紫微斗数
 
 ```typescript
 import { createChart, calculateLiunian, getDaxianIndex, getDaxianList } from '@orrery/core/ziwei'
 
-// 生成命盤
+// 生成命盘（公历年、月、日、时、分，是否为男性）
+// 海外出生：createChart(1993, 3, 12, 9, 45, true, 'America/New_York', -74.006)
 const chart = createChart(1993, 3, 12, 9, 45, true)
 
-console.log(chart.mingGongZhi)     // 命宮地支
-console.log(chart.shenGongZhi)     // 身宮地支
+console.log(chart.mingGongZhi)     // 命宫地支
+console.log(chart.shenGongZhi)     // 身宫地支
 console.log(chart.wuXingJu.name)   // 五行局（例：'水二局'）
 
 // 查看各宫位的星曜
@@ -90,17 +91,17 @@ for (const [name, palace] of Object.entries(chart.palaces)) {
 // 大限
 const daxianList = getDaxianList(chart)
 for (const dx of daxianList) {
-  console.log(`${dx.ageStart}~${dx.ageEnd}세: ${dx.palaceName} ${dx.ganZhi}`)
+  console.log(`${dx.ageStart}~${dx.ageEnd}岁: ${dx.palaceName} ${dx.ganZhi}`)
 }
 const currentDaxianIndex = getDaxianIndex(chart, new Date().getFullYear())
 
 // 流年 — 特定年份的运势
 const liunian = calculateLiunian(chart, 2026)
-console.log(liunian.natalPalaceAtMing) // 流年命宮所在的本命盤宫位
+console.log(liunian.natalPalaceAtMing) // 流年命宫所在的本命盘宫位
 console.log(liunian.siHua)             // 流年四化
 ```
 
-### 西方占星术（Natal Chart）
+### 西方占星（Natal Chart）
 
 ```typescript
 import { calculateNatal } from '@orrery/core/natal'
@@ -119,12 +120,14 @@ const chart = await calculateNatal(input)
 // 行星位置
 for (const planet of chart.planets) {
   console.log(`${planet.id}: ${planet.sign} ${planet.degreeInSign.toFixed(1)}°`)
-  // 'Sun: Pisces 21.6°'
+  // 'Sun: Pisces 21.5°'
 }
 
-// ASC / MC
-console.log(`ASC: ${chart.angles.asc.sign}`)
-console.log(`MC: ${chart.angles.mc.sign}`)
+// ASC / MC（出生时间不详时 angles 为 null）
+if (chart.angles) {
+  console.log(`ASC: ${chart.angles.asc.sign}`)
+  console.log(`MC: ${chart.angles.mc.sign}`)
+}
 
 // 宫位（默认：Placidus）
 for (const house of chart.houses) {
@@ -136,7 +139,7 @@ for (const aspect of chart.aspects) {
   console.log(`${aspect.planet1} ${aspect.type} ${aspect.planet2} (orb: ${aspect.orb.toFixed(1)}°)`)
 }
 
-// 更改宫位系统（Koch）
+// 更改宫位制（Koch）
 const kochChart = await calculateNatal(input, 'K')
 ```
 
@@ -149,8 +152,8 @@ import { getFourPillars, getDaewoon, getRelation } from '@orrery/core/pillars'
 import { STEM_INFO, ELEMENT_HANJA } from '@orrery/core/constants'
 
 // 仅计算四柱
-const [년주, 월주, 일주, 시주] = getFourPillars(1993, 3, 12, 9, 45)
-console.log(년주, 월주, 일주, 시주) // '癸酉', '乙卯', '壬辰', '乙巳'
+const [yearPillar, monthPillar, dayPillar, hourPillar] = getFourPillars(1993, 3, 12, 9, 45)
+console.log(yearPillar, monthPillar, dayPillar, hourPillar) // '癸酉', '乙卯', '壬辰', '乙巳'
 
 // 十神关系
 const relation = getRelation('壬', '乙')
@@ -163,34 +166,50 @@ console.log(ELEMENT_HANJA['water']) // '水'
 
 ### 城市数据
 
-提供韩国及世界主要城市数据，可用于出生地点输入：
+提供韩国及世界主要城市数据，可用于输入出生地点：
 
 ```typescript
 import { SEOUL, filterCities, formatCityName } from '@orrery/core/cities'
 
-console.log(SEOUL) // { name: '서울', lat: 37.5665, lon: 126.9780 }
+console.log(SEOUL) // { name: '서울', region: '서울특별시', lat: 37.5665, lon: 126.978 }
 
-// 支持韩语初声搜索
-const results = filterCities('ㅂㅅ')  // 匹配 '부산'
+// 支持韩文初声检索
+const results = filterCities('ㅂㅅ')  // 匹配 '부산'（釜山）
 console.log(formatCityName(results[0])) // '부산'
 ```
 
+## 计算规则
+
+输入日期必须是公元 1–9999 年之间的有效公历日期。不过，出生星盘只能计算 Chiron 表覆盖的约 1900–2100 年，超出此范围时 `calculateNatal()` 会抛出错误。
+
+### 四柱八字
+
+年柱、月柱的判定以及大运起运，均使用 `lunar-javascript` 计算的天文节气交接时刻（换算为 UTC）。韩国出生（`timezone` 为 `Asia/Seoul` 或省略）时，先将夏令时等韩国标准时间的历史偏差统一为 KST 钟表时间，再按韩国八字惯例把时柱边界推迟 30 分钟（子时为 23:30~01:30）。海外出生使用经过经度和均时差校正的真太阳时，不再加 30 分钟修正。
+
+### 紫微斗数
+
+以农历新年为年份分界，以午夜（00:00）为日期分界。闰月整月按其所闰的农历月处理，不采用将闰月分为前后两半的流派规则。流月命宫依据反映生月、生时的斗君确定，大限年龄采用以农历出生年为 1 岁的虚岁。计算结果已与设置为 `dayDivide: 'current'`、`yearDivide: 'normal'`、`fixLeap: false` 的 [iztro](https://github.com/SylarLong/iztro) 进行对照验证。
+
+### 出生星盘
+
+福点（Fortuna）的日夜盘判定不依据宫位编号，而依据太阳中心的几何高度（不计大气折射）。因此，对于宫位边界与地平线不一致的 Whole Sign、Morinus，以及极地地区，同样采用这一地平线标准。在无法计算 Placidus、Koch 的极地地区，会改用 Porphyrius，实际采用的宫位制记录在 `chart.houseSystem` 中。
+
 ## 运行示例
 
-克隆仓库后可以直接运行示例脚本：
+克隆仓库后可以直接运行示例脚本（输出为韩文）：
 
 ```bash
 git clone https://github.com/rath/orrery.git
 cd orrery
 bun install
 
-# 사주팔자
+# 四柱八字
 bun packages/core/examples/saju.ts
 
-# 자미두수
+# 紫微斗数
 bun packages/core/examples/ziwei.ts
 
-# 서양 점성술 출생차트
+# 西方占星出生星盘
 bun packages/core/examples/natal.ts
 ```
 
@@ -200,26 +219,28 @@ bun packages/core/examples/natal.ts
 
 | 路径 | 说明 |
 |------|------|
-| `@orrery/core` | 完整 barrel export |
+| `@orrery/core` | 汇总导出主要 API（不含 `validation`） |
 | `@orrery/core/saju` | `calculateSaju()` |
 | `@orrery/core/ziwei` | `createChart()`, `calculateLiunian()`, `getDaxianIndex()`, `getDaxianList()` |
-| `@orrery/core/natal` | `calculateNatal()`、星座/行星符号、格式化函数 |
+| `@orrery/core/natal` | `calculateNatal()`、`HOUSE_SYSTEMS`、星座/行星符号、格式化函数 |
+| `@orrery/core/timezone` | `resolveLocalDateTimeToUtc()`、`getBirthTimezone()` 等时区/夏令时工具 |
 | `@orrery/core/pillars` | `getFourPillars()`, `getDaewoon()` 等底层 API |
 | `@orrery/core/types` | 所有 TypeScript 类型/接口 |
 | `@orrery/core/constants` | 天干/地支、十神、宫位名等常量表 |
 | `@orrery/core/cities` | 城市数据、搜索函数 |
+| `@orrery/core/validation` | `assertBirthInput()` 等输入校验 |
 
 ## 依赖
 
 | 包名 | 类型 | 用途 |
 |------|------|------|
-| `lunar-javascript` | dependency | 阴历转换（紫微斗數） |
+| `lunar-javascript` | dependency | 农历转换（紫微斗数）、节气交接时刻（四柱八字） |
 
-所有功能均以纯 TypeScript 运行，无需外部 WASM 或数据文件依赖。
+所有功能均以纯 TypeScript 运行，无需外部 WASM 或数据文件。
 
 ## 许可证
 
-[AGPL-3.0](../../LICENSE)
+[AGPL-3.0](https://github.com/rath/orrery/blob/main/LICENSE)
 
 <details>
 <summary>什么是 AGPL-3.0？（简单说明）</summary>
@@ -230,20 +251,20 @@ bun packages/core/examples/natal.ts
 - **阅读和学习源代码** — 随时欢迎通过阅读代码来学习。
 - **修改、改进后再分发** — 你可以修改代码后重新分发，但必须遵守以下条件。
 
-### 你必须遵守的
+### 你必须做到
 
-- **保持相同许可证（AGPL-3.0）** — 修改或包含此代码进行分发时，衍生作品也必须以 AGPL-3.0 公开。
-- **公开源代码** — 与普通 GPL 不同，AGPL 要求**即使作为网络服务提供时也必须公开源代码**。例如，如果你修改此代码并作为网站运营，当用户请求时必须提供修改后的源代码。
+- **保持相同许可证（AGPL-3.0）** — 分发修改过或包含此代码的作品时，该作品也必须以 AGPL-3.0 公开。
+- **公开源代码** — 与普通 GPL 不同，AGPL 要求**即使作为网络服务提供时也必须公开源代码**。例如，如果你修改此代码并用于运营网站，就必须为网站用户提供获取修改后源代码的途径。
 - **标明变更内容** — 必须明确标注你对原始代码做了哪些修改。
 - **保留版权声明** — 不得删除原始的版权声明和许可证文本。
 
 ### 你不可以
 
-- **在不公开源代码的情况下运营服务** — 修改此代码用于运营网络服务却不公开源代码，属于违反许可证。
+- **在不公开源代码的情况下运营服务** — 修改此代码用于运营网络服务却不公开源代码，即违反许可证。
 - **更换许可证** — 不能将 AGPL 代码以 MIT、Apache 等更宽松的许可证重新分发。
 
 ### 一句话总结
 
-> 尽管使用，但如果你修改了代码或将其作为服务提供，请以 AGPL-3.0 公开源代码。
+> 可以随意使用，但如果分发修改版本或将其作为服务提供，请以 AGPL-3.0 公开源代码。
 
 </details>

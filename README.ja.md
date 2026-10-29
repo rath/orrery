@@ -5,51 +5,58 @@
   <h1>Orrery — 혼천의(渾天儀)</h1>
 </div>
 
-ブラウザベースの命理学ツール。四柱八字、紫微斗數、西洋占星術の出生チャート（Natal Chart）をバックエンド不要でクライアント上で計算します。
+ブラウザベースの命理学ツール。四柱八字（四柱推命）、紫微斗数、西洋占星術の出生チャート（Natal Chart）を、バックエンドを使わずクライアント側だけで計算します。
 
 **[ライブデモ →](https://sky.told.me/)**
 
 ## クレジット
 
-- **四柱万年暦** — 고영창（Ko Young-chang）氏のPerl [真万年暦](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)を김정균（Kim Jeong-gyun）氏が[PHPに移植](https://github.com/OOPS-ORG-PHP/Lunar)したものを、2018年11月に황장호（Hwang Jang-ho）がJavaとPythonに移植して使用、2026年2月にClaude Code（Opus 4.6）でTypeScriptに移植
-- **紫微斗數命盤** — [lunar-javascript](https://www.npmjs.com/package/lunar-javascript)ライブラリをベースに、Claude（Opus 4.5）が中国語文献を調査しながら実装
-- **占星術出生チャート** — [Swiss Ephemeris](https://www.astro.com/swisseph/)のMoshier理論を純粋なTypeScriptに移植
+- **四柱万年暦** — 고영창（Ko Young-chang）氏のPerl製[真万年暦](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)を김정균（Kim Jeong-gyun）氏が[PHPに移植](https://github.com/OOPS-ORG-PHP/Lunar)。2018年11月に황장호（Hwang Jang-ho）がJavaとPythonに移植して使い続け、2026年2月にClaude Code（Opus 4.6）でTypeScriptに移植
+- **紫微斗数命盤** — [lunar-javascript](https://www.npmjs.com/package/lunar-javascript)ライブラリをベースに、Claude（Opus 4.5）が中国語文献を調べながら実装
+- **占星術の出生チャート** — [Swiss Ephemeris](https://www.astro.com/swisseph/)のMoshier天体暦を純粋なTypeScriptに移植
 
 ## 機能
 
 ### 四柱八字
 - 六十干支に基づく四柱計算（時柱、日柱、月柱、年柱）
-- 十神、十二運星、地蔵干
+- 十神、十二運星、蔵干
+- 十二神殺、空亡
+- 神殺：吉神（天乙貴人、天徳貴人、月徳貴人、文昌貴人、金輿禄）と凶殺（羊刃殺、桃花殺、白虎殺、魁罡殺、紅艶殺）
 - 合冲刑破害の関係分析（三合、半合、方合を含む）
-- 神殺（羊刃殺、白虎殺、魁罡殺）
-- 夜子時/早子時（子時法）対応
-- 大運10個（順行/逆行判断）
-- 日運/月運トランジット（合/冲/刑検出）
+- 坐法、引従法
+- 子時法の選択：統子時（デフォルト）または夜子時
+- 大運10期（順行・逆行を判定）
+- 日運・月運のトランジット（合・冲・刑を検出）
 
-### 紫微斗數
-- 旧暦自動変換
-- 命宮/身宮計算
-- 十四主星配置（紫微系 + 天府系）
-- 補星/殺星配置
-- 四化（化祿/化權/化科/化忌）
-- 星曜輝度（廟/旺/得/利/平/陷）
+### 紫微斗数
+- 旧暦への自動変換
+- 命宮・身宮の算出
+- 十四主星の配置（紫微系 + 天府系）
+- 補星・殺星の配置
+- 四化（化禄・化権・化科・化忌）
+- 星曜の輝度（廟・旺・得・利・平・陥）
 - 伝統的な4×4命盤グリッドレイアウト
-- 大限12個
-- 流年運勢（流年命宮、流年四化、12流月）
+- 大限12期
+- 流年運勢（流年命宮、流年四化、12の流月）
 
 ### 出生チャート（Natal Chart）
-- Swiss Ephemeris Moshier理論に基づく惑星位置計算（純粋TypeScript）
-- 10惑星 + キロン + 南/北交点の位置（星座、度数、逆行）
-- ハウスシステム選択（デフォルトPlacidus、10種対応）
+- Swiss EphemerisのMoshier天体暦による惑星位置計算（純粋なTypeScript）
+- 10天体・キロン・南北の交点・パート・オブ・フォーチュンの位置（星座、度数、逆行、ハウス）
+- 10種類のハウスシステム（デフォルトはPlacidus）
 - ASC / MC / DESC / IC アングル
-- 5大メジャーアスペクト（コンジャンクション、セクスタイル、スクエア、トライン、オポジション）
-- 出生地入力（緯度/経度、デフォルト：ソウル）
+- 5つのメジャーアスペクト（コンジャンクション、セクスタイル、スクエア、トライン、オポジション）
+- 出生チャートのホイール表示
 
 ### 共通
-- AIエージェント向けテキストコピー（四柱八字 + 紫微斗數 + 出生チャート一括コピー）
+- AI鑑定用に全結果をテキストで一括コピー（四柱八字 + 紫微斗数 + 出生チャート）
+- 出生地：韓国・世界の主要都市を検索（ハングルの初声検索に対応）するか、緯度・経度を直接入力（デフォルトはソウル）。座標からタイムゾーンを自動推定
+- サマータイムやUTC+8:30時代など、韓国標準時の変更履歴を自動反映
+- 出生時刻不明モード（四柱八字は三柱のみ計算、紫微斗数は省略、出生チャートはハウス・アングルなし）
+- プロフィール保存（ブラウザに保存、JSONでインポート/エクスポート）
+- 6言語のUI（韓国語、英語、中国語、日本語、ドイツ語、スペイン語）
+- ライト/ダークテーマ（システム設定に連動）
 - 使い方ガイドと用語説明
-- 出生時刻不明モード（三柱計算）
-- モバイルレスポンシブ
+- モバイル対応のレスポンシブデザイン
 
 ## 使い方
 
@@ -63,6 +70,9 @@ bun dev
 # ビルド
 bun run build
 
+# リント
+bun run lint
+
 # テスト
 bun run test
 ```
@@ -72,7 +82,8 @@ bun run test
 - React 19 + TypeScript 5
 - Vite 7
 - Tailwind CSS 4
-- lunar-javascript（旧暦変換）
+- lunar-javascript（旧暦変換、節入り時刻）
+- @photostructure/tz-lookup（座標からタイムゾーンを推定）
 - Vitest（テスト）
 
 ## `@orrery/core` クイックスタート
@@ -84,21 +95,22 @@ import { calculateSaju } from '@orrery/core/saju'
 import { createChart } from '@orrery/core/ziwei'
 import { calculateNatal } from '@orrery/core/natal'
 
+// timezoneを省略するとAsia/Seoul基準で計算
 const input = { year: 1993, month: 3, day: 12, hour: 9, minute: 45, gender: 'M' as const }
 
-// 사주팔자
+// 四柱八字
 const saju = calculateSaju(input)
-saju.pillars.forEach(p => console.log(p.pillar.ganzi)) // 乙巳, 壬辰, 乙卯, 癸酉
+saju.pillars.forEach(p => console.log(p.pillar.ganzi)) // 乙巳, 壬辰, 乙卯, 癸酉（時・日・月・年の順）
 
-// 자미두수 명반
+// 紫微斗数の命盤（最後の引数：男性かどうか）
 const ziwei = createChart(1993, 3, 12, 9, 45, true)
-console.log(ziwei.mingGongZhi)  // 명궁 지지
-console.log(ziwei.wuXingJu.name) // 오행국
+console.log(ziwei.mingGongZhi)   // 命宮の地支（戌）
+console.log(ziwei.wuXingJu.name) // 五行局（水二局）
 
-// 서양 점성술 출생차트
+// 西洋占星術の出生チャート
 const natal = await calculateNatal(input)
 natal.planets.forEach(p => console.log(`${p.id}: ${p.sign} ${p.degreeInSign.toFixed(1)}°`))
-console.log(`ASC: ${natal.angles.asc.sign}`)
+console.log(`ASC: ${natal.angles?.asc.sign}`) // 出生時刻が不明な場合、anglesはnull
 ```
 
 ## ライセンス
@@ -116,9 +128,9 @@ console.log(`ASC: ${natal.angles.asc.sign}`)
 
 ### 必ず守ること
 
-- **同じライセンス（AGPL-3.0）を維持** — このコードを修正または含めて配布する場合、その成果物も必ずAGPL-3.0で公開しなければなりません。
-- **ソースコードの公開義務** — 通常のGPLと異なり、AGPLは**Webサービスとして提供する場合にも**ソースコードを公開する必要があります。例えば、このコードを修正してウェブサイトとして運営する場合、ユーザーの要求に応じて修正されたソースコードを提供しなければなりません。
-- **変更内容の明示** — 元のコードから何を変更したかわかるように表示する必要があります。
+- **同じライセンス（AGPL-3.0）を維持** — このコードを修正したもの、またはこのコードを含むものを配布する場合、その成果物も必ずAGPL-3.0で公開しなければなりません。
+- **ソースコードの公開義務** — 通常のGPLと異なり、AGPLは**Webサービスとして提供する場合にも**ソースコードを公開する必要があります。例えば、このコードを修正してWebサイトとして運営する場合、サイトの利用者が修正後のソースコードを入手できる手段を提供しなければなりません。
+- **変更内容の明示** — 元のコードから何を変更したかが分かるように表示する必要があります。
 - **著作権表示の維持** — 元の著作権表示とライセンス文言を削除してはいけません。
 
 ### できないこと
@@ -128,6 +140,6 @@ console.log(`ASC: ${natal.angles.asc.sign}`)
 
 ### 一言まとめ
 
-> 自由に使えますが、修正したりサービスとして提供する場合は、ソースコードをAGPL-3.0で公開してください。
+> 自由に使えますが、修正版を配布したりサービスとして提供したりする場合は、ソースコードをAGPL-3.0で公開してください。
 
 </details>
