@@ -218,4 +218,33 @@ describe('calculateNatal', () => {
       timezone: 'Europe/Berlin',
     })).rejects.toThrow(/^DST gap/)
   })
+
+  const utcChart = (year: number, month: number, day: number, hour: number) => calculateNatal({
+    year, month, day, hour, minute: 0, gender: 'M', timezone: 'UTC',
+  })
+  const hasChiron = (chart: { planets: { id: string }[] }) => chart.planets.some(p => p.id === 'Chiron')
+
+  it('omits Chiron outside its table range instead of failing', async () => {
+    for (const year of [1850, 2150]) {
+      const chart = await utcChart(year, 3, 12, 0)
+      expect(chart.planets.map(p => p.id)).toEqual([
+        'Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto',
+        'NorthNode', 'SouthNode', 'Fortuna',
+      ])
+      expect(chart.aspects.some(a => a.planet1 === 'Chiron' || a.planet2 === 'Chiron')).toBe(false)
+    }
+  })
+
+  it('includes Chiron from 1900-01-01 through 2099-12-23 00:00 UT', async () => {
+    expect(hasChiron(await utcChart(1899, 12, 31, 23))).toBe(false)
+    expect(hasChiron(await utcChart(1900, 1, 1, 0))).toBe(true)
+    expect(hasChiron(await utcChart(2099, 12, 23, 0))).toBe(true)
+    expect(hasChiron(await utcChart(2099, 12, 23, 1))).toBe(false)
+  })
+
+  it('rejects dates after the Moshier ephemeris range (3003-04-29 TT)', async () => {
+    await expect(utcChart(3003, 4, 28, 0)).resolves.toMatchObject({ houses: expect.any(Array) })
+    await expect(utcChart(3003, 4, 30, 0)).rejects.toThrow(RangeError)
+    await expect(utcChart(9999, 12, 31, 0)).rejects.toThrow(/outside Moshier/)
+  })
 })

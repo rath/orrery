@@ -9,6 +9,7 @@ import type {
   NatalHouse, NatalAngles, AspectType, NatalAspect, NatalChart,
 } from './types.ts'
 import { julday, calcPlanet, calcHouses } from './ephemeris/index.ts'
+import { hasChironData } from './ephemeris/chiron.ts'
 import { deltaT } from './ephemeris/deltat.ts'
 import { calcObliquity } from './ephemeris/obliquity.ts'
 import { calcNutation } from './ephemeris/nutation.ts'
@@ -234,9 +235,10 @@ export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Prom
     ascmc = Array.from(houseResult.ascmc)
   }
 
-  // 행성 위치 계산
+  // 행성 위치 계산 (Chiron은 사전 계산 표가 있는 기간에만 포함)
   const planets: PlanetPosition[] = []
   for (const [id, bodyNum] of PLANET_BODIES) {
+    if (id === 'Chiron' && !hasChironData(jd)) continue
     const pos = calcPlanet(jd, bodyNum)
     planets.push({
       id,

@@ -14,7 +14,10 @@ export type JasiMethod = 'split' | 'unified';
 
 /** 생년월일시 입력 */
 export interface BirthInput {
-  /** Gregorian year, 1–9999. Individual ephemeris tables may have narrower coverage. */
+  /**
+   * Gregorian year, 1–9999. `calculateNatal()` is limited to the Moshier ephemeris range
+   * (through 3003-04-29 TT) and includes Chiron only for 1900-01-01 – 2099-12-23 UT.
+   */
   year: number;
   month: number;
   day: number;
@@ -326,6 +329,7 @@ export interface NatalChart {
   input: BirthInput;
   /** Actual house system; may differ from the request at polar latitudes. */
   houseSystem?: string;
+  /** Chiron은 표 범위(1900-01-01 ~ 2099-12-23 UT)에서만, Fortuna는 출생 시간을 알 때만 포함 */
   planets: PlanetPosition[];
   houses: NatalHouse[];
   /** 앵글 (시간 모름이면 null) */

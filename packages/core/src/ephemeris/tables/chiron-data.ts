@@ -2,7 +2,7 @@
  * Pre-computed Chiron ephemeris table
  *
  * Generated from Swiss Ephemeris using SEFLG_SWIEPH.
- * Covers 1900-01-01 to 2100-01-01, every 10 days.
+ * Covers 1900-01-01 to 2099-12-23 (UT), every 10 days.
  * Longitude in degrees, speed in degrees/day.
  *
  * AGPL-licensed — see Swiss Ephemeris license terms.

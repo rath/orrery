@@ -38,6 +38,16 @@ function hermite(t: number, p0: number, p1: number, m0: number, m1: number): num
   return h00 * p0 + h10 * m0 + h01 * p1 + h11 * m1
 }
 
+/** Julian day (UT) of the last table sample: 2099-12-23 00:00 UT. */
+export const CHIRON_JD_END = CHIRON_JD_START + (CHIRON_N - 1) * CHIRON_JD_STEP
+
+/**
+ * Whether the pre-computed table covers a Julian day (UT), bounds inclusive.
+ */
+export function hasChironData(tjd: number): boolean {
+  return Number.isFinite(tjd) && tjd >= CHIRON_JD_START && tjd <= CHIRON_JD_END
+}
+
 /**
  * Calculate Chiron ecliptic longitude and speed.
  *
@@ -45,11 +55,9 @@ function hermite(t: number, p0: number, p1: number, m0: number, m1: number): num
  * @returns { longitude, speed } in degrees and degrees/day
  */
 export function calcChiron(tjd: number): { longitude: number; speed: number } {
-  // Check range
-  const jdEnd = CHIRON_JD_START + (CHIRON_N - 1) * CHIRON_JD_STEP
-  if (!Number.isFinite(tjd) || tjd < CHIRON_JD_START || tjd > jdEnd) {
-    throw new Error(
-      `Chiron: JD ${tjd} outside range ${CHIRON_JD_START}..${jdEnd}`
+  if (!hasChironData(tjd)) {
+    throw new RangeError(
+      `Chiron: JD ${tjd} outside range ${CHIRON_JD_START}..${CHIRON_JD_END}`
     )
   }
 

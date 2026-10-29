@@ -31,6 +31,10 @@ import {
 const J2000 = 2451545.0
 const AUNIT = 1.49597870700e+11 // meters
 
+/** Validity range of the Moshier lunar theory, JD (TT): sweph.h MOSHLUEPH_START/END. */
+export const MOSHLUEPH_START = 625000.5
+export const MOSHLUEPH_END = 2818000.5
+
 // ─── Module-level state (mirrors C static variables) ───────────────────
 
 const ss: number[][] = Array.from({ length: 5 }, () => new Array(8).fill(0))
@@ -690,6 +694,11 @@ function ecldat_equ2000(tjd: number, xpm: number[]): void {
  * @returns Object with `xp`: [x, y, z, vx, vy, vz] in AU and AU/day
  */
 export function calcMoon(tjd: number): { xp: number[] } {
+  // Like swi_moshmoon, allow 0.2 day tolerance at the range limits
+  if (!(tjd >= MOSHLUEPH_START - 0.2 && tjd <= MOSHLUEPH_END + 0.2)) {
+    throw new RangeError(`jd ${tjd} outside Moshier's Moon range ${MOSHLUEPH_START} .. ${MOSHLUEPH_END}`)
+  }
+
   // Central position
   const xpm = moshmoon2(tjd)
   ecldat_equ2000(tjd, xpm)

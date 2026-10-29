@@ -22,6 +22,10 @@ const STR = 4.84813681109536e-6  // arc seconds to radians
 const PLAN_SPEED_INTV = 0.1           // days, for numerical differentiation
 const EARTH_MOON_MRAT = 81.30056
 
+/** Validity range of the Moshier planetary theory, JD (TT): sweph.h MOSHPLEPH_START/END. */
+export const MOSHPLEPH_START = 625000.5
+export const MOSHPLEPH_END = 2818000.5
+
 /** Map from internal planet index to Moshier table index */
 const pnoint2msh = [2, 2, 0, 1, 3, 4, 5, 6, 7, 8]
 
@@ -299,6 +303,10 @@ export function moshplan(
   ipli: number,
   allPlanets: PlanetTable[],
 ): { xp: number[]; xe: number[] } {
+  // tjd beyond ephemeris limits; like swi_moshplan, allow a margin for speed at the edge
+  if (!(tjd >= MOSHPLEPH_START - 0.3 && tjd <= MOSHPLEPH_END + 0.3)) {
+    throw new RangeError(`jd ${tjd} outside Moshier planet range ${MOSHPLEPH_START} .. ${MOSHPLEPH_END}`)
+  }
   const iplm = pnoint2msh[ipli]
 
   // Obliquity at J2000 for coordinate transformation (radians)
