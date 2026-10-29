@@ -107,7 +107,8 @@ describe('daewoon dates', () => {
 
     expect(daewoon[0]).toMatchObject({
       ganzi: '戊寅',
-      startDate: new Date('1999-01-04T00:06:48.000Z'),
+      // Uses the astronomical Jingzhe instant, including seconds, instead of a fixed annual offset.
+      startDate: new Date('1999-01-03T19:26:47.000Z'),
     })
     expect(daewoon.map(item => item.startDate.getUTCFullYear())).toEqual([
       1999, 2009, 2019, 2029, 2039, 2049, 2059, 2069, 2079, 2089,

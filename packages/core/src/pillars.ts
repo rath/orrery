@@ -21,331 +21,52 @@ import type {
   TransitItem, JwaEntry, InjongEntry, JasiMethod,
 } from './types.ts';
 import { assertDateTime, civilDateToUtc } from './validation.ts';
+import { getSolarTermPeriod } from './solar-terms.ts';
 
-// =============================================
-// 유틸리티
-// =============================================
-
-/** Python의 int(a/b) — 0 방향 절사 */
-function div(a: number, b: number): number {
-  return Math.trunc(a / b);
+/** Calendar fields are local wall time; utcDate supplies the actual solar-term instant. */
+export interface PillarCalculationOptions {
+  utcDate?: Date;
+  /** Already corrected to true solar time: do not apply Korea's extra 30-minute offset. */
+  trueSolarTime?: boolean;
 }
 
-/** Python 호환 모듈로 (항상 양수) */
-function pymod(a: number, b: number): number {
-  return ((a % b) + b) % b;
-}
+const mod = (value: number, base: number) => ((value % base) + base) % base;
+const DAY_MS = 86_400_000;
+const KST_MS = 9 * 3_600_000;
+const DAY_REFERENCE = civilDateToUtc(1996, 2, 4).getTime();
 
-// =============================================
-// 절기 상수 (월 시작분)
-// =============================================
-
-const MONTH = [
-  0, 21355, 42843, 64498, 86335, 108366, 130578, 152958,
-  175471, 198077, 220728, 243370, 265955, 288432, 310767,
-  332928, 354903, 376685, 398290, 419736, 441060, 462295,
-  483493, 504693, 525949,
-];
-
-// =============================================
-// 기준점 (1996-02-04 22:08 병자년 입춘)
-// =============================================
-
-const UNIT = {
-  year: 1996, month: 2, day: 4, hour: 22, min: 8,
-  // 세차
-  ygan: 2, yji: 0,
-  // 월건
-  mgan: 6, mji: 2, msu: 26,
-  // 일진
-  dgan: 7, dji: 7, dsu: 7,
-  // 시주
-  hgan: 5, hji: 11, hsu: 35,
-};
-
-// =============================================
-// 날짜 연산
-// =============================================
-
-/** year의 1월 1일부터 month/day까지 일수 */
-function dayOfYear(year: number, month: number, day: number): number {
-  let e = 0;
-  for (let i = 1; i < month; i++) {
-    e += 31;
-    if (i === 2 || i === 4 || i === 6 || i === 9 || i === 11) {
-      e -= 1;
-    }
-    if (i === 2) {
-      e -= 2;
-      if (year % 4 === 0) e += 1;
-      if (year % 100 === 0) e -= 1;
-      if (year % 400 === 0) e += 1;
-      if (year % 4000 === 0) e -= 1;
-    }
-  }
-  e += day;
-  return e;
-}
-
-/** 두 날짜 사이의 일수 (y1m1d1 → y2m2d2 방향) */
-function daysBetween(
-  y1: number, m1: number, d1: number,
-  y2: number, m2: number, d2: number,
+function calculationInstant(
+  year: number, month: number, day: number, hour: number, minute: number,
+  options?: PillarCalculationOptions,
 ): number {
-  let p1: number, p1n: number, p2: number;
-  let pp1: number, pp2: number, pr: number;
-
-  if (y2 > y1) {
-    p1 = dayOfYear(y1, m1, d1);
-    p1n = dayOfYear(y1, 12, 31);
-    p2 = dayOfYear(y2, m2, d2);
-    pp1 = y1; pp2 = y2; pr = -1;
-  } else {
-    p1 = dayOfYear(y2, m2, d2);
-    p1n = dayOfYear(y2, 12, 31);
-    p2 = dayOfYear(y1, m1, d1);
-    pp1 = y2; pp2 = y1; pr = 1;
-  }
-
-  let dis: number;
-  if (y2 === y1) {
-    dis = p2 - p1;
-  } else {
-    dis = p1n - p1;
-    let k = pp1 + 1;
-    const ppp2 = pp2 - 1;
-
-    while (k <= ppp2) {
-      // 빠른 건너뛰기 (ppp2 > 1990일 때)
-      if (k === -2000 && ppp2 > 1990) { dis += 1457682; k = 1991; }
-      else if (k === -1750 && ppp2 > 1990) { dis += 1366371; k = 1991; }
-      else if (k === -1500 && ppp2 > 1990) { dis += 1275060; k = 1991; }
-      else if (k === -1250 && ppp2 > 1990) { dis += 1183750; k = 1991; }
-      else if (k === -1000 && ppp2 > 1990) { dis += 1092439; k = 1991; }
-      else if (k === -750 && ppp2 > 1990) { dis += 1001128; k = 1991; }
-      else if (k === -500 && ppp2 > 1990) { dis += 909818; k = 1991; }
-      else if (k === -250 && ppp2 > 1990) { dis += 818507; k = 1991; }
-      else if (k === 0 && ppp2 > 1990) { dis += 727197; k = 1991; }
-      else if (k === 250 && ppp2 > 1990) { dis += 635887; k = 1991; }
-      else if (k === 500 && ppp2 > 1990) { dis += 544576; k = 1991; }
-      else if (k === 750 && ppp2 > 1990) { dis += 453266; k = 1991; }
-      else if (k === 1000 && ppp2 > 1990) { dis += 361955; k = 1991; }
-      else if (k === 1250 && ppp2 > 1990) { dis += 270644; k = 1991; }
-      else if (k === 1500 && ppp2 > 1990) { dis += 179334; k = 1991; }
-      else if (k === 1750 && ppp2 > 1990) { dis += 88023; k = 1991; }
-
-      dis += dayOfYear(k, 12, 31);
-      k += 1;
-    }
-    dis += p2;
-    dis *= pr;
-  }
-  return dis;
+  assertDateTime(year, month, day, hour, minute);
+  const instant = options?.utcDate?.getTime()
+    ?? civilDateToUtc(year, month, day, hour, minute).getTime() - KST_MS;
+  if (!Number.isFinite(instant)) throw new RangeError('Invalid calculation instant');
+  return instant;
 }
 
-/** 두 시점 사이의 분(minutes) 계산 */
-function minutesBetween(
-  uy: number, umm: number, ud: number, uh: number, umin: number,
-  y1: number, mo1: number, d1: number, h1: number, mm1: number,
-): number {
-  const dispday = daysBetween(uy, umm, ud, y1, mo1, d1);
-  return dispday * 24 * 60 + (uh - h1) * 60 + (umin - mm1);
-}
-
-/** 분(tmin)으로부터 날짜 역산 */
-function dateFromMinutes(
-  tmin: number, uyear: number, umonth: number, uday: number,
-  uhour: number, umin: number,
-): [number, number, number, number, number] {
-  let y1: number, mo1: number, d1: number, h1: number, mi1: number;
-  let t: number;
-
-  y1 = uyear - div(tmin, 525949);
-
-  if (tmin > 0) {
-    y1 += 2;
-    while (true) {
-      y1 -= 1;
-      t = minutesBetween(uyear, umonth, uday, uhour, umin, y1, 1, 1, 0, 0);
-      if (t >= tmin) break;
-    }
-
-    mo1 = 13;
-    while (true) {
-      mo1 -= 1;
-      t = minutesBetween(uyear, umonth, uday, uhour, umin, y1, mo1, 1, 0, 0);
-      if (t >= tmin) break;
-    }
-
-    d1 = 32;
-    while (true) {
-      d1 -= 1;
-      t = minutesBetween(uyear, umonth, uday, uhour, umin, y1, mo1, d1, 0, 0);
-      if (t >= tmin) break;
-    }
-
-    h1 = 24;
-    while (true) {
-      h1 -= 1;
-      t = minutesBetween(uyear, umonth, uday, uhour, umin, y1, mo1, d1, h1, 0);
-      if (t >= tmin) break;
-    }
-
-    t = minutesBetween(uyear, umonth, uday, uhour, umin, y1, mo1, d1, h1, 0);
-    mi1 = t - tmin;
-  } else {
-    y1 -= 2;
-    while (true) {
-      y1 += 1;
-      t = minutesBetween(uyear, umonth, uday, uhour, umin, y1, 1, 1, 0, 0);
-      if (t < tmin) break;
-    }
-
-    y1 -= 1;
-    mo1 = 0;
-    while (true) {
-      mo1 += 1;
-      t = minutesBetween(uyear, umonth, uday, uhour, umin, y1, mo1, 1, 0, 0);
-      if (t < tmin) break;
-    }
-
-    mo1 -= 1;
-    d1 = 0;
-    while (true) {
-      d1 += 1;
-      t = minutesBetween(uyear, umonth, uday, uhour, umin, y1, mo1, d1, 0, 0);
-      if (t < tmin) break;
-    }
-
-    d1 -= 1;
-    h1 = -1;
-    while (true) {
-      h1 += 1;
-      t = minutesBetween(uyear, umonth, uday, uhour, umin, y1, mo1, d1, h1, 0);
-      if (t < tmin) break;
-    }
-
-    h1 -= 1;
-    t = minutesBetween(uyear, umonth, uday, uhour, umin, y1, mo1, d1, h1, 0);
-    mi1 = t - tmin;
-  }
-
-  return [y1, mo1, d1, h1, mi1];
-}
-
-// =============================================
-// 핵심: 사주 인덱스 계산 (sydtoso24yd 포팅)
-// =============================================
-
-/**
- * 그레고리력 → 60갑자 인덱스 [연주, 월주, 일주, 시주]
- *
- * @returns [so24(60년 배수), so24year, so24month, so24day, so24hour]
- */
+/** Gregorian wall clock → [year offset from 1996, year, month, day, hour indices]. */
 export function calcPillarIndices(
   year: number, month: number, day: number, hour: number, min: number,
-  jasiMethod?: JasiMethod,
+  jasiMethod?: JasiMethod, options?: PillarCalculationOptions,
 ): [number, number, number, number, number] {
-  assertDateTime(year, month, day, hour, min);
-  const displ2min = minutesBetween(
-    UNIT.year, UNIT.month, UNIT.day, UNIT.hour, UNIT.min,
-    year, month, day, hour, min,
-  );
-  const displ2day = daysBetween(
-    UNIT.year, UNIT.month, UNIT.day, year, month, day,
-  );
-
-  // 경과 연수
-  let so24 = div(displ2min, 525949);
-  if (displ2min >= 0) so24 += 1;
-
-  // 년주
-  let so24year = (so24 % 60) * -1 + 12;
-  if (so24year < 0) so24year += 60;
-  else if (so24year > 59) so24year -= 60;
-
-  // 월주
-  let monthmin100 = displ2min % 525949;
-  monthmin100 = 525949 - monthmin100;
-  if (monthmin100 < 0) monthmin100 += 525949;
-  else if (monthmin100 >= 525949) monthmin100 -= 525949;
-
-  let so24monthIdx = 0;
-  for (let i = 0; i < 12; i++) {
-    const j = i * 2;
-    if (MONTH[j] <= monthmin100 && monthmin100 < MONTH[j + 2]) {
-      so24monthIdx = i;
-    }
-  }
-
-  let t = so24year % 10;
-  t = t % 5;
-  t = t * 12 + 2 + so24monthIdx;
-  let so24month = t;
-  if (so24month > 59) so24month -= 60;
-
-  // 일주
-  let so24day = displ2day % 60;
-  so24day = so24day * -1 + 7;
-  if (so24day < 0) so24day += 60;
-  else if (so24day > 59) so24day -= 60;
-
-  // 시주 (반시 체계: 30분 경계, 동경 127.5도 보정)
-  let i: number;
-  if (hour === 0 || (hour === 1 && min < 30)) {
-    i = 0; // 子 (조자시: 00:00~01:29)
-  } else if ((hour === 1 && min >= 30) || hour === 2 || (hour === 3 && min < 30)) {
-    i = 1; // 丑
-  } else if ((hour === 3 && min >= 30) || hour === 4 || (hour === 5 && min < 30)) {
-    i = 2; // 寅
-  } else if ((hour === 5 && min >= 30) || hour === 6 || (hour === 7 && min < 30)) {
-    i = 3; // 卯
-  } else if ((hour === 7 && min >= 30) || hour === 8 || (hour === 9 && min < 30)) {
-    i = 4; // 辰
-  } else if ((hour === 9 && min >= 30) || hour === 10 || (hour === 11 && min < 30)) {
-    i = 5; // 巳
-  } else if ((hour === 11 && min >= 30) || hour === 12 || (hour === 13 && min < 30)) {
-    i = 6; // 午
-  } else if ((hour === 13 && min >= 30) || hour === 14 || (hour === 15 && min < 30)) {
-    i = 7; // 未
-  } else if ((hour === 15 && min >= 30) || hour === 16 || (hour === 17 && min < 30)) {
-    i = 8; // 申
-  } else if ((hour === 17 && min >= 30) || hour === 18 || (hour === 19 && min < 30)) {
-    i = 9; // 酉
-  } else if ((hour === 19 && min >= 30) || hour === 20 || (hour === 21 && min < 30)) {
-    i = 10; // 戌
-  } else if ((hour === 21 && min >= 30) || hour === 22 || (hour === 23 && min < 30)) {
-    i = 11; // 亥
-  } else {
-    // 야자시: hour === 23 && min >= 30
-    i = 0; // 子
-    const method = jasiMethod ?? 'unified';
-    if (method === 'unified') {
-      // 통자시: 23:30부터 일주를 다음날로 넘김
-      so24day += 1;
-      if (so24day === 60) so24day = 0;
-    }
-    // 'split' (야자시 인정): 일주 당일 유지, 시주 천간은 당일 일간 기준
-  }
-
-  // 야자시(split): 일주는 당일 유지하되, 시주 천간은 다음날 일간 기준
-  const isYajasi = i === 0 && hour === 23 && jasiMethod === 'split';
-  const dayForHour = isYajasi ? (so24day + 1) % 60 : so24day;
-  t = dayForHour % 10;
-  t = t % 5;
-  t = t * 12 + i;
-  const so24hour = t;
-
-  return [so24, so24year, so24month, so24day, so24hour];
+  const instant = calculationInstant(year, month, day, hour, min, options);
+  const { astrologyYear, previous } = getSolarTermPeriod(instant);
+  const yearIndex = mod(astrologyYear - 4, 60);
+  const monthIndex = mod((yearIndex % 10 % 5) * 12 + 2 + previous.index / 2, 60);
+  const days = Math.round((civilDateToUtc(year, month, day).getTime() - DAY_REFERENCE) / DAY_MS);
+  let dayIndex = mod(7 + days, 60);
+  const offset = options?.trueSolarTime ? 0 : 30;
+  const hourIndex = mod(Math.floor((hour * 60 + min - offset + 60) / 120), 12);
+  const lateZi = hour * 60 + min >= 23 * 60 + offset;
+  if (lateZi && jasiMethod !== 'split') dayIndex = mod(dayIndex + 1, 60);
+  const dayForHour = lateZi && jasiMethod === 'split' ? mod(dayIndex + 1, 60) : dayIndex;
+  const hourPillarIndex = (dayForHour % 10 % 5) * 12 + hourIndex;
+  return [1996 - astrologyYear, yearIndex, monthIndex, dayIndex, hourPillarIndex];
 }
 
-// =============================================
-// 절기 시간 계산 (solortoso24 포팅)
-// =============================================
-
-/**
- * 절기 시간 구하기 - 입기, 중기, 출기 날짜/시각
- */
+/** Astronomical entry/mid/exit solar terms, returned as fixed UTC+9 wall-clock fields. */
 export function calcSolarTerms(
   year: number, month: number, day: number, hour: number, min: number,
 ): {
@@ -353,110 +74,53 @@ export function calcSolarTerms(
   midName: number; midYear: number; midMonth: number; midDay: number; midHour: number; midMin: number;
   outgiName: number; outgiYear: number; outgiMonth: number; outgiDay: number; outgiHour: number; outgiMin: number;
 } {
-  const [, , so24month] = calcPillarIndices(year, month, day, hour, min);
-
-  const displ2min = minutesBetween(
-    UNIT.year, UNIT.month, UNIT.day, UNIT.hour, UNIT.min,
-    year, month, day, hour, min,
-  );
-
-  let monthmin100 = (displ2min % 525949) * -1;
-  if (monthmin100 < 0) monthmin100 += 525949;
-  else if (monthmin100 >= 525949) monthmin100 -= 525949;
-
-  let ii = so24month % 12 - 2;
-  if (ii === -2) ii = 10;
-  else if (ii === -1) ii = 11;
-
-  const ingiName = ii * 2;
-  const midName = ii * 2 + 1;
-  const outgiName = ii * 2 + 2;
-
-  const j = ii * 2;
-  let tmin = displ2min + (monthmin100 - MONTH[j]);
-  const [ingiYear, ingiMonth, ingiDay, ingiHour, ingiMin] = dateFromMinutes(
-    tmin, UNIT.year, UNIT.month, UNIT.day, UNIT.hour, UNIT.min,
-  );
-
-  tmin = displ2min + (monthmin100 - MONTH[j + 1]);
-  const [midYear, midMonth, midDay, midHour, midMin] = dateFromMinutes(
-    tmin, UNIT.year, UNIT.month, UNIT.day, UNIT.hour, UNIT.min,
-  );
-
-  tmin = displ2min + (monthmin100 - MONTH[j + 2]);
-  const [outgiYear, outgiMonth, outgiDay, outgiHour, outgiMin] = dateFromMinutes(
-    tmin, UNIT.year, UNIT.month, UNIT.day, UNIT.hour, UNIT.min,
-  );
-
+  const period = getSolarTermPeriod(calculationInstant(year, month, day, hour, min));
+  const entry = new Date(period.previous.utcMs + KST_MS);
+  const mid = new Date(period.middle.utcMs + KST_MS);
+  const exit = new Date(period.next.utcMs + KST_MS);
   return {
-    ingiName, ingiYear, ingiMonth, ingiDay, ingiHour, ingiMin,
-    midName, midYear, midMonth, midDay, midHour, midMin,
-    outgiName, outgiYear, outgiMonth, outgiDay, outgiHour, outgiMin,
+    ingiName: period.previous.index,
+    ingiYear: entry.getUTCFullYear(), ingiMonth: entry.getUTCMonth() + 1, ingiDay: entry.getUTCDate(),
+    ingiHour: entry.getUTCHours(), ingiMin: entry.getUTCMinutes(),
+    midName: period.middle.index,
+    midYear: mid.getUTCFullYear(), midMonth: mid.getUTCMonth() + 1, midDay: mid.getUTCDate(),
+    midHour: mid.getUTCHours(), midMin: mid.getUTCMinutes(),
+    outgiName: period.previous.index + 2,
+    outgiYear: exit.getUTCFullYear(), outgiMonth: exit.getUTCMonth() + 1, outgiDay: exit.getUTCDate(),
+    outgiHour: exit.getUTCHours(), outgiMin: exit.getUTCMinutes(),
   };
 }
 
-// =============================================
-// 4주 계산 API
-// =============================================
-
-/** 4주를 60갑자 문자열로 반환 [년주, 월주, 일주, 시주] */
+/** Four pillars [year, month, day, hour]. Default input is fixed UTC+9 Korean wall time. */
 export function getFourPillars(
   year: number, month: number, day: number, hour: number, minute: number,
-  jasiMethod?: JasiMethod,
+  jasiMethod?: JasiMethod, options?: PillarCalculationOptions,
 ): [string, string, string, string] {
-  const [, y, m, d, h] = calcPillarIndices(year, month, day, hour, minute, jasiMethod);
+  const [, y, m, d, h] = calcPillarIndices(year, month, day, hour, minute, jasiMethod, options);
   return [HGANJI[y], HGANJI[m], HGANJI[d], HGANJI[h]];
 }
 
-// =============================================
-// 대운 계산
-// =============================================
-
-/** 대운 10개 계산. startDate의 역학상 벽시계 날짜는 UTC 필드에 저장된다. */
+/** Ten luck cycles; civil start dates are stored in UTC fields. */
 export function getDaewoon(
   isMale: boolean,
   year: number, month: number, day: number, hour: number, minute: number,
-  jasiMethod?: JasiMethod,
+  jasiMethod?: JasiMethod, options?: PillarCalculationOptions,
 ): Array<{ ganzi: string; startDate: Date }> {
-  const [, sy, sm] = calcPillarIndices(year, month, day, hour, minute, jasiMethod);
-
-  // 순행/역행 결정
-  const yearStem = HGANJI[sy][0];
-  const isYangGan = YANGGAN.includes(yearStem);
-  const order = (isMale && isYangGan) || (!isMale && !isYangGan);
-
-  // 절기 시간 계산
-  const terms = calcSolarTerms(year, month, day, hour, minute);
-
-  // These are astrological civil timestamps, not instants in the host machine's
-  // timezone. UTC fields keep the arithmetic identical across process TZ/DST rules.
-  const d0 = order
-    ? civilDateToUtc(terms.outgiYear, terms.outgiMonth, terms.outgiDay, terms.outgiHour, terms.outgiMin)
-    : civilDateToUtc(terms.ingiYear, terms.ingiMonth, terms.ingiDay, terms.ingiHour, terms.ingiMin);
-
+  const [, sy, sm] = calcPillarIndices(year, month, day, hour, minute, jasiMethod, options);
+  const isYangGan = YANGGAN.includes(HGANJI[sy][0]);
+  const forward = (isMale && isYangGan) || (!isMale && !isYangGan);
+  const instant = calculationInstant(year, month, day, hour, minute, options);
+  const period = getSolarTermPeriod(instant);
+  const term = forward ? period.next : period.previous;
+  const elapsed = Math.abs(instant - term.utcMs);
   const birth = civilDateToUtc(year, month, day, hour, minute);
-  const diff = birth.getTime() - d0.getTime();
-  const secondsToFirst = Math.abs(diff / 1000 * 365.242196 / 3.0);
-
-  let nextDate = new Date(birth.getTime() + secondsToFirst * 1000);
-  nextDate.setMilliseconds(0);
-
-  const flow = order ? 1 : -1;
-  let mIdx = sm;
-
-  const ret: Array<{ ganzi: string; startDate: Date }> = [];
-  for (let i = 0; i < 10; i++) {
-    mIdx = mIdx + flow;
-    if (mIdx >= HGANJI.length) mIdx = 0;
-    if (mIdx < 0) mIdx = HGANJI.length - 1;
-    ret.push({ ganzi: HGANJI[mIdx], startDate: new Date(nextDate) });
-
-    // 다음 대운은 10년 후
-    nextDate = new Date(nextDate);
-    nextDate.setUTCFullYear(nextDate.getUTCFullYear() + 10);
-  }
-
-  return ret;
+  const first = new Date(birth.getTime() + elapsed * 365.242196 / 3);
+  first.setUTCMilliseconds(0);
+  return Array.from({ length: 10 }, (_, i) => {
+    const startDate = new Date(first);
+    startDate.setUTCFullYear(first.getUTCFullYear() + i * 10);
+    return { ganzi: HGANJI[mod(sm + (forward ? 1 : -1) * (i + 1), 60)], startDate };
+  });
 }
 
 // =============================================
