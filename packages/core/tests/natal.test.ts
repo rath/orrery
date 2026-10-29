@@ -30,11 +30,11 @@ describe('calculateNatal', () => {
     })
 
     it(`ASC/MC for ${label}`, async () => {
-      const chart = await calculateNatal(makeInput(fixture))
-      expect(chart.angles.asc.longitude).toBeCloseTo(fixture.expected.asc.lon, 0)
-      expect(chart.angles.asc.sign).toBe(fixture.expected.asc.sign)
-      expect(chart.angles.mc.longitude).toBeCloseTo(fixture.expected.mc.lon, 0)
-      expect(chart.angles.mc.sign).toBe(fixture.expected.mc.sign)
+      const angles = (await calculateNatal(makeInput(fixture))).angles!
+      expect(angles.asc.longitude).toBeCloseTo(fixture.expected.asc.lon, 0)
+      expect(angles.asc.sign).toBe(fixture.expected.asc.sign)
+      expect(angles.mc.longitude).toBeCloseTo(fixture.expected.mc.lon, 0)
+      expect(angles.mc.sign).toBe(fixture.expected.mc.sign)
     })
 
     it(`Mercury retrograde for ${label}`, async () => {
