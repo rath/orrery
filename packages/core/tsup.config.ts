@@ -17,5 +17,9 @@ export default defineConfig({
   dts: true,
   splitting: true,
   clean: true,
-  noExternal: ['lunar-javascript'],
+  // Bundling strips source comments; keep the license and upstream copyright in every file.
+  banner: {
+    js: '/*! @orrery/core | AGPL-3.0-only | https://github.com/rath/orrery\n'
+      + ' * Includes code ported from Swiss Ephemeris, Copyright (C) 1997-2021 Astrodienst AG, Switzerland. */',
+  },
 })

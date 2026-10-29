@@ -1,7 +1,15 @@
 {
   "name": "@orrery/core",
   "version": "0.4.5",
+  "description": "Saju (四柱八字), Ziwei Doushu (紫微斗數) and Western natal chart calculations in pure TypeScript for browsers and Node.js",
   "license": "AGPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rath/orrery.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/rath/orrery/tree/main/packages/core#readme",
+  "bugs": "https://github.com/rath/orrery/issues",
   "type": "module",
   "keywords": [
     "saju",
@@ -18,50 +26,51 @@
     "chinese-astrology"
   ],
   "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./saju": {
+      "types": "./dist/saju.d.ts",
+      "import": "./dist/saju.js"
+    },
+    "./ziwei": {
+      "types": "./dist/ziwei.d.ts",
+      "import": "./dist/ziwei.js"
+    },
+    "./natal": {
+      "types": "./dist/natal.d.ts",
+      "import": "./dist/natal.js"
+    },
+    "./timezone": {
+      "types": "./dist/timezone.d.ts",
+      "import": "./dist/timezone.js"
+    },
+    "./pillars": {
+      "types": "./dist/pillars.d.ts",
+      "import": "./dist/pillars.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js"
+    },
+    "./constants": {
+      "types": "./dist/constants.d.ts",
+      "import": "./dist/constants.js"
+    },
+    "./cities": {
+      "types": "./dist/cities.d.ts",
+      "import": "./dist/cities.js"
+    },
     "./validation": {
       "types": "./dist/validation.d.ts",
       "import": "./dist/validation.js"
-    },
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./saju": {
-      "import": "./dist/saju.js",
-      "types": "./dist/saju.d.ts"
-    },
-    "./ziwei": {
-      "import": "./dist/ziwei.js",
-      "types": "./dist/ziwei.d.ts"
-    },
-    "./natal": {
-      "import": "./dist/natal.js",
-      "types": "./dist/natal.d.ts"
-    },
-    "./timezone": {
-      "import": "./dist/timezone.js",
-      "types": "./dist/timezone.d.ts"
-    },
-    "./pillars": {
-      "import": "./dist/pillars.js",
-      "types": "./dist/pillars.d.ts"
-    },
-    "./types": {
-      "import": "./dist/types.js",
-      "types": "./dist/types.d.ts"
-    },
-    "./constants": {
-      "import": "./dist/constants.js",
-      "types": "./dist/constants.d.ts"
-    },
-    "./cities": {
-      "import": "./dist/cities.js",
-      "types": "./dist/cities.d.ts"
     }
   },
   "files": [
     "dist/",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsup",
