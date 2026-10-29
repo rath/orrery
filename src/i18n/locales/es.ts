@@ -33,6 +33,7 @@ const es: Record<string, string> = {
   'form.latitude': 'Latitud',
   'form.longitude': 'Longitud',
   'form.coordinateInvalid': 'Introduzca coordenadas numéricas válidas.',
+  'form.invalidDate': 'Introduzca una fecha y una hora válidas.',
   'form.timezoneDefault': 'Zona horaria inferida:',
   'form.timezoneAutoDetectFailed': 'No se pudo inferir la zona horaria a partir de las coordenadas actuales. Compruebe las coordenadas.',
   'form.dstActive': 'Horario de verano (DST) en vigor',

@@ -10,6 +10,7 @@ import type {
 } from './types.ts'
 import { julday, calcPlanet, calcHouses } from './ephemeris/index.ts'
 import { birthInputToUtcDate, getBirthTimezone } from './timezone.ts'
+import { assertBirthInput } from './validation.ts'
 
 export { isKoreanDaylightTime } from './kdt.ts'
 export { isKoreanHistoricalTimeAnomaly } from './timezone.ts'
@@ -182,6 +183,10 @@ function calculateAspects(planets: PlanetPosition[]): NatalAspect[] {
 // =============================================
 
 export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Promise<NatalChart> {
+  assertBirthInput(input)
+  if (!HOUSE_SYSTEMS.some(([code]) => code === houseSystem)) {
+    throw new RangeError(`Unsupported house system: ${houseSystem}`)
+  }
   const lat = input.latitude ?? DEFAULT_LAT
   const lon = input.longitude ?? DEFAULT_LON
   const unknownTime = !!input.unknownTime

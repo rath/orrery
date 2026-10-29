@@ -3,6 +3,7 @@
  */
 // @ts-expect-error lunar-javascript has no type declarations
 import { Solar } from 'lunar-javascript'
+import { assertCoordinate } from './validation.ts'
 
 import {
   TIAN_GAN, DI_ZHI, PALACE_NAMES,
@@ -249,6 +250,8 @@ export function createChart(
   year: number, month: number, day: number,
   hour: number, minute: number, isMale: boolean, timezone?: string, longitude?: number,
 ): ZiweiChart {
+  if (typeof isMale !== 'boolean') throw new RangeError('Invalid isMale')
+  if (longitude !== undefined) assertCoordinate(longitude, 180)
   // Asia/Seoul(또는 미지정) 출생은 KST(+9) 벽시계를 기준으로 하는 한국 사주 관례에 맞춰
   // 경도 기반 진태양시 보정을 건너뛰고, IANA Asia/Seoul 오프셋을 이용한 KST 벽시계 정규화만
   // 적용한다 (1948-1951 KDT, 1954-1961 UTC+8:30/+9:30, 1987-1988 KDT 자동 포함).

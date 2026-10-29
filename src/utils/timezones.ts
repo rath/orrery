@@ -6,7 +6,7 @@ import {
 
 export type BirthLocalTimeValidationResult =
   | { ok: true; timezone: string }
-  | { ok: false; reason: 'dst-gap' | 'invalid-timezone' | 'infer-failed' }
+  | { ok: false; reason: 'dst-gap' | 'invalid-timezone' | 'invalid-date' | 'infer-failed' }
 
 function formatUtcOffsetMinutes(offsetMinutes: number): string {
   const sign = offsetMinutes < 0 ? '-' : '+'

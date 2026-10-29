@@ -20,6 +20,7 @@ import type {
   Element, Relation, RelationResult, PairRelation, AllRelations, SpecialSals,
   TransitItem, JwaEntry, InjongEntry, JasiMethod,
 } from './types.ts';
+import { assertDateTime, civilDateToUtc } from './validation.ts';
 
 // =============================================
 // 유틸리티
@@ -245,6 +246,7 @@ export function calcPillarIndices(
   year: number, month: number, day: number, hour: number, min: number,
   jasiMethod?: JasiMethod,
 ): [number, number, number, number, number] {
+  assertDateTime(year, month, day, hour, min);
   const displ2min = minutesBetween(
     UNIT.year, UNIT.month, UNIT.day, UNIT.hour, UNIT.min,
     year, month, day, hour, min,
@@ -429,10 +431,10 @@ export function getDaewoon(
   // These are astrological civil timestamps, not instants in the host machine's
   // timezone. UTC fields keep the arithmetic identical across process TZ/DST rules.
   const d0 = order
-    ? new Date(Date.UTC(terms.outgiYear, terms.outgiMonth - 1, terms.outgiDay, terms.outgiHour, terms.outgiMin))
-    : new Date(Date.UTC(terms.ingiYear, terms.ingiMonth - 1, terms.ingiDay, terms.ingiHour, terms.ingiMin));
+    ? civilDateToUtc(terms.outgiYear, terms.outgiMonth, terms.outgiDay, terms.outgiHour, terms.outgiMin)
+    : civilDateToUtc(terms.ingiYear, terms.ingiMonth, terms.ingiDay, terms.ingiHour, terms.ingiMin);
 
-  const birth = new Date(Date.UTC(year, month - 1, day, hour, minute));
+  const birth = civilDateToUtc(year, month, day, hour, minute);
   const diff = birth.getTime() - d0.getTime();
   const secondsToFirst = Math.abs(diff / 1000 * 365.242196 / 3.0);
 
@@ -869,12 +871,19 @@ export function getGongmang(dayGanzi: string): [string, string] {
 
 const IMPORTANT_RELATIONS = new Set(['合', '沖', '刑']);
 
-/** N개월간의 일운/월운과 사주의 관계를 찾음 */
+/** N개월(1–120)간의 일운/월운과 사주의 관계를 찾음. 최대 4주. */
 export function findTransits(
   natalPillars: string[],
   months: number = 1,
   backward: boolean = false,
 ): TransitItem[] {
+  if (!Number.isInteger(months) || months < 1 || months > 120) {
+    throw new RangeError('Transit months must be between 1 and 120');
+  }
+  if (!Array.isArray(natalPillars) || natalPillars.length > 4
+    || natalPillars.some(p => p !== '??' && !HGANJI.includes(p))) {
+    throw new RangeError('Expected at most four valid natal pillars');
+  }
   const results: TransitItem[] = [];
   const today = new Date();
   const msPerDay = 86400000;

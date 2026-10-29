@@ -13,6 +13,7 @@
  */
 
 import type { BirthInput } from './types.ts';
+import { assertDateTime, assertCoordinate, civilDateToUtc, InvalidDateTimeError } from './validation.ts';
 
 export const DEFAULT_TIMEZONE = 'Asia/Seoul';
 const DEFAULT_LONGITUDE = 127.0992;
@@ -22,6 +23,12 @@ const DST_GAP_ERROR_PREFIX = 'DST gap';
 
 const LOCAL_FORMATTERS = new Map<string, Intl.DateTimeFormat>();
 const OFFSET_FORMATTERS = new Map<string, Intl.DateTimeFormat>();
+const MAX_FORMATTERS = 64;
+
+function cacheFormatter(cache: Map<string, Intl.DateTimeFormat>, key: string, value: Intl.DateTimeFormat): void {
+  if (cache.size >= MAX_FORMATTERS) cache.delete(cache.keys().next().value!);
+  cache.set(key, value);
+}
 
 interface LocalDateTimeParts {
   year: number;
@@ -43,7 +50,7 @@ function getLocalFormatter(timezone: string): Intl.DateTimeFormat {
       minute: '2-digit',
       hourCycle: 'h23',
     });
-    LOCAL_FORMATTERS.set(timezone, formatter);
+    cacheFormatter(LOCAL_FORMATTERS, timezone, formatter);
   }
   return formatter;
 }
@@ -58,7 +65,7 @@ function getOffsetFormatter(timezone: string): Intl.DateTimeFormat {
       minute: '2-digit',
       hourCycle: 'h23',
     });
-    OFFSET_FORMATTERS.set(timezone, formatter);
+    cacheFormatter(OFFSET_FORMATTERS, timezone, formatter);
   }
   return formatter;
 }
@@ -134,8 +141,12 @@ export function resolveLocalDateTimeToUtc(
   year: number, month: number, day: number,
   hour: number, minute: number, timezone: string,
 ): Date {
+  assertDateTime(year, month, day, hour, minute);
+  if (typeof timezone !== 'string' || !timezone || timezone.length > 100) {
+    throw new RangeError('Invalid time zone');
+  }
   const local = { year, month, day, hour, minute };
-  const naiveUtcMs = Date.UTC(year, month - 1, day, hour, minute);
+  const naiveUtcMs = civilDateToUtc(year, month, day, hour, minute).getTime();
 
   // 전환 인근에서도 "transition 전" 오프셋과 "transition 후" 오프셋을 모두 포착하도록
   // ±24h 지점에서 오프셋을 샘플링한다. 한 날에 두 번 이상의 전환이 있는 타임존은 없다.
@@ -164,7 +175,7 @@ export function resolveLocalDateTimeToUtc(
 
 export type ResolveLocalDateTimeToUtcResult =
   | { ok: true; date: Date }
-  | { ok: false; reason: 'dst-gap' | 'invalid-timezone' };
+  | { ok: false; reason: 'dst-gap' | 'invalid-timezone' | 'invalid-date' };
 
 /** `resolveLocalDateTimeToUtc`의 안전 래퍼. try/catch 없이 디스크리미네이티드 결과를 반환. */
 export function resolveLocalDateTimeToUtcSafe(
@@ -175,6 +186,7 @@ export function resolveLocalDateTimeToUtcSafe(
     const date = resolveLocalDateTimeToUtc(year, month, day, hour, minute, timezone);
     return { ok: true, date };
   } catch (err) {
+    if (err instanceof InvalidDateTimeError) return { ok: false, reason: 'invalid-date' };
     if (err instanceof RangeError) {
       if (err.message.startsWith(DST_GAP_ERROR_PREFIX)) {
         return { ok: false, reason: 'dst-gap' };
@@ -197,8 +209,8 @@ export function birthInputToUtcDate(
 }
 
 function getDayOfYear(year: number, month: number, day: number): number {
-  const start = Date.UTC(year, 0, 0);
-  const current = Date.UTC(year, month - 1, day);
+  const start = civilDateToUtc(year, 1, 0).getTime();
+  const current = civilDateToUtc(year, month, day).getTime();
   return Math.floor((current - start) / ONE_DAY_MS);
 }
 
@@ -225,6 +237,7 @@ export function adjustBirthInputToSolarTime(input: BirthInput): {
   );
   const equationOfTime = getEquationOfTimeMinutes(input.year, input.month, input.day);
   const longitude = input.longitude ?? DEFAULT_LONGITUDE;
+  assertCoordinate(longitude, 180);
   const solarDate = new Date(utcDate.getTime() + (longitude * 4 + equationOfTime) * 60_000);
 
   return {

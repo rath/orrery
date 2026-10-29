@@ -127,6 +127,7 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
       effectiveHour, effectiveMinute,
     )
     if (result.ok) return null
+    if (result.reason === 'invalid-date') return t('form.invalidDate')
     if (result.reason === 'dst-gap') return t('form.dstGapError')
     return t('form.timezoneAutoDetectFailed')
   }

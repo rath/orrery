@@ -7,6 +7,7 @@ import {
   calculateJwabeop, calculateInjongbeop, getGongmang,
 } from './pillars.ts';
 import { STEM_INFO } from './constants.ts';
+import { assertBirthInput } from './validation.ts';
 import {
   adjustBirthInputToSolarTime,
   adjustBirthInputToKstWallClock,
@@ -24,6 +25,7 @@ function getSipsin(dayStem: string, targetStem: string): string {
 
 /** BirthInput → SajuResult */
 export function calculateSaju(input: BirthInput): SajuResult {
+  assertBirthInput(input);
   // 시간 미상은 날짜 경계의 영향을 받지 않는 정오로 정규화하되, 정오 시주 자체는
   // 아래의 관계·신살 분석에 포함하지 않는다.
   const calculationInput = input.unknownTime

@@ -11,6 +11,7 @@ export default defineConfig({
     constants: 'src/constants.ts',
     cities: 'src/cities.ts',
     timezone: 'src/timezone.ts',
+    validation: 'src/validation.ts',
   },
   format: ['esm'],
   dts: true,

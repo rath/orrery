@@ -18,6 +18,10 @@
     "chinese-astrology"
   ],
   "exports": {
+    "./validation": {
+      "types": "./dist/validation.d.ts",
+      "import": "./dist/validation.js"
+    },
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"

@@ -33,6 +33,7 @@ const en: Record<string, string> = {
   'form.latitude': 'Latitude',
   'form.longitude': 'Longitude',
   'form.coordinateInvalid': 'Please enter valid numeric coordinates.',
+  'form.invalidDate': 'Please enter a valid calendar date and time.',
   'form.timezoneDefault': 'Inferred time zone:',
   'form.timezoneAutoDetectFailed': 'The time zone could not be inferred from the current coordinates. Please check the coordinates.',
   'form.dstActive': 'Daylight saving time (DST) in effect',

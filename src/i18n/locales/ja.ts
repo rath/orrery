@@ -33,6 +33,7 @@ const ja: Record<string, string> = {
   'form.latitude': '緯度',
   'form.longitude': '経度',
   'form.coordinateInvalid': '座標は有効な数値で入力してください。',
+  'form.invalidDate': '実在する日付と時刻を入力してください。',
   'form.timezoneDefault': '自動推定タイムゾーン:',
   'form.timezoneAutoDetectFailed': '現在の座標からタイムゾーンを自動推定できませんでした。座標を確認してください。',
   'form.dstActive': 'サマータイム(DST)適用中',

@@ -33,6 +33,7 @@ const ko: Record<string, string> = {
   'form.latitude': '위도',
   'form.longitude': '경도',
   'form.coordinateInvalid': '좌표를 올바른 숫자로 입력해주세요.',
+  'form.invalidDate': '실제로 존재하는 날짜와 시각을 입력해주세요.',
   'form.timezoneDefault': '자동 추론 시간대:',
   'form.timezoneAutoDetectFailed': '현재 좌표로 시간대를 자동 추론하지 못했습니다. 좌표를 확인해주세요.',
   'form.dstActive': '서머타임(DST) 적용 중',

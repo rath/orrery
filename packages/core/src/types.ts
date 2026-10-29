@@ -14,6 +14,7 @@ export type JasiMethod = 'split' | 'unified';
 
 /** 생년월일시 입력 */
 export interface BirthInput {
+  /** Gregorian year, 1–9999. Individual ephemeris tables may have narrower coverage. */
   year: number;
   month: number;
   day: number;
