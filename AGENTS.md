@@ -31,33 +31,81 @@ bun run --cwd packages/core test
 모노레포 구조 (bun workspaces):
 
 ```
-packages/core/          # @orrery/core — 독립 npm 패키지 (계산 엔진)
+packages/core/                      # @orrery/core — 독립 npm 패키지 (계산 엔진)
 ├── src/
-│   ├── index.ts        # barrel export
-│   ├── types.ts        # 인터페이스, 타입 정의
-│   ├── constants.ts    # 모든 상수/룩업 테이블
-│   ├── pillars.ts      # 사주 계산 엔진 (60갑자, 절기, 대운)
-│   ├── saju.ts         # 사주 결과 조립 (십신, 운성)
-│   ├── ziwei.ts        # 자미두수 계산 엔진 (명반 생성)
-│   ├── natal.ts        # 서양 점성술 계산 엔진 (순수 TypeScript ephemeris)
-│   └── cities.ts       # 출생 도시 데이터
+│   ├── index.ts                    # barrel export (validation 제외)
+│   ├── types.ts                    # 인터페이스, 타입 정의
+│   ├── constants.ts                # 모든 상수/룩업 테이블
+│   ├── validation.ts               # 입력 검증, 서기 1–9999년 날짜 변환
+│   ├── timezone.ts                 # IANA 타임존 → UTC, 진태양시·KST 벽시계 보정
+│   ├── kdt.ts                      # 1987–88 한국 하계표준시(KDT) 판정 (폼 안내용)
+│   ├── solar-terms.ts              # lunar-javascript 기반 천문 절입 시각 (UTC)
+│   ├── pillars.ts                  # 사주 계산 엔진 (60갑자, 대운, 관계, 신살, 트랜짓)
+│   ├── saju.ts                     # 사주 결과 조립 (타임존 보정, 십신, 운성, 공망)
+│   ├── ziwei.ts                    # 자미두수 계산 엔진 (명반, 대한, 유년·유월)
+│   ├── natal.ts                    # 서양 점성술 출생차트 (행성, 하우스, 애스펙트, 행운점)
+│   ├── cities.ts                   # 출생 도시 데이터, 초성 검색
+│   └── ephemeris/                  # Swiss Ephemeris Moshier 모드의 순수 TypeScript 포팅
+│       ├── index.ts                # 공개 API (calcPlanet, calcHouses, julday)
+│       ├── planets.ts              # Moshier 행성 이론
+│       ├── moon.ts                 # Moshier 달 이론
+│       ├── chiron.ts               # Chiron 표 보간 (1900–2100)
+│       ├── node.ts                 # 달의 평균 교점
+│       ├── houses.ts               # 하우스 시스템 10종, 극지방 대체
+│       ├── julian.ts               # 율리우스일 변환
+│       ├── deltat.ts               # ΔT (UT → TT)
+│       ├── precession.ts           # 세차 (IAU 1976)
+│       ├── nutation.ts             # 장동 (IAU 1980)
+│       ├── obliquity.ts            # 황도 경사
+│       ├── math.ts                 # 좌표 변환, 각도 유틸리티
+│       └── tables/                 # 행성·달 계수표, Chiron 표
+├── examples/                       # 실행 예제 (saju.ts, ziwei.ts, natal.ts)
 └── tests/
-    ├── fixtures.ts     # Python 기준 참조 데이터
+    ├── fixtures.ts                 # Python 기준 참조 데이터
     ├── pillars.test.ts
+    ├── solar-terms.test.ts         # 절입 시각 (Swiss Ephemeris 독립 검증값)
     ├── ziwei.test.ts
-    └── natal.test.ts
+    ├── ziwei-reference.test.ts     # iztro 2.6.3 기준값 (ziwei-reference.json)
+    ├── natal.test.ts
+    ├── ephemeris-reference.test.ts # pyswisseph 기준값 (swiss-reference.json)
+    ├── fortuna.test.ts             # 행운점 주야간 판정
+    ├── timezone.test.ts
+    └── validation.test.ts
 
-src/                    # 웹앱 (Vite + React)
+src/                                # 웹앱 (Vite + React)
+├── main.tsx                        # 진입점
+├── index.css                       # Tailwind, 전역 스타일
+├── assets/                         # 앱 아이콘
 ├── components/
-│   ├── App.tsx         # 루트: 탭 네비게이션 + 상태
-│   ├── BirthForm.tsx   # 생년월일시/성별 입력 폼
-│   ├── CopyButton.tsx  # 클립보드 복사
-│   ├── saju/           # 사주 UI 컴포넌트
-│   ├── ziwei/          # 자미두수 UI 컴포넌트
-│   └── natal/          # 출생차트 UI 컴포넌트
+│   ├── App.tsx                     # 루트: 탭 네비게이션 + 상태, AI 해석용 일괄 복사
+│   ├── BirthForm.tsx               # 생년월일시/성별/출생지 입력 폼, 타임존 추론
+│   ├── CityCombobox.tsx            # 도시 검색 콤보박스
+│   ├── CopyButton.tsx              # 클립보드 복사
+│   ├── Guide.tsx                   # 사용 가이드, 용어 설명
+│   ├── LanguageMenu.tsx            # 언어 선택
+│   ├── ProfileModal.tsx            # 프로필 관리 (저장, JSON 가져오기/내보내기)
+│   ├── ThemeToggle.tsx             # 시스템/라이트/다크 테마
+│   ├── saju/                       # 사주 UI 컴포넌트
+│   ├── ziwei/                      # 자미두수 UI 컴포넌트
+│   └── natal/                      # 출생차트 UI 컴포넌트
+│       └── wheel/                  # 출생차트 휠 (SVG)
+├── i18n/
+│   ├── index.ts                    # useLocale() 훅
+│   ├── store.ts                    # 로케일 스토어, LOCALES 정의
+│   ├── locales/                    # 6개 언어 번역 파일
+│   └── locales.test.ts             # 언어별 키 집합 일치 검증
+├── types/                          # 타입 선언이 없는 외부 패키지용 .d.ts
 └── utils/
-    ├── format.ts       # CJK 포매팅 헬퍼
-    └── text-export.ts  # 복사용 텍스트 생성
+    ├── birth-state.ts              # 저장된 폼 상태 검증·복원
+    ├── coordinate-input.ts         # 위도/경도 입력 파싱·포매팅 (+ .test.ts)
+    ├── format.ts                   # CJK 포매팅 헬퍼
+    ├── profiles.ts                 # 프로필 저장소 (localStorage) (+ .test.ts)
+    ├── text-export.ts              # 복사용 텍스트 생성
+    └── timezones.ts                # 좌표 → 타임존 추론, 현지 시각 검증
+
+public/                             # 정적 파일 (CNAME, manifest, robots.txt, sitemap)
+scripts/                            # 아이콘·OG 이미지 생성 스크립트 (sharp)
+.github/workflows/deploy.yml        # 린트·테스트·빌드 후 GitHub Pages 배포
 ```
 
 웹앱에서 코어 import: `import { ... } from '@orrery/core/saju'` 등 subpath exports 사용.
