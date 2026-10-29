@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import type { SavedFormState } from './BirthForm.tsx'
-import { loadProfiles, addProfile, updateProfile, deleteProfile, exportProfiles, importProfiles } from '../utils/profiles.ts'
+import { loadProfiles, addProfile, updateProfile, deleteProfile, exportProfiles, importProfiles, MAX_PROFILE_FILE_BYTES, MAX_PROFILE_NAME_LENGTH } from '../utils/profiles.ts'
 import type { Profile } from '../utils/profiles.ts'
 import { toHangul } from '@orrery/core/pillars'
 import { calculateSaju } from '@orrery/core/saju'
@@ -116,16 +116,26 @@ export default function ProfileModal({ open, onClose, getCurrentFormState, onSel
       setEditingId(null)
       return
     }
-    updateProfile(id, { name: trimmed })
-    setEditingId(null)
-    refresh()
+    try {
+      updateProfile(id, { name: trimmed })
+      setEditingId(null)
+      setError(null)
+      refresh()
+    } catch {
+      setError(t('profile.storageError'))
+    }
   }
 
   function handleDelete(id: string) {
     if (confirmDeleteId === id) {
-      deleteProfile(id)
-      setConfirmDeleteId(null)
-      refresh()
+      try {
+        deleteProfile(id)
+        setConfirmDeleteId(null)
+        setError(null)
+        refresh()
+      } catch {
+        setError(t('profile.storageError'))
+      }
     } else {
       setConfirmDeleteId(id)
     }
@@ -149,8 +159,14 @@ export default function ProfileModal({ open, onClose, getCurrentFormState, onSel
 
   function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
+    e.target.value = ''
     if (!file) return
+    if (file.size > MAX_PROFILE_FILE_BYTES) {
+      setError(t('profile.importError'))
+      return
+    }
     const reader = new FileReader()
+    reader.onerror = () => setError(t('profile.importError'))
     reader.onload = () => {
       try {
         const added = importProfiles(reader.result as string)
@@ -163,8 +179,6 @@ export default function ProfileModal({ open, onClose, getCurrentFormState, onSel
       }
     }
     reader.readAsText(file)
-    // 같은 파일 재선택 가능하도록 리셋
-    e.target.value = ''
   }
 
   function handleDialogClick(e: React.MouseEvent<HTMLDialogElement>) {
@@ -222,6 +236,7 @@ export default function ProfileModal({ open, onClose, getCurrentFormState, onSel
         >
           <input
             ref={newNameInputRef}
+            maxLength={MAX_PROFILE_NAME_LENGTH}
             type="text"
             value={newName}
             onChange={e => setNewName(e.target.value)}
@@ -277,6 +292,7 @@ export default function ProfileModal({ open, onClose, getCurrentFormState, onSel
                   >
                     <input
                       ref={editNameInputRef}
+                      maxLength={MAX_PROFILE_NAME_LENGTH}
                       type="text"
                       value={editName}
                       onChange={e => setEditName(e.target.value)}

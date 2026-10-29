@@ -59,7 +59,8 @@
 
     <script>
       (function() {
-        var s = localStorage.getItem('orrery-theme');
+        var s;
+        try { s = localStorage.getItem('orrery-theme'); } catch (_) {}
         var d = window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (s === 'dark' || (s !== 'light' && d)) {
           document.documentElement.classList.add('dark');

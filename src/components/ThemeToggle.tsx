@@ -6,8 +6,10 @@ type ThemePreference = 'system' | 'light' | 'dark'
 const STORAGE_KEY = 'orrery-theme'
 
 function getStored(): ThemePreference {
-  const v = localStorage.getItem(STORAGE_KEY)
-  if (v === 'light' || v === 'dark') return v
+  try {
+    const v = localStorage.getItem(STORAGE_KEY)
+    if (v === 'light' || v === 'dark') return v
+  } catch { /* Storage can be disabled by browser policy. */ }
   return 'system'
 }
 
@@ -41,11 +43,10 @@ export default function ThemeToggle() {
   function cycle() {
     const next: ThemePreference =
       pref === 'system' ? 'light' : pref === 'light' ? 'dark' : 'system'
-    if (next === 'system') {
-      localStorage.removeItem(STORAGE_KEY)
-    } else {
-      localStorage.setItem(STORAGE_KEY, next)
-    }
+    try {
+      if (next === 'system') localStorage.removeItem(STORAGE_KEY)
+      else localStorage.setItem(STORAGE_KEY, next)
+    } catch { /* Keep the in-memory preference when persistence is unavailable. */ }
     setPref(next)
   }
 

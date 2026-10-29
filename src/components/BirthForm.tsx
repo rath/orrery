@@ -18,6 +18,9 @@ import {
   stepCoordinate,
 } from '../utils/coordinate-input.ts'
 import logo from '../assets/icon-512.png'
+import { parseSavedFormState } from '../utils/birth-state.ts'
+import type { SavedFormState } from '../utils/birth-state.ts'
+export type { SavedFormState } from '../utils/birth-state.ts'
 
 export interface BirthFormHandle {
   getCurrentState(): SavedFormState
@@ -31,26 +34,11 @@ interface Props {
 
 const STORAGE_KEY = 'orrery-birth-input'
 
-export interface SavedFormState {
-  year: number
-  month: number
-  day: number
-  hour: number
-  minute: number
-  gender: Gender
-  unknownTime: boolean
-  jasiMethod: JasiMethod
-  city: City | null
-  manualCoords: boolean
-  latitude: number
-  longitude: number
-}
-
 function loadSaved(): SavedFormState | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
-    return JSON.parse(raw) as SavedFormState
+    if (!raw || raw.length > 4096) return null
+    return parseSavedFormState(JSON.parse(raw))
   } catch {
     return null
   }
