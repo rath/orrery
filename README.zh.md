@@ -64,7 +64,7 @@ bun dev
 bun run build
 
 # 测试
-bun test
+bun run test
 ```
 
 ## 技术栈

@@ -64,7 +64,7 @@ bun dev
 bun run build
 
 # 테스트
-bun test
+bun run test
 ```
 
 ## 기술 스택

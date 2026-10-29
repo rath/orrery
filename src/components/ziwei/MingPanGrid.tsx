@@ -1,5 +1,5 @@
 import type { ZiweiChart, ZiweiPalace } from '@orrery/core/types'
-import { PALACE_NAMES, MAIN_STAR_NAMES, LUCKY_STAR_NAMES, SHA_STAR_NAMES, DI_ZHI } from '@orrery/core/constants'
+import { MAIN_STAR_NAMES, LUCKY_STAR_NAMES, SHA_STAR_NAMES, DI_ZHI } from '@orrery/core/constants'
 import { getDaxianList } from '@orrery/core/ziwei'
 
 interface Props {

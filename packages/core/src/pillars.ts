@@ -293,7 +293,7 @@ export function calculateInjongbeop(
 
     // 해당 카테고리의 오행 찾기
     let targetElement: Element | null = null;
-    for (const [el, info] of Object.entries(STEM_INFO)) {
+    for (const info of Object.values(STEM_INFO)) {
       if (info.yinyang !== '+') continue;
       const inter = getInteraction(dayInfo.element, info.element);
       if (inter && cat.interactions.includes(inter)) {
@@ -559,7 +559,7 @@ export function findTransits(
   const step = backward ? -msPerDay : msPerDay;
 
   while (backward ? current >= endDate : current <= endDate) {
-    const [yearP, monthP, dayP] = getFourPillars(
+    const [, monthP, dayP] = getFourPillars(
       current.getFullYear(), current.getMonth() + 1, current.getDate(), 12, 0,
     );
 

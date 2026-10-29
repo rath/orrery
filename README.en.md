@@ -64,7 +64,7 @@ bun dev
 bun run build
 
 # Test
-bun test
+bun run test
 ```
 
 ## Tech Stack

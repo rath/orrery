@@ -17,7 +17,7 @@ bun run build
 bunx tsc --noEmit
 
 # 테스트 (전체)
-bun test
+bun run test
 
 # 코어 패키지 빌드
 bun run --cwd packages/core build

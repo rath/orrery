@@ -1,7 +1,7 @@
 import type { SajuResult, ZiweiChart, LiuNianInfo, NatalChart } from '@orrery/core/types'
 import { ELEMENT_HANJA, PILLAR_NAMES, PALACE_NAMES, MAIN_STAR_NAMES } from '@orrery/core/constants'
 import { getDaxianList } from '@orrery/core/ziwei'
-import { formatRelation, fmt2 } from './format.ts'
+import { fmt2 } from './format.ts'
 import { ZODIAC_SYMBOLS, PLANET_SYMBOLS, ASPECT_SYMBOLS, ROMAN, formatDegree, HOUSE_SYSTEMS } from '@orrery/core/natal'
 import { t as translate, getLocale } from '../i18n/index.ts'
 import type { Locale } from '../i18n/index.ts'

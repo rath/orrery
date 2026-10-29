@@ -14,7 +14,6 @@ const J2000 = 2451545.0
 const SE_TIDAL_26 = -26.0
 const SE_TIDAL_STEPHENSON_2016 = -25.85
 const TABSTART = 1620
-const TABEND = 2028
 
 /** Tabulated Delta-T values (hundredths of a second), 1620–2028 */
 const dt: number[] = [

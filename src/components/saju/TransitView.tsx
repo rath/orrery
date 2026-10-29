@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react'
 import { findTransits } from '@orrery/core/pillars'
 import { formatRelation } from '../../utils/format.ts'
-import type { TransitItem } from '@orrery/core/types'
 import { useLocale } from '../../i18n/index.ts'
 
 interface Props {

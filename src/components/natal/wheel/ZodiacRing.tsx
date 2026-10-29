@@ -5,7 +5,7 @@ import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '@orrery/core/natal'
 import type { ZodiacSign } from '@orrery/core/types'
 import {
   CX, CY, R_OUTER, R_ZODIAC_INNER,
-  lonToAngle, angleToPoint, arcPath,
+  lonToAngle, angleToPoint,
 } from './geometry.ts'
 
 /** 원소별 세그먼트 색상 */

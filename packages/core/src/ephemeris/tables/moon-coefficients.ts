@@ -5,7 +5,7 @@
  * AGPL-licensed — see Swiss Ephemeris license terms.
  */
 
-export const STR = 4.8481368110953599359e-6
+export const STR = 4.84813681109536e-6
 export const MOON_MEAN_DIST = 384400000.0
 export const MOON_MEAN_INCL = 5.1453964
 export const MOON_MEAN_ECC = 0.054900489

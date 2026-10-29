@@ -64,7 +64,7 @@ bun dev
 bun run build
 
 # テスト
-bun test
+bun run test
 ```
 
 ## 技術スタック

@@ -7,7 +7,6 @@
  * AGPL-licensed — see Swiss Ephemeris license terms.
  */
 
-const SE_GREG_CAL = 1
 
 /**
  * Calendar date → Julian Day Number (Gregorian calendar)

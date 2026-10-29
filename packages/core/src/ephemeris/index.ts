@@ -185,7 +185,9 @@ export function calcPlanet(jd: number, body: number): PlanetResult {
     throw new Error(`Unsupported body: ${body}`)
   }
 
-  let { xp, xe } = moshplan(tjde, ipli, allPlanets)
+  const initial = moshplan(tjde, ipli, allPlanets)
+  const xe = initial.xe
+  let xp = initial.xp
   const lightDaysPerAu = 0.00577551833109
   if (body !== SE_SUN) {
     // Apparent positions use the planet at emission and Earth at reception.

@@ -4,7 +4,7 @@
  * 실행: bun packages/core/examples/saju.ts
  */
 import { calculateSaju } from '../src/saju.ts'
-import { PILLAR_NAMES, ELEMENT_HANJA } from '../src/constants.ts'
+import { PILLAR_NAMES } from '../src/constants.ts'
 import type { BirthInput } from '../src/types.ts'
 
 const input: BirthInput = {

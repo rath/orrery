@@ -11,6 +11,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "test": "vitest run",
     "preview": "vite preview",
     "generate-icons": "bun scripts/generate-icons.ts",
     "generate-og-image": "bun scripts/generate-og-image.ts"

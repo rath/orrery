@@ -33,8 +33,8 @@ const AUNIT = 1.49597870700e+11 // meters
 
 // ─── Module-level state (mirrors C static variables) ───────────────────
 
-let ss: number[][] = Array.from({ length: 5 }, () => new Array(8).fill(0))
-let cc: number[][] = Array.from({ length: 5 }, () => new Array(8).fill(0))
+const ss: number[][] = Array.from({ length: 5 }, () => new Array(8).fill(0))
+const cc: number[][] = Array.from({ length: 5 }, () => new Array(8).fill(0))
 
 let SWELP = 0
 let M = 0
@@ -63,7 +63,7 @@ let l3 = 0
 let l4 = 0
 let B = 0
 
-let moonpol = [0, 0, 0]
+const moonpol = [0, 0, 0]
 
 // ─── Utility functions ─────────────────────────────────────────────────
 

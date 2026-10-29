@@ -6,7 +6,6 @@ import {
   getTwelveMeteor, getTwelveSpirit, getHiddenStems, analyzeAllRelations, getSpecialSals,
   calculateJwabeop, calculateInjongbeop, getGongmang,
 } from './pillars.ts';
-import { STEM_INFO } from './constants.ts';
 import { assertBirthInput } from './validation.ts';
 import {
   adjustBirthInputToSolarTime,

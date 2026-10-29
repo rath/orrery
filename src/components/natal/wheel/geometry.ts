@@ -134,7 +134,7 @@ export function arcPath(startAngle: number, endAngle: number, r: number): string
   const start = angleToPoint(startAngle, r)
   const end = angleToPoint(endAngle, r)
   // 호의 각도 크기 결정
-  let sweep = ((endAngle - startAngle) % 360 + 360) % 360
+  const sweep = ((endAngle - startAngle) % 360 + 360) % 360
   const largeArc = sweep > 180 ? 1 : 0
   // SVG arc는 시계 반대 방향이 sweep=0
   return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 0 ${end.x} ${end.y}`

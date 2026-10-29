@@ -11,7 +11,6 @@
  */
 
 const J2000 = 2451545.0
-const DEG_TO_RAD = Math.PI / 180
 
 function degnorm(x: number): number {
   let y = x % 360.0
@@ -34,7 +33,7 @@ export function calcMeanNode(tjd: number): number {
 
   // Chapront et al. expression for Omega (mean ascending node)
   // in degrees
-  let omega = 125.0445479
+  const omega = 125.0445479
     - 1934.1362891 * T
     + 0.0020754 * T2
     + T3 / 467441.0

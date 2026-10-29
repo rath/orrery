@@ -63,8 +63,8 @@ export function calcChiron(tjd: number): { longitude: number; speed: number } {
   const frac = fractionalIdx - i0
 
   // Get positions (handle wrap-around for 0°/360° boundary)
-  let p0 = CHIRON_LON[i0]
-  let p1 = CHIRON_LON[i1]
+  const p0 = CHIRON_LON[i0]
+  const p1 = CHIRON_LON[i1]
 
   // Unwrap: if positions differ by >180°, one crossed 0°
   let dp = p1 - p0

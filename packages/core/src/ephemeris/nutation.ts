@@ -176,8 +176,8 @@ export function calcNutation(tjd: number): [number, number] {
     cc[k] = new Array(8)
     const arg = args[k]
     const n = ns[k]
-    let su = Math.sin(arg)
-    let cu = Math.cos(arg)
+    const su = Math.sin(arg)
+    const cu = Math.cos(arg)
     ss[k][0] = su
     cc[k][0] = cu
     let sv = 2.0 * su * cu

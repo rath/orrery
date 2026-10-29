@@ -18,7 +18,7 @@ import { precess } from './precession.ts'
 const J2000 = 2451545.0
 const J1900 = 2415020.0
 const TIMESCALE = 3652500.0
-const STR = 4.8481368110953599359e-6  // arc seconds to radians
+const STR = 4.84813681109536e-6  // arc seconds to radians
 const PLAN_SPEED_INTV = 0.1           // days, for numerical differentiation
 const EARTH_MOON_MRAT = 81.30056
 
