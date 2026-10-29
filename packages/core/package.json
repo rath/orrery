@@ -1,6 +1,6 @@
 {
   "name": "@orrery/core",
-  "version": "0.4.5",
+  "version": "0.5.0",
   "description": "Saju (四柱八字), Ziwei Doushu (紫微斗數) and Western natal chart calculations in pure TypeScript for browsers and Node.js",
   "license": "AGPL-3.0-only",
   "repository": {
