@@ -9,6 +9,10 @@ import type {
   NatalHouse, NatalAngles, AspectType, NatalAspect, NatalChart,
 } from './types.ts'
 import { julday, calcPlanet, calcHouses } from './ephemeris/index.ts'
+import { deltaT } from './ephemeris/deltat.ts'
+import { calcObliquity } from './ephemeris/obliquity.ts'
+import { calcNutation } from './ephemeris/nutation.ts'
+import { DEG_TO_RAD } from './ephemeris/math.ts'
 import { birthInputToUtcDate, getBirthTimezone } from './timezone.ts'
 import { assertBirthInput } from './validation.ts'
 
@@ -126,6 +130,20 @@ function angularDifference(lon1: number, lon2: number): number {
   let diff = Math.abs(normalizeDeg(lon1) - normalizeDeg(lon2))
   if (diff > 180) diff = 360 - diff
   return diff
+}
+
+/** Geometric solar center above the horizon, independent of house divisions. */
+function isDaytime(sun: PlanetPosition, jd: number, latitude: number, armc: number): boolean {
+  const tt = jd + deltaT(jd)
+  const obliquity = calcObliquity(tt) + calcNutation(tt)[1]
+  const lon = sun.longitude * DEG_TO_RAD
+  const lat = sun.latitude * DEG_TO_RAD
+  const x = Math.cos(lat) * Math.cos(lon)
+  const y = Math.cos(lat) * Math.sin(lon) * Math.cos(obliquity) - Math.sin(lat) * Math.sin(obliquity)
+  const z = Math.cos(lat) * Math.sin(lon) * Math.sin(obliquity) + Math.sin(lat) * Math.cos(obliquity)
+  const phi = latitude * DEG_TO_RAD
+  const theta = armc * DEG_TO_RAD
+  return Math.cos(phi) * (x * Math.cos(theta) + y * Math.sin(theta)) + Math.sin(phi) * z >= 0
 }
 
 /** 도수를 DD°MM' 형식으로 포맷 */
@@ -251,8 +269,8 @@ export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Prom
     const ascLon = ascmc[0]
     const sun = planets.find(p => p.id === 'Sun')!
     const moon = planets.find(p => p.id === 'Moon')!
-    // 주간/야간 판정: 태양이 지평선 위(하우스 7~12)면 주간
-    const isDayChart = sun.house! >= 7
+    // Whole Sign/Morinus 등의 하우스 경계는 실제 지평선과 일치하지 않는다.
+    const isDayChart = isDaytime(sun, jd, lat, ascmc[2])
     const fortunaLon = isDayChart
       ? normalizeDeg(ascLon + moon.longitude - sun.longitude)
       : normalizeDeg(ascLon + sun.longitude - moon.longitude)
