@@ -51,6 +51,20 @@ describe('daxian age boundaries', () => {
   const chart = createChart(1993, 3, 12, 9, 45, true)
   const daxianList = getDaxianList(chart)
 
+  it('counts a birth before Lunar New Year from the previous lunar year', () => {
+    const january = createChart(1999, 2, 14, 8, 20, false, 'Asia/Seoul')
+    expect(january.lunarYear).toBe(1998)
+    expect(january.daXianStartAge).toBe(3)
+    expect(getDaxianIndex(january, 2010)).toBe(1) // 13歲, not 12歲
+  })
+
+  it('places lunar months using the birth month and hour (斗君)', () => {
+    // iztro 2.6.3: bySolar('1993-3-12', 5, '男', false, 'zh-TW'),
+    // horoscope('2024-2-10').monthly.index === 6 (寅-based index => 申).
+    expect(calculateLiunian(chart, 2024).liuyue.map(month => month.mingGongZhi))
+      .toEqual(['申', '酉', '戌', '亥', '子', '丑', '寅', '卯', '辰', '巳', '午', '未'])
+  })
+
   it('uses nominal age consistently at the first decade boundary', () => {
     expect(chart.daXianStartAge).toBe(2)
     expect(getDaxianIndex(chart, 2003)).toBe(0) // 11歲

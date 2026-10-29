@@ -3,7 +3,7 @@
  */
 // @ts-expect-error lunar-javascript has no type declarations
 import { Solar } from 'lunar-javascript'
-import { assertCoordinate } from './validation.ts'
+import { assertCoordinate, assertDateTime } from './validation.ts'
 
 import {
   TIAN_GAN, DI_ZHI, PALACE_NAMES,
@@ -387,9 +387,10 @@ function getPalaceByZhi(chart: ZiweiChart, zhi: string): ZiweiPalace | null {
   return null
 }
 
-/** 특정 연도의 대한 인덱스. 자미두수의 세는나이(출생년=1세)를 사용한다. */
+/** 특정 음력 연도의 대한 인덱스. 음력 출생년을 1세로 센다. */
 export function getDaxianIndex(chart: ZiweiChart, year: number): number {
-  const age = year - chart.solarYear + 1
+  assertDateTime(year, 1, 1, 0, 0)
+  const age = year - chart.lunarYear + 1
   const startAge = chart.daXianStartAge
 
   let daxianNum = Math.floor((age - startAge) / 10)
@@ -417,6 +418,7 @@ function getCurrentDaxian(chart: ZiweiChart, year: number): [string, number, num
 }
 
 export function calculateLiunian(chart: ZiweiChart, year: number): LiuNianInfo {
+  assertDateTime(year, 1, 1, 0, 0)
   const [lnGan, lnZhi] = getLiunianGanZhi(year)
   const lnMingZhi = lnZhi
 
@@ -445,10 +447,12 @@ export function calculateLiunian(chart: ZiweiChart, year: number): LiuNianInfo {
     lnPalaces[PALACE_NAMES[i]] = zhiAt(lnMingIdx - i)
   }
 
-  // 유월 계산
+  // 斗君: 유년 지지에서 생월까지 역행하고 생시까지 순행하여 정월을 정한다.
+  // 윤달은 명반과 동일하게 해당 음력 월로 처리한다 (반월 분할을 적용하지 않음).
+  const firstMonthIdx = lnMingIdx - (chart.lunarMonth - 1) + hourZhiIndex(chart.hour)
   const liuyue: LiuYueInfo[] = []
   for (let m = 1; m <= 12; m++) {
-    const lyMingIdx = (lnMingIdx + (m - 1)) % 12
+    const lyMingIdx = ((firstMonthIdx + m - 1) % 12 + 12) % 12
     const lyMingZhi = zhiAt(lyMingIdx)
     const lyNatalPalace = getPalaceByZhi(chart, lyMingZhi)
     liuyue.push({
