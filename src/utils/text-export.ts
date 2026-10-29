@@ -2,7 +2,7 @@ import type { SajuResult, ZiweiChart, LiuNianInfo, NatalChart } from '@orrery/co
 import { ELEMENT_HANJA, PILLAR_NAMES, PALACE_NAMES, MAIN_STAR_NAMES } from '@orrery/core/constants'
 import { getDaxianList } from '@orrery/core/ziwei'
 import { formatRelation, fmt2 } from './format.ts'
-import { ZODIAC_SYMBOLS, PLANET_SYMBOLS, ASPECT_SYMBOLS, ROMAN, formatDegree } from '@orrery/core/natal'
+import { ZODIAC_SYMBOLS, PLANET_SYMBOLS, ASPECT_SYMBOLS, ROMAN, formatDegree, HOUSE_SYSTEMS } from '@orrery/core/natal'
 import { t as translate, getLocale } from '../i18n/index.ts'
 import type { Locale } from '../i18n/index.ts'
 
@@ -259,6 +259,7 @@ export function ziweiToText(chart: ZiweiChart, liunian?: LiuNianInfo): string {
 
 /** Natal Chart를 텍스트로 변환 */
 export function natalToText(chart: NatalChart, houseSystemName = 'Placidus'): string {
+  houseSystemName = HOUSE_SYSTEMS.find(([code]) => code === chart.houseSystem)?.[1] ?? houseSystemName
   const t = makeT('en')
   const lines: string[] = []
   const hasHouses = chart.angles != null

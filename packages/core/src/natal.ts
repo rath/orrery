@@ -184,6 +184,7 @@ function calculateAspects(planets: PlanetPosition[]): NatalAspect[] {
 
 export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Promise<NatalChart> {
   assertBirthInput(input)
+  houseSystem = typeof houseSystem === 'string' ? houseSystem.toUpperCase() : ''
   if (!HOUSE_SYSTEMS.some(([code]) => code === houseSystem)) {
     throw new RangeError(`Unsupported house system: ${houseSystem}`)
   }
@@ -202,7 +203,7 @@ export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Prom
   const utYear = utcDate.getUTCFullYear()
   const utMonth = utcDate.getUTCMonth() + 1
   const utDay = utcDate.getUTCDate()
-  const utHour = utcDate.getUTCHours() + utcDate.getUTCMinutes() / 60
+  const utHour = utcDate.getUTCHours() + utcDate.getUTCMinutes() / 60 + utcDate.getUTCSeconds() / 3600
   const jd = julday(utYear, utMonth, utDay, utHour)
 
   // 하우스 계산 (시간 모름이면 생략)
@@ -210,6 +211,7 @@ export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Prom
   let ascmc: number[] | null = null
   if (!unknownTime) {
     const houseResult = calcHouses(jd, lat, lon, houseSystem)
+    houseSystem = houseResult.system
     cusps = Array.from(houseResult.cusps)
     ascmc = Array.from(houseResult.ascmc)
   }
@@ -240,7 +242,7 @@ export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Prom
     speed: northNode.speed,
     sign: lonToSign(southLon),
     degreeInSign: degreeInSign(southLon),
-    isRetrograde: false,
+    isRetrograde: northNode.speed < 0,
     ...(cusps ? { house: findHouse(southLon, cusps) } : {}),
   })
 
@@ -299,5 +301,5 @@ export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Prom
   const aspectPlanets = planets.filter(p => p.id !== 'SouthNode' && p.id !== 'Fortuna')
   const aspects = calculateAspects(aspectPlanets)
 
-  return { input, planets, houses, angles, aspects }
+  return { input, planets, houses, angles, aspects, houseSystem }
 }

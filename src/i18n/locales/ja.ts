@@ -165,6 +165,7 @@ const ja: Record<string, string> = {
   'ziwei.needTimeDesc': '出生時間によって命盤の構造が変わります。出生時間を入力してください。',
 
   // Natal
+  'natal.houseSystemFallback': '選択したハウス方式を計算できないため、{system} 方式で表示します。',
   'natal.loading': 'Swiss Ephemeris 読み込み中...',
   'natal.error': '計算エラー',
   'natal.unknownTime': '出生時間未入力のため、正午（12:00）基準で計算した結果です。',

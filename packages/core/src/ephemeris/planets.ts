@@ -14,8 +14,6 @@ import type { PlanetTable } from './tables/planet-coefficients.ts'
 import { polcart, coortrf2, DEG_TO_RAD } from './math.ts'
 import { calcObliquity } from './obliquity.ts'
 import { precess } from './precession.ts'
-import { calcNutation } from './nutation.ts'
-import { deltaT } from './deltat.ts'
 
 const J2000 = 2451545.0
 const J1900 = 2415020.0
@@ -291,7 +289,7 @@ function embofsMosh(
 /**
  * Compute heliocentric equatorial J2000 coordinates for Earth and a planet.
  *
- * @param tjd   Julian day (UT)
+ * @param tjd   Julian day (TT)
  * @param ipli  internal planet index (0=Earth/Sun, 2=Mercury, ..., 8=Neptune)
  * @param planets  array of all 9 PlanetTable objects [mer404..plu404]
  * @returns { xp: number[6], xe: number[6] } planet and Earth position+velocity
@@ -314,7 +312,7 @@ export function moshplan(
   // To equatorial J2000
   xe = coortrf2([xe[0], xe[1], xe[2], 0, 0, 0], -eps2000)
   // EMB → Earth (needs obliquity of date for Moon)
-  const epsDate = calcObliquity(tjd + deltaT(tjd))
+  const epsDate = calcObliquity(tjd)
   embofsMosh(tjd, xe, epsDate)
 
   // Speed via numerical differentiation

@@ -24,6 +24,7 @@ import { deltaT } from './deltat'
 export interface HousesResult {
   cusps: number[]   // cusps[1..12] in degrees (index 0 unused)
   ascmc: number[]   // ascmc[0]=ASC, ascmc[1]=MC, ascmc[2]=ARMC
+  system: string   // actual system, including polar/convergence fallback
 }
 
 // ---------------------------------------------------------------------------
@@ -196,6 +197,7 @@ function housesPorphyry(
     acUsed = degnorm(ac + 180)
     acmc = difdeg2n(acUsed, mc)
   }
+  cusps[1] = acUsed
   cusps[11] = degnorm(mc + acmc / 3)
   cusps[12] = degnorm(mc + (acmc / 3) * 2)
   cusps[2] = degnorm(acUsed + (180 - acmc) / 3)
@@ -209,11 +211,11 @@ function housesPlacidus(
   th: number, fi: number, ekl: number,
   sine: number, cose: number,
   ac: number, mc: number,
-): void {
+): string {
   // Polar circle check: fall back to Porphyry
   if (Math.abs(fi) >= 90 - ekl) {
     housesPorphyry(cusps, ac, mc)
-    return
+    return 'O'
   }
 
   cusps[1] = ac
@@ -233,7 +235,7 @@ function housesPlacidus(
   // Match Swiss Ephemeris by falling back to Porphyry for the whole chart.
   if (cusp11 === null || cusp12 === null || cusp2 === null || cusp3 === null) {
     housesPorphyry(cusps, ac, mc)
-    return
+    return 'O'
   }
 
   cusps[11] = cusp11
@@ -242,6 +244,7 @@ function housesPlacidus(
   cusps[3] = cusp3
 
   computeOpposites(cusps)
+  return 'P'
 }
 
 /**
@@ -401,14 +404,7 @@ function housesAlcabitus(
   th: number, fi: number,
   sine: number, cose: number,
   ac: number, mc: number,
-  ekl: number,
 ): void {
-  // Polar circle check: fall back to Porphyry
-  if (Math.abs(fi) >= 90 - ekl) {
-    housesPorphyry(cusps, ac, mc)
-    return
-  }
-
   cusps[1] = ac
   cusps[10] = mc
 
@@ -528,18 +524,23 @@ export function calcHouses(
   mc = degnorm(mc)
 
   // --- ASC ---
-  const ac = Asc1(th + 90, geolat, sine, cose)
+  let ac = Asc1(th + 90, geolat, sine, cose)
+  if (['E', 'W', 'B', 'M'].includes(hsys.toUpperCase()) && difdeg2n(ac, mc) < 0) {
+    ac = degnorm(ac + 180)
+  }
 
   // --- Compute cusps ---
   const cusps = new Array<number>(13).fill(0)
   const fi = geolat
+  let system = hsys.toUpperCase()
 
   switch (hsys.toUpperCase()) {
     case 'P':
-      housesPlacidus(cusps, th, fi, ekl, sine, cose, ac, mc)
+      system = housesPlacidus(cusps, th, fi, ekl, sine, cose, ac, mc)
       break
     case 'K':
       housesKoch(cusps, th, fi, sine, cose, ac, mc, ekl)
+      if (Math.abs(fi) >= 90 - ekl) system = 'O'
       break
     case 'O':
       housesPorphyry(cusps, ac, mc)
@@ -557,7 +558,7 @@ export function calcHouses(
       housesWholeSign(cusps, ac)
       break
     case 'B':
-      housesAlcabitus(cusps, th, fi, sine, cose, ac, mc, ekl)
+      housesAlcabitus(cusps, th, fi, sine, cose, ac, mc)
       break
     case 'M':
       housesMorinus(cusps, th, ekl)
@@ -567,12 +568,18 @@ export function calcHouses(
       break
     default:
       // Default to Placidus
-      housesPlacidus(cusps, th, fi, ekl, sine, cose, ac, mc)
+      system = housesPlacidus(cusps, th, fi, ekl, sine, cose, ac, mc)
       break
+  }
+
+  if (['P', 'K', 'O', 'R', 'C', 'B', 'T'].includes(hsys.toUpperCase())) {
+    ac = cusps[1]
+    mc = cusps[10]
   }
 
   return {
     cusps,
     ascmc: [ac, mc, armc],
+    system,
   }
 }

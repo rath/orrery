@@ -165,6 +165,7 @@ const en: Record<string, string> = {
   'ziwei.needTimeDesc': 'The entire chart structure changes based on birth time. Please enter your time of birth.',
 
   // Natal
+  'natal.houseSystemFallback': 'The selected house system is unavailable here. Showing {system} houses.',
   'natal.loading': 'Loading Swiss Ephemeris...',
   'natal.error': 'Calculation Error',
   'natal.unknownTime': 'Calculated based on noon (12:00) without birth time.',

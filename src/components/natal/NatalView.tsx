@@ -70,10 +70,15 @@ export default function NatalView({ input }: Props) {
 
   if (!chart) return null
 
-  const houseSystemName = HOUSE_SYSTEMS.find(([k]) => k === houseSystem)?.[1] ?? 'Placidus'
+  const houseSystemName = HOUSE_SYSTEMS.find(([k]) => k === (chart.houseSystem ?? houseSystem))?.[1] ?? 'Placidus'
 
   return (
     <div className="space-y-6">
+      {!unknownTime && chart.houseSystem && chart.houseSystem !== houseSystem && (
+        <p role="status" className="text-sm text-amber-700 dark:text-amber-400">
+          {t('natal.houseSystemFallback').replace('{system}', houseSystemName)}
+        </p>
+      )}
       {/* 시간 모름 안내 */}
       {unknownTime && (
         <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-4">

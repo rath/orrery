@@ -165,6 +165,7 @@ const de: Record<string, string> = {
   'ziwei.needTimeDesc': 'Die gesamte Struktur des Horoskops hängt von der Geburtszeit ab. Bitte geben Sie Ihre Geburtszeit ein.',
 
   // Natal
+  'natal.houseSystemFallback': 'Das gewählte Häusersystem ist hier nicht berechenbar. Angezeigt wird {system}.',
   'natal.loading': 'Swiss Ephemeris wird geladen...',
   'natal.error': 'Berechnungsfehler',
   'natal.unknownTime': 'Ohne Geburtszeit auf Basis von 12:00 Uhr berechnet.',

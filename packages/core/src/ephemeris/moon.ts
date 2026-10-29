@@ -15,7 +15,6 @@
 import { polcart, coortrf2 } from './math.ts'
 import { precess } from './precession.ts'
 import { calcObliquity } from './obliquity.ts'
-import { deltaT } from './deltat.ts'
 import {
   STR,
   MOON_SPEED_INTV,
@@ -665,7 +664,7 @@ function ecldat_equ2000(tjd: number, xpm: number[]): void {
   const cart = polcart([xpm[0], xpm[1], xpm[2]])
 
   // Obliquity of date (need TT for obliquity)
-  const tjde = tjd + deltaT(tjd)
+  const tjde = tjd
   const eps = calcObliquity(tjde)
 
   // Ecliptic → equatorial rotation
@@ -687,7 +686,7 @@ function ecldat_equ2000(tjd: number, xpm: number[]): void {
  * Implements the Moshier lunar theory (DE404 fit).
  * Speed is obtained via parabolic interpolation of three positions.
  *
- * @param tjd  Julian day (UT)
+ * @param tjd  Julian day (TT)
  * @returns Object with `xp`: [x, y, z, vx, vy, vz] in AU and AU/day
  */
 export function calcMoon(tjd: number): { xp: number[] } {

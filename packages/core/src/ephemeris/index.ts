@@ -149,8 +149,9 @@ export function calcPlanet(jd: number, body: number): PlanetResult {
   // ── Mean Node ──
   if (body === SE_MEAN_NODE) {
     const { longitude, speed } = calcMeanNodeFull(tjde)
+    const [dpsi] = calcNutation(tjde)
     return {
-      longitude, latitude: 0, distance: 0.002569,
+      longitude: degnorm(longitude + dpsi * RAD_TO_DEG), latitude: 0, distance: 0.002569,
       longitudeSpeed: speed, latitudeSpeed: 0, distanceSpeed: 0,
     }
   }
@@ -166,7 +167,7 @@ export function calcPlanet(jd: number, body: number): PlanetResult {
 
   // ── Moon ──
   if (body === SE_MOON) {
-    const { xp } = calcMoon(jd)
+    const { xp } = calcMoon(tjde)
     const polar = equ2000ToEclDate(xp, tjde)
     return {
       longitude: degnorm(polar[0] * RAD_TO_DEG),
@@ -184,7 +185,13 @@ export function calcPlanet(jd: number, body: number): PlanetResult {
     throw new Error(`Unsupported body: ${body}`)
   }
 
-  const { xp, xe } = moshplan(jd, ipli, allPlanets)
+  let { xp, xe } = moshplan(tjde, ipli, allPlanets)
+  const lightDaysPerAu = 0.00577551833109
+  if (body !== SE_SUN) {
+    // Apparent positions use the planet at emission and Earth at reception.
+    const distance = Math.hypot(xp[0] - xe[0], xp[1] - xe[1], xp[2] - xe[2])
+    xp = moshplan(tjde - distance * lightDaysPerAu, ipli, allPlanets).xp
+  }
 
   // Geocentric = planet - Earth (for Sun: geocentric = -Earth)
   const xgeo = new Array(6)
@@ -192,6 +199,16 @@ export function calcPlanet(jd: number, body: number): PlanetResult {
     for (let i = 0; i < 6; i++) xgeo[i] = -xe[i]
   } else {
     for (let i = 0; i < 6; i++) xgeo[i] = xp[i] - xe[i]
+  }
+
+  // Annual aberration: Lorentz transform using Earth's barycentric velocity
+  // (heliocentric velocity is sufficient for the Moshier approximation here).
+  const distance = Math.hypot(xgeo[0], xgeo[1], xgeo[2])
+  const beta = xe.slice(3).map(v => v * lightDaysPerAu)
+  const dot = (xgeo[0] * beta[0] + xgeo[1] * beta[1] + xgeo[2] * beta[2]) / distance
+  const bm1 = Math.sqrt(1 - beta.reduce((sum, v) => sum + v * v, 0))
+  for (let i = 0; i < 3; i++) {
+    xgeo[i] = (bm1 * xgeo[i] + (1 + dot / (1 + bm1)) * beta[i] * distance) / (1 + dot)
   }
 
   const polar = equ2000ToEclDate(xgeo, tjde)

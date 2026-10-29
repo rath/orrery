@@ -324,6 +324,8 @@ export interface NatalAspect {
 /** 네이탈 차트 전체 결과 */
 export interface NatalChart {
   input: BirthInput;
+  /** Actual house system; may differ from the request at polar latitudes. */
+  houseSystem?: string;
   planets: PlanetPosition[];
   houses: NatalHouse[];
   /** 앵글 (시간 모름이면 null) */

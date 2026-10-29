@@ -165,6 +165,7 @@ const zh: Record<string, string> = {
   'ziwei.needTimeDesc': '命盘结构随出生时间变化，请输入出生时间。',
 
   // Natal
+  'natal.houseSystemFallback': '此处无法计算所选宫位制，现显示 {system} 宫位。',
   'natal.loading': '正在加载 Swiss Ephemeris...',
   'natal.error': '计算错误',
   'natal.unknownTime': '未输入出生时间，以正午（12:00）为基准计算。',

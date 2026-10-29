@@ -46,7 +46,7 @@ export function calcMeanNode(tjd: number): number {
 /**
  * Calculate Mean Node ecliptic longitude and speed.
  *
- * @param tjd Julian day (UT)
+ * @param tjd Julian day (TT)
  * @returns { longitude: number, speed: number } in degrees and degrees/day
  */
 export function calcMeanNodeFull(tjd: number): { longitude: number; speed: number } {
@@ -55,10 +55,8 @@ export function calcMeanNodeFull(tjd: number): { longitude: number; speed: numbe
   // Speed via numerical differentiation (0.1 day interval)
   const dt = 0.1
   const lon2 = calcMeanNode(tjd - dt)
-  let speed = (lon - lon2) / dt
-  // Handle wrap-around
-  if (speed > 180) speed -= 360
-  if (speed < -180) speed += 360
+  // Wrap the angular difference before dividing by the time interval.
+  const speed = (((lon - lon2 + 180) % 360 + 360) % 360 - 180) / dt
 
   return { longitude: lon, speed }
 }

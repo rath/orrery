@@ -47,7 +47,7 @@ function hermite(t: number, p0: number, p1: number, m0: number, m1: number): num
 export function calcChiron(tjd: number): { longitude: number; speed: number } {
   // Check range
   const jdEnd = CHIRON_JD_START + (CHIRON_N - 1) * CHIRON_JD_STEP
-  if (tjd < CHIRON_JD_START || tjd > jdEnd) {
+  if (!Number.isFinite(tjd) || tjd < CHIRON_JD_START || tjd > jdEnd) {
     throw new Error(
       `Chiron: JD ${tjd} outside range ${CHIRON_JD_START}..${jdEnd}`
     )
@@ -56,11 +56,11 @@ export function calcChiron(tjd: number): { longitude: number; speed: number } {
   // Find table index
   const fractionalIdx = (tjd - CHIRON_JD_START) / CHIRON_JD_STEP
   const i = Math.floor(fractionalIdx)
-  const frac = fractionalIdx - i
 
   // Clamp to valid range
   const i0 = Math.min(i, CHIRON_N - 2)
   const i1 = i0 + 1
+  const frac = fractionalIdx - i0
 
   // Get positions (handle wrap-around for 0°/360° boundary)
   let p0 = CHIRON_LON[i0]
