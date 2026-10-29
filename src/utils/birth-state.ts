@@ -30,6 +30,7 @@ export function parseSavedFormState(value: unknown): SavedFormState | null {
   if (!isRecord(value)) return null
   try {
     assertBirthInput(value as unknown as BirthInput)
+    if ((value.year as number) < 1900 || (value.year as number) > new Date().getFullYear()) return null
     assertCoordinate(value.latitude as number, 90)
     assertCoordinate(value.longitude as number, 180)
     if (typeof value.manualCoords !== 'boolean') return null

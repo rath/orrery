@@ -13,6 +13,7 @@
  */
 
 import type { BirthInput } from './types.ts';
+export { isKoreanDaylightTime } from './kdt.ts';
 import { assertDateTime, assertCoordinate, civilDateToUtc, InvalidDateTimeError } from './validation.ts';
 
 export const DEFAULT_TIMEZONE = 'Asia/Seoul';

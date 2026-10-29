@@ -23,7 +23,7 @@ afterEach(() => vi.unstubAllGlobals())
 describe('untrusted saved data', () => {
   it.each([null, [], { ...state, latitude: '37.5' }, { ...state, day: 31 },
     { ...state, city: { name: {}, lat: 37, lon: 127 } },
-    { ...state, unknownTime: 'false' }, { ...state, jasiMethod: 'invalid' },
+    { ...state, unknownTime: 'false' }, { ...state, jasiMethod: 'invalid' }, { ...state, year: 9999 },
   ])('rejects invalid form state: %j', data => {
     expect(parseSavedFormState(data)).toBeNull()
   })

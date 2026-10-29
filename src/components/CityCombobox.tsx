@@ -72,11 +72,11 @@ export default function CityCombobox({ selectedCity, onSelect }: Props) {
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault()
-        setHighlightIndex(i => (i + 1) % flatResults.length)
+        setHighlightIndex(i => flatResults.length ? (i + 1) % flatResults.length : -1)
         break
       case 'ArrowUp':
         e.preventDefault()
-        setHighlightIndex(i => (i - 1 + flatResults.length) % flatResults.length)
+        setHighlightIndex(i => flatResults.length ? (i - 1 + flatResults.length) % flatResults.length : -1)
         break
       case 'Enter':
         e.preventDefault()
@@ -156,7 +156,8 @@ export default function CityCombobox({ selectedCity, onSelect }: Props) {
     const label = formatCityName(city)
     return (
       <li
-        key={`${city.name}-${city.country ?? 'kr'}`}
+        key={`${city.name}-${city.country ?? city.region ?? 'kr'}`}
+        id={`city-option-${index}`}
         role="option"
         aria-selected={isHighlighted}
         className={`px-3 py-2 text-base cursor-pointer transition-colors ${

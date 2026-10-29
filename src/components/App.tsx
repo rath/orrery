@@ -1,20 +1,17 @@
-import { useCallback, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useRef, useState } from 'react'
 import BirthForm from './BirthForm.tsx'
-import type { BirthFormHandle, SavedFormState } from './BirthForm.tsx'
-import ProfileModal from './ProfileModal.tsx'
+import type { BirthFormHandle } from './BirthForm.tsx'
 import Guide from './Guide.tsx'
 import CopyButton from './CopyButton.tsx'
 import ThemeToggle from './ThemeToggle.tsx'
 import LanguageMenu from './LanguageMenu.tsx'
 import { useLocale } from '../i18n/index.ts'
-import SajuView from './saju/SajuView.tsx'
-import ZiweiView from './ziwei/ZiweiView.tsx'
-import NatalView from './natal/NatalView.tsx'
-import { calculateSaju } from '@orrery/core/saju'
-import { createChart } from '@orrery/core/ziwei'
-import { calculateNatal } from '@orrery/core/natal'
-import { sajuToText, ziweiToText, natalToText } from '../utils/text-export.ts'
 import type { BirthInput } from '@orrery/core/types'
+
+const SajuView = lazy(() => import('./saju/SajuView.tsx'))
+const ZiweiView = lazy(() => import('./ziwei/ZiweiView.tsx'))
+const NatalView = lazy(() => import('./natal/NatalView.tsx'))
+const ProfileModal = lazy(() => import('./ProfileModal.tsx'))
 
 type Tab = 'saju' | 'ziwei' | 'natal'
 
@@ -23,7 +20,6 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('saju')
   const [birthInput, setBirthInput] = useState<BirthInput | null>(null)
   const [profileModalOpen, setProfileModalOpen] = useState(false)
-  const [externalFormState, setExternalFormState] = useState<SavedFormState | null>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
   const birthFormRef = useRef<BirthFormHandle>(null)
 
@@ -65,8 +61,6 @@ export default function App() {
         <BirthForm
           ref={birthFormRef}
           onSubmit={handleSubmit}
-          externalState={externalFormState}
-          onExternalStateConsumed={() => setExternalFormState(null)}
         />
         <div className="flex justify-end mt-2">
           <button
@@ -84,7 +78,7 @@ export default function App() {
         {birthInput && (
           <>
             {/* 탭 네비게이션 */}
-            <div ref={resultsRef} className="flex items-center border-b border-gray-200 dark:border-gray-700 mt-6 mb-4">
+            <div ref={resultsRef} className="flex flex-wrap items-center gap-y-2 border-b border-gray-200 dark:border-gray-700 mt-6 mb-4 scroll-mt-24 sm:scroll-mt-4">
               <button
                 className={`px-2 sm:px-4 py-2 text-sm sm:text-base font-medium whitespace-nowrap border-b-2 transition-colors ${
                   tab === 'saju'
@@ -119,6 +113,10 @@ export default function App() {
                 <CopyButton
                   label={<>{t('app.copyAll')}<br />{t('app.copyAllSub')}</>}
                   getText={async () => {
+                    const [{ calculateSaju }, { createChart }, { calculateNatal }, { sajuToText, ziweiToText, natalToText }] = await Promise.all([
+                      import('@orrery/core/saju'), import('@orrery/core/ziwei'),
+                      import('@orrery/core/natal'), import('../utils/text-export.ts'),
+                    ])
                     const saju = calculateSaju(birthInput)
                     const parts = [sajuToText(saju)]
                     if (!birthInput.unknownTime) {
@@ -140,9 +138,11 @@ export default function App() {
               </div>
             </div>
 
-            {tab === 'saju' && <SajuView input={birthInput} />}
-            {tab === 'ziwei' && <ZiweiView input={birthInput} />}
-            {tab === 'natal' && <NatalView input={birthInput} />}
+            <Suspense fallback={<p role="status" className="py-8 text-center text-gray-500">{t('app.loading')}</p>}>
+              {tab === 'saju' && <SajuView input={birthInput} />}
+              {tab === 'ziwei' && <ZiweiView input={birthInput} />}
+              {tab === 'natal' && <NatalView input={birthInput} />}
+            </Suspense>
           </>
         )}
 
@@ -151,12 +151,13 @@ export default function App() {
       <footer className="text-center text-xs text-gray-400 dark:text-gray-500 py-6">
         <p>&copy; 2026 Jang-Ho Hwang &middot; <a href="https://x.com/xrath" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 dark:hover:text-gray-300">@xrath</a> &middot; <a href="https://x.com/xrath/status/2022548658562937028" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 dark:hover:text-gray-300">{t('app.intro')}</a></p>
       </footer>
-      <ProfileModal
-        open={profileModalOpen}
-        onClose={() => setProfileModalOpen(false)}
-        getCurrentFormState={getCurrentFormState}
-        onSelect={setExternalFormState}
-      />
+      {profileModalOpen && <Suspense fallback={<p role="status" className="text-center">{t('app.loading')}</p>}>
+        <ProfileModal
+          onClose={() => setProfileModalOpen(false)}
+          getCurrentFormState={getCurrentFormState}
+          onSelect={state => birthFormRef.current?.loadState(state)}
+        />
+      </Suspense>}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 const zh: Record<string, string> = {
   // App
+  'app.loading': '加载中…',
   'app.subtitle1': '无需服务器，在浏览器中运行的',
   'app.subtitle.tool': '四柱八字 · 紫微斗数 · 西洋占星术',
   'app.subtitle2': '计算器',
@@ -48,6 +49,7 @@ const zh: Record<string, string> = {
   'form.privacy2': '您输入的信息不会发送到任何服务器。',
 
   // CopyButton
+  'copy.failed': '复制失败 · 重试',
   'copy.copy': '复制',
   'copy.copied': '已复制 ✓',
   'copy.aiCopy': 'AI 解读用复制',

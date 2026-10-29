@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
 import { localeStore, LOCALES, DEFAULT_LOCALE } from './store.ts'
 import type { Locale } from './store.ts'
 import ko from './locales/ko.ts'
@@ -19,10 +19,11 @@ function lookup(locale: Locale, key: string): string {
 
 export function useLocale() {
   const locale = useSyncExternalStore(localeStore.subscribe, localeStore.getSnapshot)
+  const translate = useCallback((key: string) => lookup(locale, key), [locale])
   return {
     locale,
     setLocale: localeStore.setLocale,
-    t: (key: string) => lookup(locale, key),
+    t: translate,
   }
 }
 

@@ -1,5 +1,6 @@
 const ja: Record<string, string> = {
   // App
+  'app.loading': '読み込み中…',
   'app.subtitle1': 'サーバー不要、ブラウザで動作する',
   'app.subtitle.tool': '四柱八字 · 紫微斗数 · 西洋占星術',
   'app.subtitle2': '計算機',
@@ -48,6 +49,7 @@ const ja: Record<string, string> = {
   'form.privacy2': '入力された情報はいかなるサーバーにも送信されません。',
 
   // CopyButton
+  'copy.failed': 'コピー失敗 · 再試行',
   'copy.copy': 'コピー',
   'copy.copied': 'コピー済み ✓',
   'copy.aiCopy': 'AI 鑑定用コピー',

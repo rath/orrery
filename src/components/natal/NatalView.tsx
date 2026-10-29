@@ -5,7 +5,6 @@ import HouseTable from './HouseTable.tsx'
 import AspectGrid from './AspectGrid.tsx'
 import NatalWheel from './wheel/NatalWheel.tsx'
 import CopyButton from '../CopyButton.tsx'
-import { natalToText } from '../../utils/text-export.ts'
 import type { BirthInput, NatalChart } from '@orrery/core/types'
 import { useLocale } from '../../i18n/index.ts'
 
@@ -15,30 +14,29 @@ interface Props {
 
 export default function NatalView({ input }: Props) {
   const { t } = useLocale()
-  const [chart, setChart] = useState<NatalChart | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [calculation, setCalculation] = useState<{
+    input: BirthInput; houseSystem: string; chart: NatalChart | null; error: string | null
+  } | null>(null)
   const [houseSystem, setHouseSystem] = useState('P')
 
+  const current = calculation?.input === input && calculation.houseSystem === houseSystem ? calculation : null
+  const chart = current?.chart
+  const error = current?.error
+  const loading = !current
   const unknownTime = !!input.unknownTime
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
-    setError(null)
-    setChart(null)
 
     calculateNatal(input, houseSystem)
       .then(result => {
         if (!cancelled) {
-          setChart(result)
-          setLoading(false)
+          setCalculation({ input, houseSystem, chart: result, error: null })
         }
       })
       .catch(err => {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : String(err))
-          setLoading(false)
+          setCalculation({ input, houseSystem, chart: null, error: err instanceof Error ? err.message : String(err) })
         }
       })
 
@@ -100,8 +98,8 @@ export default function NatalView({ input }: Props) {
 
       {/* Planets + Angles */}
       <section className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-1 sm:gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <div className="flex flex-wrap items-center gap-1 sm:gap-3">
             <h2 className="text-base font-medium text-gray-700 dark:text-gray-200">Natal Chart</h2>
             {!unknownTime && (
               <label className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 sm:ml-2">
@@ -118,7 +116,7 @@ export default function NatalView({ input }: Props) {
               </label>
             )}
           </div>
-          <CopyButton getText={() => natalToText(chart, houseSystemName)} label={t('copy.aiCopy')} />
+          <CopyButton getText={async () => (await import('../../utils/text-export.ts')).natalToText(chart, houseSystemName)} label={t('copy.aiCopy')} />
         </div>
         <PlanetTable planets={chart.planets} angles={chart.angles} />
       </section>

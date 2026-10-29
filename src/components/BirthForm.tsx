@@ -1,6 +1,6 @@
-import { useState, useMemo, useEffect, useImperativeHandle, forwardRef } from 'react'
+import { useState, useMemo, useImperativeHandle, forwardRef } from 'react'
 import type { BirthInput, Gender, JasiMethod } from '@orrery/core/types'
-import { isKoreanDaylightTime, isKoreanHistoricalTimeAnomaly } from '@orrery/core/natal'
+import { isKoreanDaylightTime, isKoreanHistoricalTimeAnomaly } from '@orrery/core/timezone'
 import type { City } from '@orrery/core/cities'
 import { SEOUL, formatCityName } from '@orrery/core/cities'
 import CityCombobox from './CityCombobox.tsx'
@@ -24,12 +24,11 @@ export type { SavedFormState } from '../utils/birth-state.ts'
 
 export interface BirthFormHandle {
   getCurrentState(): SavedFormState
+  loadState(state: SavedFormState): void
 }
 
 interface Props {
   onSubmit: (input: BirthInput) => void
-  externalState?: SavedFormState | null
-  onExternalStateConsumed?: () => void
 }
 
 const STORAGE_KEY = 'orrery-birth-input'
@@ -62,7 +61,7 @@ const inputClass =
   'focus:outline-none focus:ring-2 focus:ring-gray-800/20 dark:focus:ring-gray-200/20 focus:border-gray-400 dark:focus:border-gray-500 transition-all'
 
 
-const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubmit, externalState, onExternalStateConsumed }, ref) {
+const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubmit }, ref) {
   const { t } = useLocale()
   const [year, setYear] = useState(saved?.year ?? currentYear - 20)
   const [month, setMonth] = useState(saved?.month ?? now.getMonth() + 1)
@@ -80,6 +79,14 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
   const [latitudeInput, setLatitudeInput] = useState(() => formatCoordinate(initialLatitude))
   const [longitudeInput, setLongitudeInput] = useState(() => formatCoordinate(initialLongitude))
   const [timezoneError, setTimezoneError] = useState<string | null>(null)
+  const daysInMonth = new Date(year, month, 0).getDate()
+
+  function changeDate(nextYear: number, nextMonth: number) {
+    setYear(nextYear)
+    setMonth(nextMonth)
+    setDay(current => Math.min(current, new Date(nextYear, nextMonth, 0).getDate()))
+    setTimezoneError(null)
+  }
 
   const inferredTimezone = useMemo(
     () => inferTimeZoneFromCoordinates(latitude, longitude),
@@ -144,13 +151,11 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
       year, month, day, hour, minute, gender, unknownTime, jasiMethod,
       city: selectedCity, manualCoords, latitude, longitude,
     }),
+    loadState,
   }))
 
-  useEffect(() => {
-    setTimezoneError(null)
-  }, [latitude, longitude])
-
   function syncCoordinates(nextLatitude: number, nextLongitude: number) {
+    setTimezoneError(null)
     setLatitude(nextLatitude)
     setLongitude(nextLongitude)
     setLatitudeInput(formatCoordinate(nextLatitude))
@@ -158,11 +163,13 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
   }
 
   function applyLatitude(nextLatitude: number) {
+    setTimezoneError(null)
     setLatitude(nextLatitude)
     setLatitudeInput(formatCoordinate(nextLatitude))
   }
 
   function applyLongitude(nextLongitude: number) {
+    setTimezoneError(null)
     setLongitude(nextLongitude)
     setLongitudeInput(formatCoordinate(nextLongitude))
   }
@@ -175,6 +182,7 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
     if (!isCoordinateDraft(value)) return
 
     setDraft(value)
+    setTimezoneError(null)
 
     const parsed = parseCoordinateDraft(value)
     if (parsed != null) setValue(parsed)
@@ -193,9 +201,9 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
     apply(stepCoordinate(baseValue, e.key === 'ArrowUp' ? 1 : -1))
   }
 
-  useEffect(() => {
-    if (!externalState) return
-    const s = externalState
+  function loadState(state: SavedFormState) {
+    const s = parseSavedFormState(state)
+    if (!s) return
     setYear(s.year)
     setMonth(s.month)
     setDay(s.day)
@@ -207,11 +215,10 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
     setSelectedCity(s.city)
     setManualCoords(s.manualCoords)
     syncCoordinates(s.latitude, s.longitude)
-    setTimezoneError(null)
-    onExternalStateConsumed?.()
+    setTimezoneError(getTimezoneValidationError(s))
     const birthInput = buildBirthInput(s)
     if (birthInput) onSubmit(birthInput)
-  }, [externalState]) // eslint-disable-line react-hooks/exhaustive-deps
+  }
 
   const isKDT = useMemo(
     () => inferredTimezone === 'Asia/Seoul' && isKoreanDaylightTime(year, month, day),
@@ -276,6 +283,8 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
         <div className="flex flex-col items-center shrink-0">
           <img
             src={logo}
+            width={512}
+            height={512}
             alt="혼천의"
             className="w-48 md:w-64"
           />
@@ -290,7 +299,7 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
             <div className="grid grid-cols-3 gap-2">
               <select
                 value={year}
-                onChange={e => setYear(Number(e.target.value))}
+                onChange={e => changeDate(Number(e.target.value), month)}
                 className={selectClass}
               >
                 {Array.from({ length: currentYear - 1900 + 1 }, (_, i) => {
@@ -300,7 +309,7 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
               </select>
               <select
                 value={month}
-                onChange={e => setMonth(Number(e.target.value))}
+                onChange={e => changeDate(year, Number(e.target.value))}
                 className={selectClass}
               >
                 {Array.from({ length: 12 }, (_, i) => (
@@ -312,7 +321,7 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
                 onChange={e => setDay(Number(e.target.value))}
                 className={selectClass}
               >
-                {Array.from({ length: 31 }, (_, i) => (
+                {Array.from({ length: daysInMonth }, (_, i) => (
                   <option key={i + 1} value={i + 1}>{`${i + 1}${t('form.daySuffix')}`}</option>
                 ))}
               </select>

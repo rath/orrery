@@ -26,6 +26,7 @@ function getMainStarsAtZhi(chart: ZiweiChart, zhi: string): string[] {
 export default function LiunianView({ chart }: Props) {
   const currentYear = new Date().getFullYear()
   const [year, setYear] = useState(currentYear)
+  const [yearDraft, setYearDraft] = useState(String(currentYear))
 
   const liunian = useMemo(() => calculateLiunian(chart, year), [chart, year])
 
@@ -42,8 +43,16 @@ export default function LiunianView({ chart }: Props) {
         <h3 className="text-base font-medium text-gray-700 dark:text-gray-200">流年</h3>
         <input
           type="number"
-          value={year}
-          onChange={e => setYear(Number(e.target.value))}
+          value={yearDraft}
+          onChange={e => {
+            const draft = e.target.value
+            setYearDraft(draft)
+            const next = Number(draft)
+            if (Number.isInteger(next) && next >= chart.solarYear && next <= Math.min(9999, chart.solarYear + 100)) {
+              setYear(next)
+            }
+          }}
+          onBlur={() => setYearDraft(String(year))}
           min={chart.solarYear}
           max={chart.solarYear + 100}
           className="w-20 text-base border border-gray-300 dark:border-gray-600 rounded px-2 py-0.5 text-gray-700 dark:text-gray-200"

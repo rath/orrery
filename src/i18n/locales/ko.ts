@@ -1,5 +1,6 @@
 const ko: Record<string, string> = {
   // App
+  'app.loading': '불러오는 중…',
   'app.subtitle1': '서버 없이 브라우저에서 동작하는',
   'app.subtitle.tool': '사주팔자 · 자미두수 · 서양 점성술',
   'app.subtitle2': '계산기',
@@ -48,6 +49,7 @@ const ko: Record<string, string> = {
   'form.privacy2': '입력하신 정보는 어떤 서버에도 전송되지 않습니다.',
 
   // CopyButton
+  'copy.failed': '복사 실패 · 다시 시도',
   'copy.copy': '복사',
   'copy.copied': '복사됨 ✓',
   'copy.aiCopy': 'AI 해석용 복사',

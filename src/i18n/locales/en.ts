@@ -1,5 +1,6 @@
 const en: Record<string, string> = {
   // App
+  'app.loading': 'Loading…',
   'app.subtitle1': 'A serverless, browser-based',
   'app.subtitle.tool': 'Saju · Ziwei Doushu · Natal Chart',
   'app.subtitle2': 'Calculator',
@@ -48,6 +49,7 @@ const en: Record<string, string> = {
   'form.privacy2': 'Your information is never sent to any server.',
 
   // CopyButton
+  'copy.failed': 'Copy failed · Retry',
   'copy.copy': 'Copy',
   'copy.copied': 'Copied ✓',
   'copy.aiCopy': 'Copy for AI Reading',

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import type { SavedFormState } from './BirthForm.tsx'
 import { loadProfiles, addProfile, updateProfile, deleteProfile, exportProfiles, importProfiles, MAX_PROFILE_FILE_BYTES, MAX_PROFILE_NAME_LENGTH } from '../utils/profiles.ts'
 import type { Profile } from '../utils/profiles.ts'
@@ -8,7 +8,6 @@ import { useLocale } from '../i18n/index.ts'
 import { inferTimeZoneFromCoordinates } from '../utils/timezones.ts'
 
 interface Props {
-  open: boolean
   onClose: () => void
   getCurrentFormState: () => SavedFormState | null
   onSelect: (data: SavedFormState) => void
@@ -47,9 +46,9 @@ function formatSummary(data: SavedFormState, t: (key: string) => string): string
   }
 }
 
-export default function ProfileModal({ open, onClose, getCurrentFormState, onSelect }: Props) {
+export default function ProfileModal({ onClose, getCurrentFormState, onSelect }: Props) {
   const { t } = useLocale()
-  const [profiles, setProfiles] = useState<Profile[]>([])
+  const [profiles, setProfiles] = useState<Profile[]>(loadProfiles)
   const [savingNew, setSavingNew] = useState(false)
   const [newName, setNewName] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -61,19 +60,15 @@ export default function ProfileModal({ open, onClose, getCurrentFormState, onSel
   const editNameInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const [currentState] = useState(getCurrentFormState)
+  const currentSummary = useMemo(() => currentState ? formatSummary(currentState, t) : '', [currentState, t])
+  const summaries = useMemo(() => new Map(profiles.map(profile => [profile.id, formatSummary(profile.data, t)])), [profiles, t])
+
   useEffect(() => {
-    if (open) {
-      setProfiles(loadProfiles())
-      setSavingNew(false)
-      setNewName('')
-      setEditingId(null)
-      setConfirmDeleteId(null)
-      setError(null)
-      dialogRef.current?.showModal()
-    } else {
-      dialogRef.current?.close()
-    }
-  }, [open])
+    const dialog = dialogRef.current
+    dialog?.showModal()
+    return () => dialog?.close()
+  }, [])
 
   useEffect(() => {
     if (savingNew) newNameInputRef.current?.focus()
@@ -258,7 +253,7 @@ export default function ProfileModal({ open, onClose, getCurrentFormState, onSel
         >
           <span>{t('profile.addNew')}</span>
           <span className="block text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            {open && getCurrentFormState() && formatSummary(getCurrentFormState()!, t)}
+            {currentSummary}
           </span>
         </button>
       )}
@@ -336,7 +331,7 @@ export default function ProfileModal({ open, onClose, getCurrentFormState, onSel
 
                 {/* 요약 */}
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                  {formatSummary(profile.data, t)}
+                  {summaries.get(profile.id)}
                 </p>
               </div>
             ))}

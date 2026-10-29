@@ -1,5 +1,6 @@
 const de: Record<string, string> = {
   // App
+  'app.loading': 'Wird geladen…',
   'app.subtitle1': 'Ein serverloser, browserbasierter',
   'app.subtitle.tool': 'Saju · Zi Wei Dou Shu · Geburtshoroskop',
   'app.subtitle2': 'Rechner',
@@ -48,6 +49,7 @@ const de: Record<string, string> = {
   'form.privacy2': 'Ihre Daten werden an keinen Server gesendet.',
 
   // CopyButton
+  'copy.failed': 'Kopieren fehlgeschlagen · Erneut versuchen',
   'copy.copy': 'Kopieren',
   'copy.copied': 'Kopiert ✓',
   'copy.aiCopy': 'Für KI-Deutung kopieren',
