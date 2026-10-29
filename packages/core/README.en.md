@@ -14,7 +14,7 @@ No backend required: all calculations run on the client.
 
 ## Credits
 
-- **Saju Perpetual Calendar** — Originally a Perl [perpetual calendar](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html) by Ko Young-chang, [ported to PHP](https://github.com/OOPS-ORG-PHP/Lunar) by Kim Jeong-gyun. In November 2018, Jang-Ho Hwang ported it to Java and Python for personal use, and in February 2026 ported it to TypeScript with Claude Code (Opus 4.6).
+- **Saju Perpetual Calendar** — Originally a Perl [perpetual calendar](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html) by Ko Young-chang, [ported to PHP](https://github.com/OOPS-ORG-PHP/Lunar) by Kim Jeong-gyun. In November 2018, Jang-Ho Hwang ported it to Java and Python for personal use, and in February 2026 ported it to TypeScript with Claude Code (Opus 4.6). Since October 2026, solar-term instants come from lunar-javascript's astronomical calculation.
 - **紫微斗數 Chart** — Implemented by Claude (Opus 4.5) on top of the [lunar-javascript](https://www.npmjs.com/package/lunar-javascript) library, drawing on Chinese-language sources.
 - **Astrology Natal Chart** — A pure TypeScript port of the Moshier ephemeris from [Swiss Ephemeris](https://www.astro.com/swisseph/).
 
@@ -180,7 +180,7 @@ console.log(formatCityName(results[0])) // '부산'
 
 ## Calculation Conventions
 
-Input dates must be valid Gregorian dates from 1 to 9999 CE. Natal charts, however, are limited to roughly 1900–2100, the range covered by the Chiron table; outside it, `calculateNatal()` throws an error.
+Input dates must be valid Gregorian dates from 1 to 9999 CE. Natal charts are computed only through 3003-04-29 (TT), the end of the Moshier ephemeris; after that, `calculateNatal()` throws a `RangeError`. Chiron is included only from 1900-01-01 to 2099-12-23 (UT), the span of its pre-computed table; outside it, the chart is calculated without Chiron.
 
 ### 四柱八字
 

@@ -13,8 +13,11 @@ bun dev
 # 빌드 (웹앱)
 bun run build
 
-# 타입 체크
-bunx tsc --noEmit
+# 린트
+bun run lint
+
+# 타입 체크 (웹앱 tsc -b + 코어 src·tests)
+bun run typecheck
 
 # 테스트 (전체)
 bun run test
@@ -49,7 +52,7 @@ packages/core/                      # @orrery/core — 독립 npm 패키지 (계
 │       ├── index.ts                # 공개 API (calcPlanet, calcHouses, julday)
 │       ├── planets.ts              # Moshier 행성 이론
 │       ├── moon.ts                 # Moshier 달 이론
-│       ├── chiron.ts               # Chiron 표 보간 (1900–2100)
+│       ├── chiron.ts               # Chiron 표 보간 (1900-01-01 ~ 2099-12-23 UT)
 │       ├── node.ts                 # 달의 평균 교점
 │       ├── houses.ts               # 하우스 시스템 10종, 극지방 대체
 │       ├── julian.ts               # 율리우스일 변환
@@ -114,8 +117,8 @@ scripts/                            # 아이콘·OG 이미지 생성 스크립�
 
 - bun workspaces (모노레포, 패키지 매니저)
 - TypeScript 5 (strict mode)
-- **@orrery/core**: tsup (빌드), Vitest (테스트), lunar-javascript (음력 변환)
-- **웹앱**: React 19, Vite 7 (빌드/개발 서버), Tailwind CSS 4 (스타일링), Vitest (테스트)
+- **@orrery/core**: tsup (빌드), Vitest (테스트), lunar-javascript (음력 변환, 절입 시각 — 번들하지 않는 런타임 의존성)
+- **웹앱**: React 19, Vite 7 (빌드/개발 서버), Tailwind CSS 4 (스타일링), Vitest (테스트), @photostructure/tz-lookup (좌표 → 타임존)
 
 ## 포팅 주의사항
 
@@ -158,3 +161,5 @@ Python에서 TypeScript로 포팅 시 주의:
 동작 규칙:
 - `'Asia/Seoul'` 또는 미지정: KDT→KST 보정 후 KST 벽시계로 계산 (한국 사주 관례 유지)
 - 그 외 타임존: IANA → UTC 변환 후 경도·균시차 기반 진태양시 보정
+
+출생차트 날짜 범위: `calculateNatal()`은 Moshier 천체력 범위(3003-04-29 TT)를 넘으면 `RangeError`를 던지고, Chiron은 사전 계산 표가 있는 1900-01-01 ~ 2099-12-23(UT)에만 결과에 포함한다. 웹 폼은 연도를 1900년~올해로 제한하므로 영향이 없지만, 테스트·스크립트에서 이 범위 밖 날짜를 다룰 때는 Chiron이 빠질 수 있음을 전제로 작성할 것.

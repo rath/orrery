@@ -14,7 +14,7 @@
 
 ## 크레딧
 
-- **사주 만세력** — 고영창님의 Perl [진짜만세력](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)을 김정균님이 [PHP로 포팅](https://github.com/OOPS-ORG-PHP/Lunar)했고, 이를 황장호가 2018년 11월 Java와 Python으로 옮겨 사용해 오다가 2026년 2월 Claude Code(Opus 4.6)로 TypeScript에 포팅
+- **사주 만세력** — 고영창님의 Perl [진짜만세력](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)을 김정균님이 [PHP로 포팅](https://github.com/OOPS-ORG-PHP/Lunar)했고, 이를 황장호가 2018년 11월 Java와 Python으로 옮겨 사용해 오다가 2026년 2월 Claude Code(Opus 4.6)로 TypeScript에 포팅. 절입 시각은 2026년 10월부터 lunar-javascript의 천문 계산 사용
 - **자미두수 명반** — [lunar-javascript](https://www.npmjs.com/package/lunar-javascript) 라이브러리를 바탕으로 Claude(Opus 4.5)가 중국어 문헌을 조사하며 구현
 - **점성술 출생차트** — [Swiss Ephemeris](https://www.astro.com/swisseph/)의 Moshier 천체력을 순수 TypeScript로 포팅
 
@@ -180,7 +180,7 @@ console.log(formatCityName(results[0])) // '부산'
 
 ## 계산 기준
 
-입력 날짜는 서기 1–9999년의 유효한 그레고리력 날짜여야 합니다. 단, 출생차트는 Chiron 표가 다루는 약 1900–2100년만 계산할 수 있으며, 이 범위를 벗어나면 `calculateNatal()`이 오류를 던집니다.
+입력 날짜는 서기 1–9999년의 유효한 그레고리력 날짜여야 합니다. 출생차트는 Moshier 천체력이 다루는 3003-04-29(TT)까지만 계산하며, 그 이후에는 `calculateNatal()`이 `RangeError`를 던집니다. Chiron은 사전 계산 표가 있는 1900-01-01 ~ 2099-12-23(UT)에만 포함되고, 그 밖의 날짜에서는 Chiron 없이 계산합니다.
 
 ### 사주팔자
 

@@ -205,7 +205,7 @@ export interface WuXingJu {
 /** 성요 정보 */
 export interface ZiweiStar {
   name: string;
-  brightness: string;  // 廟/旺/得/利/平/不/陷
+  brightness: string;  // 廟/旺/得/利/平/陷 (밝기 표에 없는 성요는 '')
   siHua: string;       // 化祿/化權/化科/化忌 or ''
 }
 

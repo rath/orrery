@@ -11,7 +11,7 @@ A browser-based divination tool. It computes Saju (四柱八字, Four Pillars of
 
 ## Credits
 
-- **Saju Perpetual Calendar** — Originally a Perl [perpetual calendar](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html) by Ko Young-chang, [ported to PHP](https://github.com/OOPS-ORG-PHP/Lunar) by Kim Jeong-gyun. In November 2018, Jang-Ho Hwang ported it to Java and Python for personal use, and in February 2026 ported it to TypeScript with Claude Code (Opus 4.6).
+- **Saju Perpetual Calendar** — Originally a Perl [perpetual calendar](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html) by Ko Young-chang, [ported to PHP](https://github.com/OOPS-ORG-PHP/Lunar) by Kim Jeong-gyun. In November 2018, Jang-Ho Hwang ported it to Java and Python for personal use, and in February 2026 ported it to TypeScript with Claude Code (Opus 4.6). Since October 2026, solar-term instants come from lunar-javascript's astronomical calculation.
 - **紫微斗數 Chart** — Implemented by Claude (Opus 4.5) on top of the [lunar-javascript](https://www.npmjs.com/package/lunar-javascript) library, drawing on Chinese-language sources.
 - **Astrology Natal Chart** — A pure TypeScript port of the Moshier ephemeris from [Swiss Ephemeris](https://www.astro.com/swisseph/).
 
@@ -72,6 +72,9 @@ bun run build
 
 # Lint
 bun run lint
+
+# Type check
+bun run typecheck
 
 # Test
 bun run test

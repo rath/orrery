@@ -11,7 +11,7 @@
 
 ## クレジット
 
-- **四柱万年暦** — 고영창（Ko Young-chang）氏のPerl製[真万年暦](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)を김정균（Kim Jeong-gyun）氏が[PHPに移植](https://github.com/OOPS-ORG-PHP/Lunar)。2018年11月に황장호（Hwang Jang-ho）がJavaとPythonに移植して使い続け、2026年2月にClaude Code（Opus 4.6）でTypeScriptに移植
+- **四柱万年暦** — 고영창（Ko Young-chang）氏のPerl製[真万年暦](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)を김정균（Kim Jeong-gyun）氏が[PHPに移植](https://github.com/OOPS-ORG-PHP/Lunar)。2018年11月に황장호（Hwang Jang-ho）がJavaとPythonに移植して使い続け、2026年2月にClaude Code（Opus 4.6）でTypeScriptに移植。2026年10月からは節入り時刻にlunar-javascriptの天文計算を使用
 - **紫微斗数命盤** — [lunar-javascript](https://www.npmjs.com/package/lunar-javascript)ライブラリをベースに、Claude（Opus 4.5）が中国語文献を調べながら実装
 - **占星術の出生チャート** — [Swiss Ephemeris](https://www.astro.com/swisseph/)のMoshier天体暦を純粋なTypeScriptに移植
 
@@ -72,6 +72,9 @@ bun run build
 
 # リント
 bun run lint
+
+# 型チェック
+bun run typecheck
 
 # テスト
 bun run test

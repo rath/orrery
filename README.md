@@ -11,7 +11,7 @@
 
 ## 크레딧
 
-- **사주 만세력** — 고영창님의 Perl [진짜만세력](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)을 김정균님이 [PHP로 포팅](https://github.com/OOPS-ORG-PHP/Lunar)했고, 이를 황장호가 2018년 11월 Java와 Python으로 옮겨 사용해 오다가 2026년 2월 Claude Code(Opus 4.6)로 TypeScript에 포팅
+- **사주 만세력** — 고영창님의 Perl [진짜만세력](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)을 김정균님이 [PHP로 포팅](https://github.com/OOPS-ORG-PHP/Lunar)했고, 이를 황장호가 2018년 11월 Java와 Python으로 옮겨 사용해 오다가 2026년 2월 Claude Code(Opus 4.6)로 TypeScript에 포팅. 절입 시각은 2026년 10월부터 lunar-javascript의 천문 계산 사용
 - **자미두수 명반** — [lunar-javascript](https://www.npmjs.com/package/lunar-javascript) 라이브러리를 바탕으로 Claude(Opus 4.5)가 중국어 문헌을 조사하며 구현
 - **점성술 출생차트** — [Swiss Ephemeris](https://www.astro.com/swisseph/)의 Moshier 천체력을 순수 TypeScript로 포팅
 
@@ -72,6 +72,9 @@ bun run build
 
 # 린트
 bun run lint
+
+# 타입 체크
+bun run typecheck
 
 # 테스트
 bun run test
