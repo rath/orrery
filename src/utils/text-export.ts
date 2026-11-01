@@ -330,7 +330,7 @@ export function natalToText(chart: NatalChart, houseSystemName = 'Placidus'): st
   // Aspects
   lines.push('Major Aspects')
   lines.push('─────')
-  for (const a of chart.aspects.slice(0, 15)) {
+  for (const a of chart.aspects) {
     const sym1 = PLANET_SYMBOLS[a.planet1]
     const sym2 = PLANET_SYMBOLS[a.planet2]
     const aspSym = ASPECT_SYMBOLS[a.type]

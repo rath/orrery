@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { createChart, calculateLiunian } from '@orrery/core/ziwei'
+import { calculateNatal } from '@orrery/core/natal'
 import type { BirthInput } from '@orrery/core/types'
-import { allChartsToText, ziweiToText } from './text-export.ts'
+import { allChartsToText, natalToText, ziweiToText } from './text-export.ts'
 import { resolveLiunianYear } from './ziwei-year.ts'
 
 const input: BirthInput = {
@@ -11,6 +12,14 @@ const input: BirthInput = {
 const chart = createChart(1993, 3, 12, 9, 45, true, input.timezone, input.longitude)
 
 describe('AI text export', () => {
+  it('exports every calculated aspect in both individual and combined copies', async () => {
+    const natal = await calculateNatal(input)
+    expect(natal.aspects.length).toBeGreaterThan(15)
+    for (const text of [natalToText(natal), await allChartsToText(input)]) {
+      expect(text.match(/^.+ orb [\d.]+°$/gm)).toHaveLength(natal.aspects.length)
+    }
+  })
+
   it('includes the selected lunar year and all twelve months in the combined copy', async () => {
     const text = await allChartsToText(input, { ziweiYear: 2032, locale: 'ko' })
     const individual = ziweiToText(chart, calculateLiunian(chart, 2032))
