@@ -54,6 +54,24 @@ const ja: Record<string, string> = {
   'copy.copied': 'コピー済み ✓',
   'copy.aiCopy': 'AI 鑑定用コピー',
 
+  // AI text export
+  'export.timeKst': '時刻基準：KST（UTC+09:00）の時計時刻に正規化。歴史的な時差・夏時間を補正',
+  'export.timeSolar': '時刻基準：IANA 現地時刻 → UTC → 経度・均時差に基づく真太陽時',
+  'export.timeUnspecified': '時刻基準：元のタイムゾーン情報なし',
+  'export.sajuCalendar': '計算基準：年柱は立春、月柱は天文上の節入り時刻で切り替え',
+  'export.sajuUnified': '子時法：通子時 — 子時は {start} から、日柱を翌日に切り替え',
+  'export.sajuSplit': '子時法：分割 — 子時は {start} から、00:00 前の日柱は当日、時干は翌日基準',
+  'export.sajuAge': '大運の表示年齢：開始年 − 補正後の出生年（誕生日基準の満年齢ではない）',
+  'export.ziweiCalendar': '計算基準：旧暦（lunar-javascript）。年柱・流年は旧正月で切り替え',
+  'export.ziweiTime': '子時：23:00–01:00。補正後の23時は旧暦の日付を当日のまま維持',
+  'export.ziweiLeap': '閏月：対応する通常月として扱う（半月での分割なし）',
+  'export.ziweiAge': '大限・流年の年齢：数え年 = 対象の旧暦年 − 出生の旧暦年 + 1',
+  'export.ziweiFlowYear': '期間：記載の旧暦年の旧正月から次の旧正月の前日まで',
+  'export.ziweiMonths': '流月（旧暦1–12月 · 斗君に基づく命宮の位置概要）',
+  'export.natalBasis': '計算基準：トロピカル黄道 · 地心位置 · 平均月交点',
+  'export.natalTime': '時刻基準：IANA 現地時刻 → UTC（歴史的な時差・夏時間を適用）',
+  'export.natalHouses': 'ハウス：{system}。開始カスプを含み、次のカスプを含まない',
+
   // ThemeToggle
   'theme.system': 'システム設定に従う',
   'theme.light': 'ライトモード',

@@ -2,6 +2,7 @@ import type { BirthInput, SajuResult, ZiweiChart, LiuNianInfo, NatalChart } from
 import { ELEMENT_HANJA, PILLAR_NAMES, PALACE_NAMES, MAIN_STAR_NAMES } from '@orrery/core/constants'
 import { calculateSaju } from '@orrery/core/saju'
 import { createChart, calculateLiunian, getDaxianList } from '@orrery/core/ziwei'
+import { DEFAULT_TIMEZONE, getBirthTimezone } from '@orrery/core/timezone'
 import { fmt2 } from './format.ts'
 import { calculateNatal, ZODIAC_SYMBOLS, PLANET_SYMBOLS, ASPECT_SYMBOLS, ROMAN, formatDegree, HOUSE_SYSTEMS } from '@orrery/core/natal'
 import { t as translate, getLocale } from '../i18n/index.ts'
@@ -15,6 +16,11 @@ interface TextExportOptions {
   locale?: Locale
 }
 
+interface ZiweiTextOptions {
+  timezone?: string
+  locale?: Locale
+}
+
 /** 화면과 같은 선택 조건으로 세 계산 결과를 모은다. */
 export async function allChartsToText(input: BirthInput, options: TextExportOptions = {}): Promise<string> {
   const locale = options.locale ?? getLocale()
@@ -25,7 +31,7 @@ export async function allChartsToText(input: BirthInput, options: TextExportOpti
       input.gender === 'M', input.timezone, input.longitude,
     )
     const year = resolveLiunianYear(chart, options.ziweiYear, options.referenceDate ?? new Date())
-    parts.push(ziweiToText(chart, calculateLiunian(chart, year)))
+    parts.push(ziweiToText(chart, calculateLiunian(chart, year), { timezone: getBirthTimezone(input), locale }))
   }
   parts.push(natalToText(await calculateNatal(input, options.houseSystem)))
   return parts.join('\n\n')
@@ -37,6 +43,11 @@ function makeT(locale?: Locale) {
   return (key: string) => translate(l, key)
 }
 
+function timeBasisKey(timezone?: string): string {
+  if (timezone == null) return 'export.timeUnspecified'
+  return timezone === DEFAULT_TIMEZONE ? 'export.timeKst' : 'export.timeSolar'
+}
+
 /** 사주 결과를 CLI 형식 텍스트로 변환 */
 export function sajuToText(result: SajuResult, locale?: Locale): string {
   const t = makeT(locale)
@@ -46,6 +57,13 @@ export function sajuToText(result: SajuResult, locale?: Locale): string {
 
   lines.push(`四柱八字 (${genderChar})`)
   lines.push('─────')
+  const timezone = getBirthTimezone(input)
+  lines.push(t('export.sajuCalendar'))
+  lines.push(t(timeBasisKey(timezone)))
+  const ziStart = timezone === DEFAULT_TIMEZONE ? '23:30' : '23:00'
+  lines.push(t(input.jasiMethod === 'split' ? 'export.sajuSplit' : 'export.sajuUnified').replace('{start}', ziStart))
+  lines.push(t('export.sajuAge'))
+  lines.push('')
 
   const labels = ['時柱', '日柱', '月柱', '年柱']
   const q = input.unknownTime
@@ -174,12 +192,18 @@ export function sajuToText(result: SajuResult, locale?: Locale): string {
 }
 
 /** 자미두수 명반을 텍스트로 변환 */
-export function ziweiToText(chart: ZiweiChart, liunian?: LiuNianInfo): string {
+export function ziweiToText(chart: ZiweiChart, liunian?: LiuNianInfo, options: ZiweiTextOptions = {}): string {
+  const t = makeT(options.locale)
   const lines: string[] = []
   const genderChar = chart.isMale ? '男' : '女'
 
   lines.push(`紫微斗數 命盤 (${genderChar})`)
   lines.push('═════')
+  lines.push(t('export.ziweiCalendar'))
+  lines.push(t(timeBasisKey(options.timezone)))
+  lines.push(t('export.ziweiTime'))
+  lines.push(t('export.ziweiLeap'))
+  lines.push(t('export.ziweiAge'))
   lines.push('')
   lines.push(`年柱: ${chart.yearGan}${chart.yearZhi}`)
 
@@ -259,6 +283,7 @@ export function ziweiToText(chart: ZiweiChart, liunian?: LiuNianInfo): string {
     lines.push('')
     lines.push(`流年 (${liunian.year}年 ${liunian.gan}${liunian.zhi}年)`)
     lines.push('═════')
+    lines.push(t('export.ziweiFlowYear'))
     lines.push(`大限: ${liunian.daxianAgeStart}-${liunian.daxianAgeEnd}歲 ${liunian.daxianPalaceName}`)
     lines.push(`流年命宮: ${liunian.mingGongZhi}宮 → 本命 ${liunian.natalPalaceAtMing}`)
 
@@ -272,6 +297,8 @@ export function ziweiToText(chart: ZiweiChart, liunian?: LiuNianInfo): string {
     }
 
     lines.push('')
+    lines.push(t('export.ziweiMonths'))
+    lines.push('─────')
     const lunarMonthNames = ['正月', '二月', '三月', '四月', '五月', '六月',
                               '七月', '八月', '九月', '十月', '冬月', '臘月']
     for (const ly of liunian.liuyue) {
@@ -292,6 +319,13 @@ export function natalToText(chart: NatalChart, houseSystemName = 'Placidus'): st
   lines.push('Natal Chart')
   if (!hasHouses) lines.push(`(${t('natal.unknownTime')})`)
   lines.push('═════')
+  lines.push(t('export.natalBasis'))
+  lines.push(t('export.natalTime'))
+  if (hasHouses) {
+    lines.push(t('export.natalHouses').replace('{system}', houseSystemName))
+  } else {
+    lines.push(t('natal.unknownTimeDetail'))
+  }
   lines.push('')
 
   // Angles

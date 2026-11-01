@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { createChart, calculateLiunian } from '@orrery/core/ziwei'
+import { getBirthTimezone } from '@orrery/core/timezone'
 import MingPanGrid from './MingPanGrid.tsx'
 import SihuaSummary from './SihuaSummary.tsx'
 import DaxianTable from './DaxianTable.tsx'
@@ -53,7 +54,7 @@ export default function ZiweiView({ input, year, onYearChange, referenceDate }: 
       <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex items-center gap-2 mb-3">
           <h2 className="text-base font-medium text-gray-700 dark:text-gray-200">紫微斗數 命盤</h2>
-          <CopyButton getText={async () => (await import('../../utils/text-export.ts')).ziweiToText(chart, liunian)} label={t('copy.aiCopy')} />
+          <CopyButton getText={async () => (await import('../../utils/text-export.ts')).ziweiToText(chart, liunian, { timezone: getBirthTimezone(input) })} label={t('copy.aiCopy')} />
         </div>
         <MingPanGrid chart={chart} />
       </div>

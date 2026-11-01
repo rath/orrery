@@ -54,6 +54,24 @@ const zh: Record<string, string> = {
   'copy.copied': '已复制 ✓',
   'copy.aiCopy': 'AI 解读用复制',
 
+  // AI text export
+  'export.timeKst': '时间基准：归一化至 KST（UTC+09:00）钟表时间；已校正历史时差及夏令时',
+  'export.timeSolar': '时间基准：IANA 当地时间 → UTC → 按经度及均时差计算的真太阳时',
+  'export.timeUnspecified': '时间基准：未提供原始时区信息',
+  'export.sajuCalendar': '计算依据：年柱以立春为界，月柱以天文节气交节时刻为界',
+  'export.sajuUnified': '子時法：通子时 — 子時从 {start} 开始，日柱转为次日',
+  'export.sajuSplit': '子時法：分子时 — 子時从 {start} 开始，00:00 前日柱仍属当日，時干按次日计算',
+  'export.sajuAge': '大運显示年龄：起始年份 − 校正后的出生年份（非按生日计算的周岁）',
+  'export.ziweiCalendar': '计算依据：农历（lunar-javascript）；年柱与流年以春节为界',
+  'export.ziweiTime': '子時：23:00–01:00；校正时间的23时仍使用当日农历日期',
+  'export.ziweiLeap': '閏月：按对应本月处理（不作半月划分）',
+  'export.ziweiAge': '大限·流年年龄：虚岁 = 查询农历年 − 出生农历年 + 1',
+  'export.ziweiFlowYear': '期间：所列农历年的春节至下一年春节前一日',
+  'export.ziweiMonths': '流月（农历1–12月 · 斗君法命宫位置摘要）',
+  'export.natalBasis': '计算依据：回归黄道 · 地心位置 · 平均月球交点',
+  'export.natalTime': '时间基准：IANA 当地时间 → UTC（已应用历史时差及夏令时）',
+  'export.natalHouses': '宫位系统：{system}；包含本宫宫头，不含下一宫宫头',
+
   // ThemeToggle
   'theme.system': '跟随系统设置',
   'theme.light': '浅色模式',

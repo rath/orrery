@@ -54,6 +54,24 @@ const es: Record<string, string> = {
   'copy.copied': 'Copiado ✓',
   'copy.aiCopy': 'Copiar para lectura con IA',
 
+  // AI text export
+  'export.timeKst': 'Base horaria: hora normalizada a KST (UTC+09:00); desfases históricos y horario de verano corregidos',
+  'export.timeSolar': 'Base horaria: hora local IANA → UTC → hora solar verdadera según longitud y ecuación del tiempo',
+  'export.timeUnspecified': 'Base horaria: zona horaria original no indicada',
+  'export.sajuCalendar': 'Base de cálculo: 年柱 cambia en 立春; 月柱 en el instante astronómico de entrada del término solar',
+  'export.sajuUnified': '子時法: unificado — 子時 empieza a las {start}; 日柱 pasa al día siguiente',
+  'export.sajuSplit': '子時法: dividido — 子時 empieza a las {start}; antes de las 00:00, 日柱 conserva el día y 時干 usa el siguiente',
+  'export.sajuAge': 'Edad mostrada en 大運: año de inicio − año de nacimiento ajustado (no calculada por cumpleaños)',
+  'export.ziweiCalendar': 'Base de cálculo: calendario lunar (lunar-javascript); 年柱 y 流年 cambian en el Año Nuevo lunar',
+  'export.ziweiTime': '子時: 23:00–01:00; a las 23:00 de la hora ajustada se conserva la fecha lunar del mismo día',
+  'export.ziweiLeap': '閏月: se trata como el mes regular correspondiente (sin dividirlo en mitades)',
+  'export.ziweiAge': 'Edad de 大限 / 流年: edad nominal = año lunar de consulta − año lunar de nacimiento + 1',
+  'export.ziweiFlowYear': 'Periodo: desde el Año Nuevo lunar del año indicado hasta el día anterior al siguiente Año Nuevo lunar',
+  'export.ziweiMonths': '流月 (meses lunares 1–12 · resumen de la posición de 命宮 según 斗君)',
+  'export.natalBasis': 'Base de cálculo: zodiaco tropical · posiciones geocéntricas · nodo lunar medio',
+  'export.natalTime': 'Base horaria: hora local IANA → UTC (con desfases históricos y horario de verano)',
+  'export.natalHouses': 'Casas: {system}; cúspide inicial incluida y siguiente cúspide excluida',
+
   // ThemeToggle
   'theme.system': 'Según el sistema',
   'theme.light': 'Modo claro',

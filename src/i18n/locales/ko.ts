@@ -54,6 +54,24 @@ const ko: Record<string, string> = {
   'copy.copied': '복사됨 ✓',
   'copy.aiCopy': 'AI 해석용 복사',
 
+  // AI text export
+  'export.timeKst': '시각 기준: KST(UTC+09:00) 벽시계로 정규화; 역사적 표준시·서머타임 보정',
+  'export.timeSolar': '시각 기준: IANA 현지 시각 → UTC → 경도·균시차 기반 진태양시',
+  'export.timeUnspecified': '시각 기준: 원본 타임존 정보 미제공',
+  'export.sajuCalendar': '계산 기준: 年柱는 立春, 月柱는 천문 절입 시각 기준',
+  'export.sajuUnified': '子時法: 통자시 — 子時는 {start}부터, 日柱를 다음날로 전환',
+  'export.sajuSplit': '子時法: 야자시 — 子時는 {start}부터, 00:00 전 日柱는 당일·時干은 익일 기준',
+  'export.sajuAge': '大運 표시 나이: 시작 연도 − 보정된 출생 연도 (생일 기준 만 나이 아님)',
+  'export.ziweiCalendar': '계산 기준: 음력 달력(lunar-javascript); 年柱·流年은 설날 기준',
+  'export.ziweiTime': '子時: 23:00–01:00; 보정된 시각의 23시에는 음력 날짜를 당일로 유지',
+  'export.ziweiLeap': '閏月: 본월로 처리 (반월 분할 없음)',
+  'export.ziweiAge': '大限·流年 나이: 세는나이 = 조회 음력년 − 출생 음력년 + 1',
+  'export.ziweiFlowYear': '기간: 해당 음력년의 설날부터 다음 설날 전날까지',
+  'export.ziweiMonths': '流月 (음력 1–12월 · 斗君 기준 명궁 위치 요약)',
+  'export.natalBasis': '계산 기준: 트로피컬 황도 · 지구 중심 천체 위치 · 평균 달 교점',
+  'export.natalTime': '시각 기준: IANA 현지 시각 → UTC (역사적 표준시·서머타임 반영)',
+  'export.natalHouses': '하우스: {system}; 커스프 시작 포함·다음 커스프 제외',
+
   // ThemeToggle
   'theme.system': '시스템 설정 따름',
   'theme.light': '라이트 모드',

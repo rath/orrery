@@ -54,6 +54,24 @@ const en: Record<string, string> = {
   'copy.copied': 'Copied ✓',
   'copy.aiCopy': 'Copy for AI Reading',
 
+  // AI text export
+  'export.timeKst': 'Time basis: normalized KST (UTC+09:00) wall clock; historical offsets and DST corrected',
+  'export.timeSolar': 'Time basis: IANA local time → UTC → true solar time using longitude and equation of time',
+  'export.timeUnspecified': 'Time basis: original timezone not provided',
+  'export.sajuCalendar': 'Calculation basis: 年柱 changes at 立春; 月柱 changes at astronomical solar-term entry',
+  'export.sajuUnified': '子時法: unified — 子時 starts at {start}; 日柱 advances to the next day',
+  'export.sajuSplit': '子時法: split — 子時 starts at {start}; before 00:00, 日柱 stays on the same day and 時干 uses the next day',
+  'export.sajuAge': '大運 displayed age: start year − adjusted birth year (not birthday-based age)',
+  'export.ziweiCalendar': 'Calculation basis: lunar calendar (lunar-javascript); 年柱 and 流年 change at Lunar New Year',
+  'export.ziweiTime': '子時: 23:00–01:00; at 23:00 in the adjusted clock, the lunar date stays on the same day',
+  'export.ziweiLeap': '閏月: treated as the corresponding regular month (no half-month split)',
+  'export.ziweiAge': '大限 / 流年 age: nominal age = reference lunar year − birth lunar year + 1',
+  'export.ziweiFlowYear': 'Period: Lunar New Year of the stated year through the day before the next Lunar New Year',
+  'export.ziweiMonths': '流月 (lunar months 1–12 · 斗君-based 命宮 position summary)',
+  'export.natalBasis': 'Calculation basis: tropical zodiac · geocentric positions · mean lunar node',
+  'export.natalTime': 'Time basis: IANA local time → UTC (historical offsets and DST applied)',
+  'export.natalHouses': 'Houses: {system}; cusp start inclusive, next cusp exclusive',
+
   // ThemeToggle
   'theme.system': 'Follow System',
   'theme.light': 'Light Mode',
