@@ -163,6 +163,7 @@ const zh: Record<string, string> = {
   'saju.injong.desc': '— 缺失十神的阳干引种',
 
   // Ziwei
+  'ziwei.lunarYear': '流年（农历年）',
   'ziwei.needTime': '紫微斗数需要出生时间。',
   'ziwei.needTimeDesc': '命盘结构随出生时间变化，请输入出生时间。',
 

@@ -67,6 +67,12 @@ function solarToLunar(year: number, month: number, day: number): {
   }
 }
 
+/** 양력 날짜가 속한 음력년 (설날 경계). */
+export function getLunarYear(year: number, month: number, day: number): number {
+  assertDateTime(year, month, day, 0, 0)
+  return solarToLunar(year, month, day).lunarYear
+}
+
 // =============================================
 // 년주 간지
 // =============================================

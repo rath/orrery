@@ -163,6 +163,7 @@ const es: Record<string, string> = {
   'saju.injong.desc': '— Siembra de tronco Yang para los Diez Dioses ausentes',
 
   // Ziwei
+  'ziwei.lunarYear': '流年 (año lunar)',
   'ziwei.needTime': 'Zi Wei Dou Shu requiere la hora de nacimiento.',
   'ziwei.needTimeDesc': 'Toda la estructura de la carta cambia según la hora de nacimiento. Introduzca su hora de nacimiento.',
 

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { createChart } from '@orrery/core/ziwei'
+import { createChart, calculateLiunian } from '@orrery/core/ziwei'
 import MingPanGrid from './MingPanGrid.tsx'
 import SihuaSummary from './SihuaSummary.tsx'
 import DaxianTable from './DaxianTable.tsx'
@@ -7,12 +7,16 @@ import LiunianView from './LiunianView.tsx'
 import CopyButton from '../CopyButton.tsx'
 import type { BirthInput } from '@orrery/core/types'
 import { useLocale } from '../../i18n/index.ts'
+import { resolveLiunianYear } from '../../utils/ziwei-year.ts'
 
 interface Props {
   input: BirthInput
+  year: number | null
+  onYearChange: (year: number) => void
+  referenceDate: Date
 }
 
-export default function ZiweiView({ input }: Props) {
+export default function ZiweiView({ input, year, onYearChange, referenceDate }: Props) {
   const { t } = useLocale()
 
   const chart = useMemo(
@@ -25,7 +29,12 @@ export default function ZiweiView({ input }: Props) {
     [input],
   )
 
-  if (input.unknownTime || !chart) {
+  const liunian = useMemo(
+    () => chart ? calculateLiunian(chart, resolveLiunianYear(chart, year, referenceDate)) : null,
+    [chart, year, referenceDate],
+  )
+
+  if (input.unknownTime || !chart || !liunian) {
     return (
       <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
         <p className="text-base text-amber-800 dark:text-amber-300 font-medium">
@@ -44,7 +53,7 @@ export default function ZiweiView({ input }: Props) {
       <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex items-center gap-2 mb-3">
           <h2 className="text-base font-medium text-gray-700 dark:text-gray-200">紫微斗數 命盤</h2>
-          <CopyButton getText={async () => (await import('../../utils/text-export.ts')).ziweiToText(chart)} label={t('copy.aiCopy')} />
+          <CopyButton getText={async () => (await import('../../utils/text-export.ts')).ziweiToText(chart, liunian)} label={t('copy.aiCopy')} />
         </div>
         <MingPanGrid chart={chart} />
       </div>
@@ -61,7 +70,7 @@ export default function ZiweiView({ input }: Props) {
 
       {/* 유년 */}
       <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-        <LiunianView chart={chart} />
+        <LiunianView chart={chart} liunian={liunian} onYearChange={onYearChange} />
       </div>
     </div>
   )

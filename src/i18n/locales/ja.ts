@@ -163,6 +163,7 @@ const ja: Record<string, string> = {
   'saju.injong.desc': '— 欠落十神の陽干引種',
 
   // Ziwei
+  'ziwei.lunarYear': '流年（旧暦年）',
   'ziwei.needTime': '紫微斗数には出生時間が必須です。',
   'ziwei.needTimeDesc': '出生時間によって命盤の構造が変わります。出生時間を入力してください。',
 

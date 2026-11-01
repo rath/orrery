@@ -163,6 +163,7 @@ const de: Record<string, string> = {
   'saju.injong.desc': '— Yang-Stamm-Aussaat für fehlende Zehn Götter',
 
   // Ziwei
+  'ziwei.lunarYear': '流年 (Mondjahr)',
   'ziwei.needTime': 'Zi Wei Dou Shu benötigt die Geburtszeit.',
   'ziwei.needTimeDesc': 'Die gesamte Struktur des Horoskops hängt von der Geburtszeit ab. Bitte geben Sie Ihre Geburtszeit ein.',
 

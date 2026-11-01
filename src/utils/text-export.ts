@@ -1,10 +1,34 @@
-import type { SajuResult, ZiweiChart, LiuNianInfo, NatalChart } from '@orrery/core/types'
+import type { BirthInput, SajuResult, ZiweiChart, LiuNianInfo, NatalChart } from '@orrery/core/types'
 import { ELEMENT_HANJA, PILLAR_NAMES, PALACE_NAMES, MAIN_STAR_NAMES } from '@orrery/core/constants'
-import { getDaxianList } from '@orrery/core/ziwei'
+import { calculateSaju } from '@orrery/core/saju'
+import { createChart, calculateLiunian, getDaxianList } from '@orrery/core/ziwei'
 import { fmt2 } from './format.ts'
-import { ZODIAC_SYMBOLS, PLANET_SYMBOLS, ASPECT_SYMBOLS, ROMAN, formatDegree, HOUSE_SYSTEMS } from '@orrery/core/natal'
+import { calculateNatal, ZODIAC_SYMBOLS, PLANET_SYMBOLS, ASPECT_SYMBOLS, ROMAN, formatDegree, HOUSE_SYSTEMS } from '@orrery/core/natal'
 import { t as translate, getLocale } from '../i18n/index.ts'
 import type { Locale } from '../i18n/index.ts'
+import { resolveLiunianYear } from './ziwei-year.ts'
+
+interface TextExportOptions {
+  ziweiYear?: number | null
+  referenceDate?: Date
+  locale?: Locale
+}
+
+/** 화면과 같은 선택 조건으로 세 계산 결과를 모은다. */
+export async function allChartsToText(input: BirthInput, options: TextExportOptions = {}): Promise<string> {
+  const locale = options.locale ?? getLocale()
+  const parts = [sajuToText(calculateSaju(input), locale)]
+  if (!input.unknownTime) {
+    const chart = createChart(
+      input.year, input.month, input.day, input.hour, input.minute,
+      input.gender === 'M', input.timezone, input.longitude,
+    )
+    const year = resolveLiunianYear(chart, options.ziweiYear, options.referenceDate ?? new Date())
+    parts.push(ziweiToText(chart, calculateLiunian(chart, year)))
+  }
+  parts.push(natalToText(await calculateNatal(input)))
+  return parts.join('\n\n')
+}
 
 /** 현재 로케일의 t() 래퍼 생성 */
 function makeT(locale?: Locale) {

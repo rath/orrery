@@ -163,6 +163,7 @@ const en: Record<string, string> = {
   'saju.injong.desc': '— Yang stem seeding for missing Ten Gods',
 
   // Ziwei
+  'ziwei.lunarYear': '流年 (lunar year)',
   'ziwei.needTime': 'Ziwei Doushu requires the time of birth.',
   'ziwei.needTimeDesc': 'The entire chart structure changes based on birth time. Please enter your time of birth.',
 

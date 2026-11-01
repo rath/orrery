@@ -163,6 +163,7 @@ const ko: Record<string, string> = {
   'saju.injong.desc': '— 누락 십성의 양간 인종',
 
   // Ziwei
+  'ziwei.lunarYear': '流年 (음력년)',
   'ziwei.needTime': '자미두수는 출생 시간이 필수입니다.',
   'ziwei.needTimeDesc': '시간에 따라 명반 전체 구조가 바뀝니다. 출생 시간을 입력해주세요.',
 

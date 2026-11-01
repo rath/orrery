@@ -19,6 +19,8 @@ export default function App() {
   const { t } = useLocale()
   const [tab, setTab] = useState<Tab>('saju')
   const [birthInput, setBirthInput] = useState<BirthInput | null>(null)
+  const [ziweiYear, setZiweiYear] = useState<number | null>(null)
+  const [referenceDate] = useState(() => new Date())
   const [profileModalOpen, setProfileModalOpen] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
   const birthFormRef = useRef<BirthFormHandle>(null)
@@ -113,26 +115,8 @@ export default function App() {
                 <CopyButton
                   label={<>{t('app.copyAll')}<br />{t('app.copyAllSub')}</>}
                   getText={async () => {
-                    const [{ calculateSaju }, { createChart }, { calculateNatal }, { sajuToText, ziweiToText, natalToText }] = await Promise.all([
-                      import('@orrery/core/saju'), import('@orrery/core/ziwei'),
-                      import('@orrery/core/natal'), import('../utils/text-export.ts'),
-                    ])
-                    const saju = calculateSaju(birthInput)
-                    const parts = [sajuToText(saju)]
-                    if (!birthInput.unknownTime) {
-                      const chart = createChart(
-                        birthInput.year, birthInput.month, birthInput.day,
-                        birthInput.hour,
-                        birthInput.minute,
-                        birthInput.gender === 'M',
-                        birthInput.timezone,
-                        birthInput.longitude,
-                      )
-                      parts.push(ziweiToText(chart))
-                    }
-                    const natal = await calculateNatal(birthInput)
-                    parts.push(natalToText(natal))
-                    return parts.join('\n\n')
+                    const { allChartsToText } = await import('../utils/text-export.ts')
+                    return allChartsToText(birthInput, { ziweiYear, referenceDate })
                   }}
                 />
               </div>
@@ -140,7 +124,7 @@ export default function App() {
 
             <Suspense fallback={<p role="status" className="py-8 text-center text-gray-500">{t('app.loading')}</p>}>
               {tab === 'saju' && <SajuView input={birthInput} />}
-              {tab === 'ziwei' && <ZiweiView input={birthInput} />}
+              {tab === 'ziwei' && <ZiweiView input={birthInput} year={ziweiYear} onYearChange={setZiweiYear} referenceDate={referenceDate} />}
               {tab === 'natal' && <NatalView input={birthInput} />}
             </Suspense>
           </>

@@ -1,10 +1,12 @@
-import { useState, useMemo } from 'react'
-import { calculateLiunian } from '@orrery/core/ziwei'
-import type { ZiweiChart } from '@orrery/core/types'
+import { useState } from 'react'
+import type { ZiweiChart, LiuNianInfo } from '@orrery/core/types'
 import { MAIN_STAR_NAMES } from '@orrery/core/constants'
+import { useLocale } from '../../i18n/index.ts'
 
 interface Props {
   chart: ZiweiChart
+  liunian: LiuNianInfo
+  onYearChange: (year: number) => void
 }
 
 const LUNAR_MONTH_NAMES = [
@@ -23,12 +25,10 @@ function getMainStarsAtZhi(chart: ZiweiChart, zhi: string): string[] {
   return []
 }
 
-export default function LiunianView({ chart }: Props) {
-  const currentYear = new Date().getFullYear()
-  const [year, setYear] = useState(currentYear)
-  const [yearDraft, setYearDraft] = useState(String(currentYear))
-
-  const liunian = useMemo(() => calculateLiunian(chart, year), [chart, year])
+export default function LiunianView({ chart, liunian, onYearChange }: Props) {
+  const { t } = useLocale()
+  const { year } = liunian
+  const [yearDraft, setYearDraft] = useState<string | null>(null)
 
   const colorMap: Record<string, string> = {
     '化祿': 'text-green-600 dark:text-green-400',
@@ -40,21 +40,22 @@ export default function LiunianView({ chart }: Props) {
   return (
     <section>
       <div className="flex items-center gap-3 mb-3">
-        <h3 className="text-base font-medium text-gray-700 dark:text-gray-200">流年</h3>
+        <h3 className="text-base font-medium text-gray-700 dark:text-gray-200">{t('ziwei.lunarYear')}</h3>
         <input
           type="number"
-          value={yearDraft}
+          aria-label={t('ziwei.lunarYear')}
+          value={yearDraft ?? year}
           onChange={e => {
             const draft = e.target.value
             setYearDraft(draft)
             const next = Number(draft)
-            if (Number.isInteger(next) && next >= chart.solarYear && next <= Math.min(9999, chart.solarYear + 100)) {
-              setYear(next)
+            if (Number.isInteger(next) && next >= chart.lunarYear && next <= 9999) {
+              onYearChange(next)
             }
           }}
-          onBlur={() => setYearDraft(String(year))}
-          min={chart.solarYear}
-          max={chart.solarYear + 100}
+          onBlur={() => setYearDraft(null)}
+          min={chart.lunarYear}
+          max={9999}
           className="w-20 text-base border border-gray-300 dark:border-gray-600 rounded px-2 py-0.5 text-gray-700 dark:text-gray-200"
         />
         <span className="text-sm text-gray-400 dark:text-gray-500 font-hanja">{liunian.gan}{liunian.zhi}年</span>
