@@ -20,6 +20,7 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('saju')
   const [birthInput, setBirthInput] = useState<BirthInput | null>(null)
   const [ziweiYear, setZiweiYear] = useState<number | null>(null)
+  const [houseSystem, setHouseSystem] = useState('P')
   const [referenceDate] = useState(() => new Date())
   const [profileModalOpen, setProfileModalOpen] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
@@ -116,7 +117,7 @@ export default function App() {
                   label={<>{t('app.copyAll')}<br />{t('app.copyAllSub')}</>}
                   getText={async () => {
                     const { allChartsToText } = await import('../utils/text-export.ts')
-                    return allChartsToText(birthInput, { ziweiYear, referenceDate })
+                    return allChartsToText(birthInput, { ziweiYear, referenceDate, houseSystem })
                   }}
                 />
               </div>
@@ -125,7 +126,7 @@ export default function App() {
             <Suspense fallback={<p role="status" className="py-8 text-center text-gray-500">{t('app.loading')}</p>}>
               {tab === 'saju' && <SajuView input={birthInput} />}
               {tab === 'ziwei' && <ZiweiView input={birthInput} year={ziweiYear} onYearChange={setZiweiYear} referenceDate={referenceDate} />}
-              {tab === 'natal' && <NatalView input={birthInput} />}
+              {tab === 'natal' && <NatalView input={birthInput} houseSystem={houseSystem} onHouseSystemChange={setHouseSystem} />}
             </Suspense>
           </>
         )}

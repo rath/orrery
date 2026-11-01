@@ -10,14 +10,15 @@ import { useLocale } from '../../i18n/index.ts'
 
 interface Props {
   input: BirthInput
+  houseSystem: string
+  onHouseSystemChange: (houseSystem: string) => void
 }
 
-export default function NatalView({ input }: Props) {
+export default function NatalView({ input, houseSystem, onHouseSystemChange }: Props) {
   const { t } = useLocale()
   const [calculation, setCalculation] = useState<{
     input: BirthInput; houseSystem: string; chart: NatalChart | null; error: string | null
   } | null>(null)
-  const [houseSystem, setHouseSystem] = useState('P')
 
   const current = calculation?.input === input && calculation.houseSystem === houseSystem ? calculation : null
   const chart = current?.chart
@@ -106,7 +107,7 @@ export default function NatalView({ input }: Props) {
                 House
                 <select
                   value={houseSystem}
-                  onChange={e => setHouseSystem(e.target.value)}
+                  onChange={e => onHouseSystemChange(e.target.value)}
                   className="border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500"
                 >
                 {HOUSE_SYSTEMS.map(([key, name]) => (

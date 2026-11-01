@@ -10,6 +10,7 @@ import { resolveLiunianYear } from './ziwei-year.ts'
 
 interface TextExportOptions {
   ziweiYear?: number | null
+  houseSystem?: string
   referenceDate?: Date
   locale?: Locale
 }
@@ -26,7 +27,7 @@ export async function allChartsToText(input: BirthInput, options: TextExportOpti
     const year = resolveLiunianYear(chart, options.ziweiYear, options.referenceDate ?? new Date())
     parts.push(ziweiToText(chart, calculateLiunian(chart, year)))
   }
-  parts.push(natalToText(await calculateNatal(input)))
+  parts.push(natalToText(await calculateNatal(input, options.houseSystem)))
   return parts.join('\n\n')
 }
 

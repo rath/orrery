@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createChart, calculateLiunian } from '@orrery/core/ziwei'
-import { calculateNatal } from '@orrery/core/natal'
+import { calculateNatal, HOUSE_SYSTEMS } from '@orrery/core/natal'
 import type { BirthInput } from '@orrery/core/types'
 import { allChartsToText, natalToText, ziweiToText } from './text-export.ts'
 import { resolveLiunianYear } from './ziwei-year.ts'
@@ -12,6 +12,25 @@ const input: BirthInput = {
 const chart = createChart(1993, 3, 12, 9, 45, true, input.timezone, input.longitude)
 
 describe('AI text export', () => {
+  it.each(['W', 'K'])('uses the selected house system %s for the combined copy', async houseSystem => {
+    const selected = await calculateNatal(input, houseSystem)
+    const placidus = await calculateNatal(input, 'P')
+    expect(selected.houses).not.toEqual(placidus.houses)
+    const text = await allChartsToText(input, { houseSystem })
+    expect(text).toContain(natalToText(selected))
+    expect(text).not.toContain('Houses (Placidus)')
+  })
+
+  it('names the actual fallback house system at polar latitudes', async () => {
+    const polarInput = { ...input, latitude: 78.2232, longitude: 15.6469, timezone: 'Arctic/Longyearbyen' }
+    const natal = await calculateNatal(polarInput, 'P')
+    expect(natal.houseSystem).not.toBe('P')
+    const name = HOUSE_SYSTEMS.find(([code]) => code === natal.houseSystem)![1]
+    const text = await allChartsToText(polarInput, { houseSystem: 'P' })
+    expect(text).toContain(`Houses (${name})`)
+    expect(text).toContain(natalToText(natal))
+  })
+
   it('exports every calculated aspect in both individual and combined copies', async () => {
     const natal = await calculateNatal(input)
     expect(natal.aspects.length).toBeGreaterThan(15)
