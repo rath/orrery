@@ -17,9 +17,10 @@ export default defineConfig({
   dts: true,
   splitting: true,
   clean: true,
-  // Bundling strips source comments; keep the license and upstream copyright in every file.
+  // Bundling strips source comments; keep the license and the sources of the ephemeris data in every file.
   banner: {
-    js: '/*! @orrery/core | AGPL-3.0-only | https://github.com/rath/orrery\n'
-      + ' * Includes code ported from Swiss Ephemeris, Copyright (C) 1997-2021 Astrodienst AG, Switzerland. */',
+    js: '/*! @orrery/core | MIT License | Copyright (c) 2026 Jang-Ho Hwang | https://github.com/rath/orrery\n'
+      + ' * Ephemeris data: VSOP87 (Bretagnon & Francou 1988), ELP 2000-82B (Chapront-Touze & Chapront 1983),\n'
+      + ' * NASA/JPL Horizons (DE441), IERS Conventions 2010, USNO. */',
   },
 })

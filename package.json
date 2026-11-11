@@ -2,7 +2,7 @@
   "name": "orrery",
   "private": true,
   "version": "0.1.0",
-  "license": "AGPL-3.0-only",
+  "license": "MIT",
   "type": "module",
   "workspaces": [
     "packages/*"

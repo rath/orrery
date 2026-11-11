@@ -118,31 +118,8 @@ console.log(`ASC: ${natal.angles?.asc.sign}`) // angles is null when the birth t
 
 ## License
 
-[AGPL-3.0](LICENSE)
+[MIT](LICENSE)
 
-<details>
-<summary>What is AGPL-3.0? (Plain English)</summary>
+You may use, modify and distribute this software freely, including commercially, as long as the copyright notice and the license text are kept.
 
-### What you CAN do
-
-- **Use it personally** — Run and modify it freely on your own machine.
-- **Read and study the source code** — You are always welcome to learn from the code.
-- **Modify, improve, and redistribute** — You can fork and redistribute the code, provided you follow the conditions below.
-
-### What you MUST do
-
-- **Keep the same license (AGPL-3.0)** — Any derivative work that includes or modifies this code must also be released under AGPL-3.0.
-- **Disclose source code** — Unlike the standard GPL, the AGPL requires source disclosure **even when the software is offered as a web service**. If you modify this code and run it as a website, you must give the site's users a way to obtain the modified source code.
-- **State changes** — You must clearly indicate what you changed from the original.
-- **Preserve copyright notices** — Do not remove the original copyright and license notices.
-
-### What you CANNOT do
-
-- **Run a service with closed source** — Using a modified version of this code to operate a web service without disclosing the source is a license violation.
-- **Relicense** — You cannot redistribute AGPL code under a more permissive license such as MIT or Apache.
-
-### TL;DR
-
-> Use it freely, but if you distribute a modified version or offer it as a service, you must release the source code under AGPL-3.0.
-
-</details>
+Versions of `@orrery/core` up to 0.5.0 include ephemeris code ported from Swiss Ephemeris and remain under AGPL-3.0. Later versions replace it with an independent implementation and are released under MIT.
