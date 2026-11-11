@@ -40,6 +40,8 @@ function instants(start: number, end: number, count: number): number[] {
 
 /** An observer table for the geocentre at TT instants; returns the two angle columns in degrees. */
 async function observe(command: string, jds: readonly number[], quantity: string): Promise<[number, number][]> {
+  // Horizons returns the rows in chronological order whatever the order of the request.
+  if (jds.some((jd, i) => i > 0 && jd <= jds[i - 1])) throw new Error('instants must be in ascending order')
   const result: [number, number][] = []
   for (const batch of chunks(jds, 40)) {
     const text = await horizons({
