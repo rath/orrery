@@ -224,7 +224,7 @@ describe('calculateNatal', () => {
   })
   const hasChiron = (chart: { planets: { id: string }[] }) => chart.planets.some(p => p.id === 'Chiron')
 
-  it('omits Chiron outside its table range instead of failing', async () => {
+  it('omits Chiron outside its range instead of failing', async () => {
     for (const year of [1850, 2150]) {
       const chart = await utcChart(year, 3, 12, 0)
       expect(chart.planets.map(p => p.id)).toEqual([
@@ -235,16 +235,24 @@ describe('calculateNatal', () => {
     }
   })
 
-  it('includes Chiron from 1900-01-01 through 2099-12-23 00:00 UT', async () => {
+  it('includes Chiron from 1900-01-01 through 2099-12-31 UT', async () => {
     expect(hasChiron(await utcChart(1899, 12, 31, 23))).toBe(false)
     expect(hasChiron(await utcChart(1900, 1, 1, 0))).toBe(true)
-    expect(hasChiron(await utcChart(2099, 12, 23, 0))).toBe(true)
-    expect(hasChiron(await utcChart(2099, 12, 23, 1))).toBe(false)
+    expect(hasChiron(await utcChart(2099, 12, 31, 23))).toBe(true)
+    expect(hasChiron(await utcChart(2100, 1, 1, 0))).toBe(false)
   })
 
-  it('rejects dates after the Moshier ephemeris range (3003-04-29 TT)', async () => {
-    await expect(utcChart(3003, 4, 28, 0)).resolves.toMatchObject({ houses: expect.any(Array) })
-    await expect(utcChart(3003, 4, 30, 0)).rejects.toThrow(RangeError)
-    await expect(utcChart(9999, 12, 31, 0)).rejects.toThrow(/outside Moshier/)
+  it('rejects dates after the ephemeris range (year 3000)', async () => {
+    await expect(utcChart(3000, 12, 31, 23)).resolves.toMatchObject({ houses: expect.any(Array) })
+    await expect(utcChart(3001, 1, 1, 0)).rejects.toThrow(RangeError)
+    await expect(utcChart(9999, 12, 31, 0)).rejects.toThrow(/outside the ephemeris range/)
+  })
+
+  it('covers the year 1 in every time zone', async () => {
+    const chart = await calculateNatal({
+      year: 1, month: 1, day: 1, hour: 0, minute: 0, gender: 'M',
+      latitude: 1.87, longitude: -157.4, timezone: 'Pacific/Kiritimati',
+    })
+    expect(chart.planets.find(p => p.id === 'Sun')!.sign).toBe('Capricorn')
   })
 })

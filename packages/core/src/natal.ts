@@ -1,19 +1,15 @@
 /**
  * 서양 점성술 Natal Chart 계산 엔진
  *
- * Pure TypeScript ephemeris (Moshier 이론 기반).
+ * 자체 구현한 순수 TypeScript 천체력(`./ephemeris`)을 사용한다.
  * 외부 데이터 파일이나 WASM 없이 브라우저에서 동기 실행 가능.
  */
 import type {
   BirthInput, ZodiacSign, PlanetId, PlanetPosition,
   NatalHouse, NatalAngles, AspectType, NatalAspect, NatalChart,
 } from './types.ts'
-import { julday, calcPlanet, calcHouses } from './ephemeris/index.ts'
-import { hasChironData } from './ephemeris/chiron.ts'
-import { deltaT } from './ephemeris/deltat.ts'
-import { calcObliquity } from './ephemeris/obliquity.ts'
-import { calcNutation } from './ephemeris/nutation.ts'
-import { DEG_TO_RAD } from './ephemeris/math.ts'
+import { eclipticPosition, housesAt, isAvailable, julianDay } from './ephemeris/index.ts'
+import type { Body, HouseSystem, Houses } from './ephemeris/index.ts'
 import { birthInputToUtcDate, getBirthTimezone } from './timezone.ts'
 import { assertBirthInput } from './validation.ts'
 
@@ -59,20 +55,20 @@ export const PLANET_KO: Record<PlanetId, string> = {
   NorthNode: '북교점', SouthNode: '남교점', Fortuna: '행운점',
 }
 
-/** PlanetId → swisseph body number 매핑 (SouthNode 제외 — 수동 계산) */
-const PLANET_BODIES: [PlanetId, number][] = [
-  ['Sun', 0],       // SE_SUN
-  ['Moon', 1],      // SE_MOON
-  ['Mercury', 2],   // SE_MERCURY
-  ['Venus', 3],     // SE_VENUS
-  ['Mars', 4],      // SE_MARS
-  ['Jupiter', 5],   // SE_JUPITER
-  ['Saturn', 6],    // SE_SATURN
-  ['Uranus', 7],    // SE_URANUS
-  ['Neptune', 8],   // SE_NEPTUNE
-  ['Pluto', 9],     // SE_PLUTO
-  ['Chiron', 15],   // SE_CHIRON
-  ['NorthNode', 10], // SE_MEAN_NODE
+/** PlanetId → 천체력 천체 매핑 (SouthNode, Fortuna 제외 — 파생 포인트) */
+const PLANET_BODIES: [PlanetId, Body][] = [
+  ['Sun', 'Sun'],
+  ['Moon', 'Moon'],
+  ['Mercury', 'Mercury'],
+  ['Venus', 'Venus'],
+  ['Mars', 'Mars'],
+  ['Jupiter', 'Jupiter'],
+  ['Saturn', 'Saturn'],
+  ['Uranus', 'Uranus'],
+  ['Neptune', 'Neptune'],
+  ['Pluto', 'Pluto'],
+  ['Chiron', 'Chiron'],
+  ['NorthNode', 'MeanNode'], // 평균 교점
 ]
 
 export const ASPECT_SYMBOLS: Record<AspectType, string> = {
@@ -93,7 +89,7 @@ const ASPECT_DEFS: { type: AspectType; angle: number; maxOrb: number }[] = [
 
 export const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII']
 
-/** 하우스 시스템: [swisseph char, 표시 이름] */
+/** 하우스 시스템: [한 글자 코드, 표시 이름] */
 export const HOUSE_SYSTEMS: [string, string][] = [
   ['P', 'Placidus'],
   ['K', 'Koch'],
@@ -133,17 +129,20 @@ function angularDifference(lon1: number, lon2: number): number {
   return diff
 }
 
+const DEG_TO_RAD = Math.PI / 180
+
 /** Geometric solar center above the horizon, independent of house divisions. */
-function isDaytime(sun: PlanetPosition, jd: number, latitude: number, armc: number): boolean {
-  const tt = jd + deltaT(jd)
-  const obliquity = calcObliquity(tt) + calcNutation(tt)[1]
+function isDaytime(sun: PlanetPosition, latitude: number, houses: Houses): boolean {
+  const obliquity = houses.obliquity * DEG_TO_RAD
   const lon = sun.longitude * DEG_TO_RAD
   const lat = sun.latitude * DEG_TO_RAD
+  // 황도 좌표 → 적도 직교 좌표
   const x = Math.cos(lat) * Math.cos(lon)
   const y = Math.cos(lat) * Math.sin(lon) * Math.cos(obliquity) - Math.sin(lat) * Math.sin(obliquity)
   const z = Math.cos(lat) * Math.sin(lon) * Math.sin(obliquity) + Math.sin(lat) * Math.cos(obliquity)
+  // 천정 방향과의 내적 = sin(고도)
   const phi = latitude * DEG_TO_RAD
-  const theta = armc * DEG_TO_RAD
+  const theta = houses.ramc * DEG_TO_RAD
   return Math.cos(phi) * (x * Math.cos(theta) + y * Math.sin(theta)) + Math.sin(phi) * z >= 0
 }
 
@@ -155,17 +154,17 @@ export function formatDegree(lon: number): string {
   return `${deg}°${String(min).padStart(2, '0')}'`
 }
 
-/** 행성이 어느 하우스에 속하는지 판정 (cusps는 1-indexed: cusps[1]~cusps[12]) */
+/** 행성이 어느 하우스(1~12)에 속하는지 판정 (cusps[0]이 1하우스 시작점) */
 function findHouse(planetLon: number, cusps: number[]): number {
   const lon = normalizeDeg(planetLon)
-  for (let i = 1; i <= 12; i++) {
+  for (let i = 0; i < 12; i++) {
     const start = normalizeDeg(cusps[i])
-    const end = normalizeDeg(cusps[i === 12 ? 1 : i + 1])
+    const end = normalizeDeg(cusps[(i + 1) % 12])
     if (start < end) {
-      if (lon >= start && lon < end) return i
+      if (lon >= start && lon < end) return i + 1
     } else {
       // 0° 경계를 넘는 경우
-      if (lon >= start || lon < end) return i
+      if (lon >= start || lon < end) return i + 1
     }
   }
   return 1
@@ -223,31 +222,26 @@ export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Prom
   const utMonth = utcDate.getUTCMonth() + 1
   const utDay = utcDate.getUTCDate()
   const utHour = utcDate.getUTCHours() + utcDate.getUTCMinutes() / 60 + utcDate.getUTCSeconds() / 3600
-  const jd = julday(utYear, utMonth, utDay, utHour)
+  const jd = julianDay(utYear, utMonth, utDay, utHour)
 
-  // 하우스 계산 (시간 모름이면 생략)
-  let cusps: number[] | null = null
-  let ascmc: number[] | null = null
-  if (!unknownTime) {
-    const houseResult = calcHouses(jd, lat, lon, houseSystem)
-    houseSystem = houseResult.system
-    cusps = Array.from(houseResult.cusps)
-    ascmc = Array.from(houseResult.ascmc)
-  }
+  // 하우스 계산 (시간 모름이면 생략). 극지방에서는 요청한 방식 대신 Porphyry가 쓰일 수 있다.
+  const houseResult = unknownTime ? null : housesAt(jd, lat, lon, houseSystem as HouseSystem)
+  const cusps = houseResult?.cusps ?? null
+  if (houseResult) houseSystem = houseResult.system
 
-  // 행성 위치 계산 (Chiron은 사전 계산 표가 있는 기간에만 포함)
+  // 행성 위치 계산 (Chiron은 천체력이 다루는 1900~2099년에만 포함)
   const planets: PlanetPosition[] = []
-  for (const [id, bodyNum] of PLANET_BODIES) {
-    if (id === 'Chiron' && !hasChironData(jd)) continue
-    const pos = calcPlanet(jd, bodyNum)
+  for (const [id, body] of PLANET_BODIES) {
+    if (body === 'Chiron' && !isAvailable(body, jd)) continue
+    const pos = eclipticPosition(body, jd)
     planets.push({
       id,
       longitude: pos.longitude,
       latitude: pos.latitude,
-      speed: pos.longitudeSpeed,
+      speed: pos.speed,
       sign: lonToSign(pos.longitude),
       degreeInSign: degreeInSign(pos.longitude),
-      isRetrograde: pos.longitudeSpeed < 0,
+      isRetrograde: pos.speed < 0,
       ...(cusps ? { house: findHouse(pos.longitude, cusps) } : {}),
     })
   }
@@ -267,12 +261,12 @@ export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Prom
   })
 
   // Fortuna (Part of Fortune) — ASC 필요하므로 시간을 알 때만 계산
-  if (ascmc) {
-    const ascLon = ascmc[0]
+  if (houseResult) {
+    const ascLon = houseResult.ascendant
     const sun = planets.find(p => p.id === 'Sun')!
     const moon = planets.find(p => p.id === 'Moon')!
     // Whole Sign/Morinus 등의 하우스 경계는 실제 지평선과 일치하지 않는다.
-    const isDayChart = isDaytime(sun, jd, lat, ascmc[2])
+    const isDayChart = isDaytime(sun, lat, houseResult)
     const fortunaLon = isDayChart
       ? normalizeDeg(ascLon + moon.longitude - sun.longitude)
       : normalizeDeg(ascLon + sun.longitude - moon.longitude)
@@ -291,10 +285,10 @@ export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Prom
   // 하우스 배열 구축
   const houses: NatalHouse[] = []
   if (cusps) {
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 0; i < 12; i++) {
       const cuspLon = cusps[i]
       houses.push({
-        number: i,
+        number: i + 1,
         cuspLongitude: cuspLon,
         sign: lonToSign(cuspLon),
         degreeInSign: degreeInSign(cuspLon),
@@ -304,9 +298,9 @@ export async function calculateNatal(input: BirthInput, houseSystem = 'P'): Prom
 
   // 앵글
   let angles: NatalAngles | null = null
-  if (ascmc) {
-    const ascLon = ascmc[0]
-    const mcLon = ascmc[1]
+  if (houseResult) {
+    const ascLon = houseResult.ascendant
+    const mcLon = houseResult.midheaven
     const descLon = normalizeDeg(ascLon + 180)
     const icLon = normalizeDeg(mcLon + 180)
     angles = {

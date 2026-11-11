@@ -15,8 +15,8 @@ export type JasiMethod = 'split' | 'unified';
 /** 생년월일시 입력 */
 export interface BirthInput {
   /**
-   * Gregorian year, 1–9999. `calculateNatal()` is limited to the Moshier ephemeris range
-   * (through 3003-04-29 TT) and includes Chiron only for 1900-01-01 – 2099-12-23 UT.
+   * Gregorian year, 1–9999. `calculateNatal()` is limited to the ephemeris range
+   * (years 1–3000 UT) and includes Chiron only for the years 1900–2099 UT.
    */
   year: number;
   month: number;
