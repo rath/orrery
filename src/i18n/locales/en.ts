@@ -187,7 +187,7 @@ const en: Record<string, string> = {
 
   // Natal
   'natal.houseSystemFallback': 'The selected house system is unavailable here. Showing {system} houses.',
-  'natal.loading': 'Loading Swiss Ephemeris...',
+  'natal.loading': 'Calculating natal chart...',
   'natal.error': 'Calculation Error',
   'natal.unknownTime': 'Calculated based on noon (12:00) without birth time.',
   'natal.unknownTimeDetail': 'The Moon may have up to ±6° error, and ASC / house placements are not displayed.',

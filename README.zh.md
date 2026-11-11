@@ -13,7 +13,7 @@
 
 - **四柱万年历** — 고영창（Ko Young-chang）用 Perl 编写了[真万年历](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)，김정균（Kim Jeong-gyun）将其[移植到 PHP](https://github.com/OOPS-ORG-PHP/Lunar)；2018年11月，황장호（Hwang Jang-ho）又将其移植到 Java 和 Python 自用，2026年2月借助 Claude Code（Opus 4.6）移植到 TypeScript；自2026年10月起，节气交接时刻改用 lunar-javascript 的天文计算
 - **紫微斗数命盘** — 由 Claude（Opus 4.5）参考中文文献，基于 [lunar-javascript](https://www.npmjs.com/package/lunar-javascript) 库实现
-- **占星出生星盘** — 将 [Swiss Ephemeris](https://www.astro.com/swisseph/) 的 Moshier 星历移植为纯 TypeScript
+- **占星出生星盘** — 仅依据公开发表的天文理论与公共数据独立实现的纯 TypeScript 星历。水星至火星采用 [VSOP87](https://ftp.imcce.fr/pub/ephem/planets/vsop87/)，月球采用 [ELP 2000-82B](https://ftp.imcce.fr/pub/ephem/moon/elp82b/) 理论，木星至冥王星和凯龙星则从 [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/)（DE441）的状态向量出发做数值积分，结果均与 JPL Horizons 对照验证
 
 ## 功能
 
@@ -40,7 +40,7 @@
 - 流年运势（流年命宫、流年四化、12个流月）
 
 ### 出生星盘（Natal Chart）
-- 基于 Swiss Ephemeris Moshier 星历的行星位置计算（纯 TypeScript）
+- 基于 VSOP87、ELP 2000-82B 理论和数值积分自行实现的星历计算行星位置（纯 TypeScript，1800–2200 年与 JPL DE441 相差不超过 0.3″）
 - 10颗行星、凯龙星、南/北交点及福点的位置（星座、度数、逆行、宫位）
 - 支持10种宫位制（默认 Placidus）
 - ASC / MC / DESC / IC 四轴

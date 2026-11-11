@@ -187,7 +187,7 @@ const ko: Record<string, string> = {
 
   // Natal
   'natal.houseSystemFallback': '선택한 하우스를 계산할 수 없어 {system} 방식으로 표시합니다.',
-  'natal.loading': 'Swiss Ephemeris 로딩 중...',
+  'natal.loading': '출생차트 계산 중...',
   'natal.error': '계산 오류',
   'natal.unknownTime': '출생 시간 없이 정오(12:00) 기준으로 계산한 결과입니다.',
   'natal.unknownTimeDetail': '달은 최대 ±6° 오차가 있을 수 있으며, ASC · 하우스 배치는 표시하지 않습니다.',

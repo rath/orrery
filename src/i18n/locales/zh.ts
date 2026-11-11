@@ -187,7 +187,7 @@ const zh: Record<string, string> = {
 
   // Natal
   'natal.houseSystemFallback': '此处无法计算所选宫位制，现显示 {system} 宫位。',
-  'natal.loading': '正在加载 Swiss Ephemeris...',
+  'natal.loading': '正在计算出生星盘...',
   'natal.error': '计算错误',
   'natal.unknownTime': '未输入出生时间，以正午（12:00）为基准计算。',
   'natal.unknownTimeDetail': '月亮可能有最大 ±6° 的误差，ASC 和宫位配置不予显示。',

@@ -27,6 +27,9 @@ bun run --cwd packages/core build
 
 # 코어 패키지 테스트
 bun run --cwd packages/core test
+
+# 천체력 표 재생성 (원자료·JPL Horizons 응답은 .cache에 보관)
+bun packages/core/scripts/ephemeris/build-tables.ts
 ```
 
 ## Architecture
@@ -48,20 +51,20 @@ packages/core/                      # @orrery/core — 독립 npm 패키지 (계
 │   ├── ziwei.ts                    # 자미두수 계산 엔진 (명반, 대한, 유년·유월)
 │   ├── natal.ts                    # 서양 점성술 출생차트 (행성, 하우스, 애스펙트, 행운점)
 │   ├── cities.ts                   # 출생 도시 데이터, 초성 검색
-│   └── ephemeris/                  # Swiss Ephemeris Moshier 모드의 순수 TypeScript 포팅
-│       ├── index.ts                # 공개 API (calcPlanet, calcHouses, julday)
-│       ├── planets.ts              # Moshier 행성 이론
-│       ├── moon.ts                 # Moshier 달 이론
-│       ├── chiron.ts               # Chiron 표 보간 (1900-01-01 ~ 2099-12-23 UT)
-│       ├── node.ts                 # 달의 평균 교점
-│       ├── houses.ts               # 하우스 시스템 10종, 극지방 대체
-│       ├── julian.ts               # 율리우스일 변환
-│       ├── deltat.ts               # ΔT (UT → TT)
-│       ├── precession.ts           # 세차 (IAU 1976)
-│       ├── nutation.ts             # 장동 (IAU 1980)
-│       ├── obliquity.ts            # 황도 경사
-│       ├── math.ts                 # 좌표 변환, 각도 유틸리티
-│       └── tables/                 # 행성·달 계수표, Chiron 표
+│   └── ephemeris/                  # 자체 구현 천체력 (공개 이론·데이터 기반, 순수 TypeScript)
+│       ├── index.ts                # 공개 API (eclipticPosition, housesAt, isAvailable, julianDay)
+│       ├── time.ts                 # 율리우스일, ΔT (UT → TT)
+│       ├── frames.ts               # 세차 (IAU 2006), 장동 (IAU 2000A_R06), 황도 경사, 항성시
+│       ├── series.ts               # Poisson 급수 평가 (VSOP87·ELP 공용)
+│       ├── planets.ts              # 수성~화성: VSOP87 + DE441 시간 보정
+│       ├── lunar-theory.ts         # 달: ELP 2000-82B 인수와 급수 평가
+│       ├── moon.ts                 # 달의 지심 위치 (DE441 재적합 인수 적용)
+│       ├── integrator.ts           # 목성~명왕성·Chiron: N체 수치적분 (RK4)
+│       ├── outer.ts                # 체크포인트 표에서 적분한 일심 위치, 일 단위 캐시
+│       ├── apparent.ts             # 겉보기 위치 (광행시간, 광굴절, 광행차, 날짜 기준 황도)
+│       ├── houses.ts               # 하우스 시스템 10종, 극지방 처리
+│       └── data/                   # 생성된 표 (직접 수정 금지, scripts/ephemeris로 재생성)
+├── scripts/ephemeris/              # 표·테스트 기준값 생성 스크립트, 출처 문서 (README.md)
 ├── examples/                       # 실행 예제 (saju.ts, ziwei.ts, natal.ts)
 └── tests/
     ├── fixtures.ts                 # Python 기준 참조 데이터
@@ -70,7 +73,8 @@ packages/core/                      # @orrery/core — 독립 npm 패키지 (계
     ├── ziwei.test.ts
     ├── ziwei-reference.test.ts     # iztro 2.6.3 기준값 (ziwei-reference.json)
     ├── natal.test.ts
-    ├── ephemeris-reference.test.ts # pyswisseph 기준값 (swiss-reference.json)
+    ├── ephemeris.test.ts           # 천체력 단위 테스트 (시간, 좌표계, 하우스, 적분기, 범위)
+    ├── ephemeris-reference.test.ts # JPL Horizons 기준값 (horizons-reference.json), pyswisseph 교차검증 (swiss-reference.json)
     ├── fortuna.test.ts             # 행운점 주야간 판정
     ├── timezone.test.ts
     └── validation.test.ts
@@ -162,4 +166,12 @@ Python에서 TypeScript로 포팅 시 주의:
 - `'Asia/Seoul'` 또는 미지정: KDT→KST 보정 후 KST 벽시계로 계산 (한국 사주 관례 유지)
 - 그 외 타임존: IANA → UTC 변환 후 경도·균시차 기반 진태양시 보정
 
-출생차트 날짜 범위: `calculateNatal()`은 Moshier 천체력 범위(3003-04-29 TT)를 넘으면 `RangeError`를 던지고, Chiron은 사전 계산 표가 있는 1900-01-01 ~ 2099-12-23(UT)에만 결과에 포함한다. 웹 폼은 연도를 1900년~올해로 제한하므로 영향이 없지만, 테스트·스크립트에서 이 범위 밖 날짜를 다룰 때는 Chiron이 빠질 수 있음을 전제로 작성할 것.
+출생차트 날짜 범위: `calculateNatal()`은 천체력이 다루는 서기 1~3000년(UT)을 벗어나면 `RangeError`를 던지고, Chiron은 궤도가 잘 결정된 1900~2099년(UT)에만 결과에 포함한다. 웹 폼은 연도를 1900년~올해로 제한하므로 영향이 없지만, 테스트·스크립트에서 이 범위 밖 날짜를 다룰 때는 Chiron이 빠질 수 있음을 전제로 작성할 것.
+
+## 천체력 (`packages/core/src/ephemeris`) 수정 시 주의
+
+이 천체력은 **공개된 천문 이론과 공공 데이터만으로 독자 구현**했다. 프로젝트를 MIT 라이선스로 배포하기 위한 전제이므로, AGPL인 Swiss Ephemeris에서 파생된 코드가 섞이면 안 된다. 출처와 가공 방법은 `packages/core/scripts/ephemeris/README.md`에 있다.
+
+- Swiss Ephemeris(AGPL/상용)나 그 파생 포팅의 소스 코드·계수표를 참고하거나 옮겨 오지 말 것. 근거는 발표된 논문, IAU/IERS 문서, 원자료에 딸린 설명서, JPL Horizons의 계산 결과로 한정한다.
+- `src/ephemeris/data/`의 표는 생성물이다. 직접 고치지 말고 `scripts/ephemeris`의 생성기를 고친 뒤 재생성할 것.
+- 정확도의 기준은 JPL Horizons(DE441)다. `tests/swiss-reference.json`은 Swiss Ephemeris의 출력 수치만 담은 교차검증 자료이며, 구현의 근거가 아니다.

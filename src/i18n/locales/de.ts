@@ -187,7 +187,7 @@ const de: Record<string, string> = {
 
   // Natal
   'natal.houseSystemFallback': 'Das gewählte Häusersystem ist hier nicht berechenbar. Angezeigt wird {system}.',
-  'natal.loading': 'Swiss Ephemeris wird geladen...',
+  'natal.loading': 'Geburtshoroskop wird berechnet...',
   'natal.error': 'Berechnungsfehler',
   'natal.unknownTime': 'Ohne Geburtszeit auf Basis von 12:00 Uhr berechnet.',
   'natal.unknownTimeDetail': 'Der Mond kann bis zu ±6° abweichen; AC und Häuserstellungen werden nicht angezeigt.',

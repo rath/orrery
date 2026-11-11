@@ -187,7 +187,7 @@ const es: Record<string, string> = {
 
   // Natal
   'natal.houseSystemFallback': 'El sistema de casas elegido no se puede calcular aquí. Se muestra {system}.',
-  'natal.loading': 'Cargando Swiss Ephemeris...',
+  'natal.loading': 'Calculando carta natal...',
   'natal.error': 'Error de cálculo',
   'natal.unknownTime': 'Calculado a partir del mediodía (12:00) sin hora de nacimiento.',
   'natal.unknownTimeDetail': 'La Luna puede tener un error de hasta ±6°, y no se muestran el ASC ni las posiciones de las casas.',

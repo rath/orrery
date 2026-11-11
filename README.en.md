@@ -13,7 +13,7 @@ A browser-based divination tool. It computes Saju (四柱八字, Four Pillars of
 
 - **Saju Perpetual Calendar** — Originally a Perl [perpetual calendar](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html) by Ko Young-chang, [ported to PHP](https://github.com/OOPS-ORG-PHP/Lunar) by Kim Jeong-gyun. In November 2018, Jang-Ho Hwang ported it to Java and Python for personal use, and in February 2026 ported it to TypeScript with Claude Code (Opus 4.6). Since October 2026, solar-term instants come from lunar-javascript's astronomical calculation.
 - **紫微斗數 Chart** — Implemented by Claude (Opus 4.5) on top of the [lunar-javascript](https://www.npmjs.com/package/lunar-javascript) library, drawing on Chinese-language sources.
-- **Astrology Natal Chart** — A pure TypeScript port of the Moshier ephemeris from [Swiss Ephemeris](https://www.astro.com/swisseph/).
+- **Astrology Natal Chart** — An independent pure TypeScript ephemeris built only from published theories and public data: [VSOP87](https://ftp.imcce.fr/pub/ephem/planets/vsop87/) for Mercury to Mars, [ELP 2000-82B](https://ftp.imcce.fr/pub/ephem/moon/elp82b/) for the Moon, and numerical integration from [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/) (DE441) state vectors for Jupiter to Pluto and Chiron. Results are verified against JPL Horizons.
 
 ## Features
 
@@ -40,7 +40,7 @@ A browser-based divination tool. It computes Saju (四柱八字, Four Pillars of
 - Annual fortune (流年): 流年命宮, 流年四化, 12 流月
 
 ### Natal Chart (Western Astrology)
-- Planetary positions from the Swiss Ephemeris Moshier ephemeris (pure TypeScript)
+- Planetary positions from an in-house ephemeris built on the VSOP87 and ELP 2000-82B theories and numerical integration (pure TypeScript; within 0.3″ of JPL DE441 for 1800–2200)
 - Positions of the 10 planets, Chiron, the North/South Nodes, and the Part of Fortune (sign, degree, retrograde, house)
 - 10 house systems (Placidus by default)
 - ASC / MC / DESC / IC angles

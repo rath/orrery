@@ -13,7 +13,7 @@
 
 - **사주 만세력** — 고영창님의 Perl [진짜만세력](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)을 김정균님이 [PHP로 포팅](https://github.com/OOPS-ORG-PHP/Lunar)했고, 이를 황장호가 2018년 11월 Java와 Python으로 옮겨 사용해 오다가 2026년 2월 Claude Code(Opus 4.6)로 TypeScript에 포팅. 절입 시각은 2026년 10월부터 lunar-javascript의 천문 계산 사용
 - **자미두수 명반** — [lunar-javascript](https://www.npmjs.com/package/lunar-javascript) 라이브러리를 바탕으로 Claude(Opus 4.5)가 중국어 문헌을 조사하며 구현
-- **점성술 출생차트** — [Swiss Ephemeris](https://www.astro.com/swisseph/)의 Moshier 천체력을 순수 TypeScript로 포팅
+- **점성술 출생차트** — 공개된 천문 이론과 데이터만으로 독자 구현한 순수 TypeScript 천체력. 수성~화성은 [VSOP87](https://ftp.imcce.fr/pub/ephem/planets/vsop87/), 달은 [ELP 2000-82B](https://ftp.imcce.fr/pub/ephem/moon/elp82b/) 이론으로, 목성~명왕성과 키론은 [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/)(DE441) 상태벡터에서 출발하는 수치적분으로 계산하고, 결과를 JPL Horizons와 대조해 검증
 
 ## 기능
 
@@ -40,7 +40,7 @@
 - 유년 운세 (유년명궁, 유년사화, 12유월)
 
 ### 출생차트 (Natal Chart)
-- Swiss Ephemeris의 Moshier 천체력 기반 행성 위치 계산 (순수 TypeScript)
+- VSOP87·ELP 2000-82B 이론과 수치적분으로 구현한 자체 천체력 기반 행성 위치 계산 (순수 TypeScript, 1800–2200년 JPL DE441 대비 0.3″ 이내)
 - 10개 행성 + 키론 + 남/북교점 + 행운점(Part of Fortune) 위치 (별자리, 도수, 역행, 하우스)
 - 하우스 시스템 10종 지원 (기본값 Placidus)
 - ASC/MC/DESC/IC 앵글

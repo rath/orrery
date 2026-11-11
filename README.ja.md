@@ -13,7 +13,7 @@
 
 - **四柱万年暦** — 고영창（Ko Young-chang）氏のPerl製[真万年暦](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)を김정균（Kim Jeong-gyun）氏が[PHPに移植](https://github.com/OOPS-ORG-PHP/Lunar)。2018年11月に황장호（Hwang Jang-ho）がJavaとPythonに移植して使い続け、2026年2月にClaude Code（Opus 4.6）でTypeScriptに移植。2026年10月からは節入り時刻にlunar-javascriptの天文計算を使用
 - **紫微斗数命盤** — [lunar-javascript](https://www.npmjs.com/package/lunar-javascript)ライブラリをベースに、Claude（Opus 4.5）が中国語文献を調べながら実装
-- **占星術の出生チャート** — [Swiss Ephemeris](https://www.astro.com/swisseph/)のMoshier天体暦を純粋なTypeScriptに移植
+- **占星術の出生チャート** — 公開された天文理論とデータだけで独自に実装した純粋なTypeScript天体暦。水星〜火星は[VSOP87](https://ftp.imcce.fr/pub/ephem/planets/vsop87/)、月は[ELP 2000-82B](https://ftp.imcce.fr/pub/ephem/moon/elp82b/)の理論で、木星〜冥王星とキロンは[JPL Horizons](https://ssd.jpl.nasa.gov/horizons/)（DE441）の状態ベクトルから出発する数値積分で計算し、結果をJPL Horizonsと照合して検証
 
 ## 機能
 
@@ -40,7 +40,7 @@
 - 流年運勢（流年命宮、流年四化、12の流月）
 
 ### 出生チャート（Natal Chart）
-- Swiss EphemerisのMoshier天体暦による惑星位置計算（純粋なTypeScript）
+- VSOP87・ELP 2000-82B理論と数値積分で実装した独自天体暦による惑星位置計算（純粋なTypeScript、1800〜2200年はJPL DE441との差0.3″以内）
 - 10天体・キロン・南北の交点・パート・オブ・フォーチュンの位置（星座、度数、逆行、ハウス）
 - 10種類のハウスシステム（デフォルトはPlacidus）
 - ASC / MC / DESC / IC アングル

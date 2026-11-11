@@ -16,7 +16,7 @@
 
 - **四柱万年暦** — 고영창（Ko Young-chang）氏のPerl製[真万年暦](http://afnmp3.homeip.net/~kohyc/calendar/cal20000.html)を김정균（Kim Jeong-gyun）氏が[PHPに移植](https://github.com/OOPS-ORG-PHP/Lunar)。2018年11月に황장호（Hwang Jang-ho）がJavaとPythonに移植して使い続け、2026年2月にClaude Code（Opus 4.6）でTypeScriptに移植。2026年10月からは節入り時刻にlunar-javascriptの天文計算を使用
 - **紫微斗数命盤** — [lunar-javascript](https://www.npmjs.com/package/lunar-javascript)ライブラリをベースに、Claude（Opus 4.5）が中国語文献を調べながら実装
-- **占星術の出生チャート** — [Swiss Ephemeris](https://www.astro.com/swisseph/)のMoshier天体暦を純粋なTypeScriptに移植
+- **占星術の出生チャート** — 公開された天文理論とデータだけで独自に実装した純粋なTypeScript天体暦。水星〜火星は[VSOP87](https://ftp.imcce.fr/pub/ephem/planets/vsop87/)、月は[ELP 2000-82B](https://ftp.imcce.fr/pub/ephem/moon/elp82b/)の理論で、木星〜冥王星とキロンは[JPL Horizons](https://ssd.jpl.nasa.gov/horizons/)（DE441）の状態ベクトルから出発する数値積分で計算し、結果をJPL Horizonsと照合して検証
 
 ## インストール
 
@@ -180,7 +180,7 @@ console.log(formatCityName(results[0])) // '부산'
 
 ## 計算の基準
 
-入力日付は西暦1〜9999年の有効なグレゴリオ暦の日付である必要があります。出生チャートはMoshier天体暦が収録する3003-04-29（TT）までしか計算できず、それ以降は `calculateNatal()` が `RangeError` を投げます。キロンは事前計算表がある1900-01-01〜2099-12-23（UT）の間だけ結果に含まれ、範囲外ではキロンなしで計算します。
+入力日付は西暦1〜9999年の有効なグレゴリオ暦の日付である必要があります。出生チャートは天体暦が扱う西暦1〜3000年（UT）の間だけ計算でき、範囲外では `calculateNatal()` が `RangeError` を投げます。キロンは軌道が十分に確定している1900〜2099年（UT）の間だけ結果に含まれ、範囲外ではキロンなしで計算します。
 
 ### 四柱八字
 
