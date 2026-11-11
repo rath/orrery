@@ -24,3 +24,6 @@ dist-ssr
 *.sln
 *.sw?
 .claude/
+
+# Ephemeris table sources downloaded by packages/core/scripts/ephemeris
+packages/core/scripts/ephemeris/.cache/
