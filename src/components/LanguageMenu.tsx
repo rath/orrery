@@ -88,7 +88,7 @@ export default function LanguageMenu() {
   }
 
   return (
-    <div ref={containerRef} className="fixed top-14 left-3 z-50">
+    <div ref={containerRef} className="relative">
       <button
         ref={triggerRef}
         type="button"
@@ -99,15 +99,12 @@ export default function LanguageMenu() {
         aria-controls={open ? LISTBOX_ID : undefined}
         aria-label={label}
         title={label}
-        className="w-8 h-8 rounded-full
-          flex items-center justify-center
-          bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm
-          border border-gray-200 dark:border-gray-700
-          text-gray-600 dark:text-gray-300
-          hover:bg-gray-100 dark:hover:bg-gray-700
-          transition-colors text-xs font-medium"
+        className="inline-flex h-9 items-center gap-1 rounded-md px-2.5 text-sm text-fg-2 transition-colors hover:bg-sunken hover:text-fg"
       >
-        {current.short}
+        <span lang={current.code}>{current.name}</span>
+        <svg className="h-4 w-4 text-faint" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+        </svg>
       </button>
 
       {open && (
@@ -119,10 +116,7 @@ export default function LanguageMenu() {
           aria-label={label}
           aria-activedescendant={optionId(LOCALES[highlight].code)}
           onKeyDown={handleListKeyDown}
-          className="absolute top-full left-0 mt-1 w-36 py-1 outline-none
-            rounded-lg border shadow-lg
-            bg-white dark:bg-gray-800
-            border-gray-200 dark:border-gray-700"
+          className="absolute top-full right-0 z-20 mt-1 w-40 rounded-md border border-line bg-surface py-1 shadow-lg outline-none"
         >
           {LOCALES.map((l, i) => {
             const selected = l.code === locale
@@ -135,11 +129,13 @@ export default function LanguageMenu() {
                 aria-selected={selected}
                 onClick={() => choose(l.code)}
                 onMouseEnter={() => setHighlight(i)}
-                className={`flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer select-none
-                  ${highlighted ? 'bg-gray-100 dark:bg-gray-700' : ''}
-                  ${selected ? 'text-gray-900 dark:text-gray-100 font-medium' : 'text-gray-600 dark:text-gray-300'}`}
+                className={`flex items-center gap-2 px-3 py-2 text-sm select-none ${highlighted ? 'bg-sunken' : ''} ${
+                  selected ? 'font-medium text-fg' : 'text-fg-2'
+                }`}
               >
-                <span className="w-3 text-center text-xs" aria-hidden="true">{selected ? '✓' : ''}</span>
+                <svg className={`h-4 w-4 ${selected ? '' : 'invisible'}`} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fillRule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-7.5 7.5a1 1 0 01-1.4 0L3.3 9.7a1 1 0 011.4-1.4l3.8 3.8 6.8-6.8a1 1 0 011.4 0z" clipRule="evenodd" />
+                </svg>
                 <span lang={l.code}>{l.name}</span>
               </li>
             )

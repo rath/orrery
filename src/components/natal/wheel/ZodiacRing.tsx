@@ -2,6 +2,7 @@
  * 외곽 별자리 링 — 12개 호형 세그먼트, 심볼, 눈금
  */
 import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '@orrery/core/natal'
+import { textGlyph } from '../../../utils/format.ts'
 import type { ZodiacSign } from '@orrery/core/types'
 import {
   CX, CY, R_OUTER, R_ZODIAC_INNER,
@@ -90,11 +91,12 @@ export default function ZodiacRing({ ascLon }: Props) {
         y={pos.y}
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize={14}
+        fontSize={17}
+        className="font-symbol"
         fill="var(--wheel-axis)"
         style={{ userSelect: 'none' }}
       >
-        {ZODIAC_SYMBOLS[sign]}
+        {textGlyph(ZODIAC_SYMBOLS[sign])}
       </text>,
     )
 

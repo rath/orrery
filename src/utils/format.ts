@@ -12,12 +12,6 @@ export function elementClass(element: Element | undefined): string {
   return `el-${element}`
 }
 
-/** 오행에 대응하는 배경 CSS 클래스 */
-export function elementBgClass(element: Element | undefined): string {
-  if (!element) return ''
-  return `bg-el-${element}`
-}
-
 /** 천간에 대한 오행 색상 CSS 클래스 */
 export function stemColorClass(stem: string): string {
   return elementClass(stemElement(stem))
@@ -47,6 +41,14 @@ export function stemSolidBgClass(stem: string): string {
 /** 지지에 대한 solid 배경 CSS 클래스 */
 export function branchSolidBgClass(branch: string): string {
   return elementSolidBgClass(branchElement(branch))
+}
+
+/**
+ * 행성·별자리 기호 뒤에 글자 표시 선택자(U+FE0E)를 붙인다.
+ * 붙이지 않으면 별자리 기호가 색 있는 이모지로 그려지는 플랫폼이 있다.
+ */
+export function textGlyph(symbol: string): string {
+  return `${symbol}\uFE0E`
 }
 
 /** 관계 결과를 문자열로 포맷 */

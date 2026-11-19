@@ -7,6 +7,9 @@ import NatalWheel from './wheel/NatalWheel.tsx'
 import CopyButton from '../CopyButton.tsx'
 import type { BirthInput, NatalChart } from '@orrery/core/types'
 import { useLocale } from '../../i18n/index.ts'
+import Section from '../ui/Section.tsx'
+import Notice from '../ui/Notice.tsx'
+import { selectSmallClass } from '../ui/classes.ts'
 
 interface Props {
   input: BirthInput
@@ -45,26 +48,11 @@ export default function NatalView({ input, houseSystem, onHouseSystemChange }: P
   }, [input, houseSystem])
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="flex items-center gap-3 text-base text-gray-500 dark:text-gray-400">
-          <svg className="w-5 h-5 animate-spin text-gray-400 dark:text-gray-500" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          {t('natal.loading')}
-        </div>
-      </div>
-    )
+    return <p role="status" className="py-12 text-center text-muted">{t('natal.loading')}</p>
   }
 
   if (error) {
-    return (
-      <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-4">
-        <p className="text-base text-red-800 dark:text-red-300 font-medium">{t('natal.error')}</p>
-        <p className="text-base text-red-600 dark:text-red-400 mt-1">{error}</p>
-      </div>
-    )
+    return <Notice tone="error" role="alert" title={t('natal.error')}>{error}</Notice>
   }
 
   if (!chart) return null
@@ -72,68 +60,47 @@ export default function NatalView({ input, houseSystem, onHouseSystemChange }: P
   const houseSystemName = HOUSE_SYSTEMS.find(([k]) => k === (chart.houseSystem ?? houseSystem))?.[1] ?? 'Placidus'
 
   return (
-    <div className="space-y-6">
+    <div>
       {!unknownTime && chart.houseSystem && chart.houseSystem !== houseSystem && (
-        <p role="status" className="text-sm text-amber-700 dark:text-amber-400">
+        <Notice tone="warn" role="status" className="mb-4">
           {t('natal.houseSystemFallback').replace('{system}', houseSystemName)}
-        </p>
+        </Notice>
       )}
-      {/* 시간 모름 안내 */}
       {unknownTime && (
-        <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-          <p className="text-base text-amber-800 dark:text-amber-300 font-medium">
-            {t('natal.unknownTime')}
-          </p>
-          <p className="text-base text-amber-600 dark:text-amber-400 mt-1">
-            {t('natal.unknownTimeDetail')}
-          </p>
-        </div>
+        <Notice tone="warn" title={t('natal.unknownTime')} className="mb-4">{t('natal.unknownTimeDetail')}</Notice>
       )}
 
-      {/* Wheel Chart — 시간 있을 때만 */}
+      {/* 휠: 출생 시각이 있을 때만 */}
       {!unknownTime && (
-        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-          <NatalWheel chart={chart} />
+        <div className="pt-2 pb-6">
+          <NatalWheel chart={chart} label={t('app.tab.natal')} />
         </div>
       )}
 
-      {/* Planets + Angles */}
-      <section className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-          <div className="flex flex-wrap items-center gap-1 sm:gap-3">
-            <h2 className="text-base font-medium text-gray-700 dark:text-gray-200">Natal Chart</h2>
-            {!unknownTime && (
-              <label className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 sm:ml-2">
-                House
-                <select
-                  value={houseSystem}
-                  onChange={e => onHouseSystemChange(e.target.value)}
-                  className="border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500"
-                >
-                {HOUSE_SYSTEMS.map(([key, name]) => (
-                  <option key={key} value={key}>{name}</option>
-                ))}
-                </select>
-              </label>
-            )}
-          </div>
-          <CopyButton getText={async () => (await import('../../utils/text-export.ts')).natalToText(chart, houseSystemName)} label={t('copy.aiCopy')} />
-        </div>
+      <Section
+        level={2}
+        title={t('natal.planets')}
+        controls={!unknownTime && (
+          <label className="flex items-center gap-2 text-sm text-muted">
+            {t('natal.houseSystem')}
+            <select
+              value={houseSystem}
+              onChange={e => onHouseSystemChange(e.target.value)}
+              className={selectSmallClass}
+            >
+              {HOUSE_SYSTEMS.map(([key, name]) => (
+                <option key={key} value={key}>{name}</option>
+              ))}
+            </select>
+          </label>
+        )}
+        action={<CopyButton getText={async () => (await import('../../utils/text-export.ts')).natalToText(chart, houseSystemName)} label={t('copy.aiCopy')} />}
+      >
         <PlanetTable planets={chart.planets} angles={chart.angles} />
-      </section>
+      </Section>
 
-      {/* Houses — 시간 있을 때만 */}
-      {!unknownTime && chart.houses.length > 0 && (
-        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Houses</h3>
-          <HouseTable houses={chart.houses} />
-        </div>
-      )}
-
-      {/* Aspects */}
-      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-        <AspectGrid aspects={chart.aspects} />
-      </div>
+      {!unknownTime && chart.houses.length > 0 && <HouseTable houses={chart.houses} />}
+      <AspectGrid aspects={chart.aspects} />
     </div>
   )
 }

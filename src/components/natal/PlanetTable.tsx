@@ -1,10 +1,22 @@
 import type { PlanetPosition, NatalAngles } from '@orrery/core/types'
 import { PLANET_SYMBOLS, ZODIAC_SYMBOLS, ROMAN, formatDegree } from '@orrery/core/natal'
 import { useLocale } from '../../i18n/index.ts'
+import { textGlyph } from '../../utils/format.ts'
 
 interface Props {
   planets: PlanetPosition[]
   angles: NatalAngles | null
+}
+
+function Sign({ sign }: { sign: PlanetPosition['sign'] }) {
+  const { t } = useLocale()
+  return (
+    <>
+      <span className="mr-1.5 inline-block w-5 text-center font-symbol text-lg leading-none text-fg">{textGlyph(ZODIAC_SYMBOLS[sign])}</span>
+      <span className="sm:hidden">{t(`zodiac.short.${sign}`)}</span>
+      <span className="hidden sm:inline">{t(`zodiac.${sign}`)}</span>
+    </>
+  )
 }
 
 export default function PlanetTable({ planets, angles }: Props) {
@@ -13,40 +25,29 @@ export default function PlanetTable({ planets, angles }: Props) {
 
   return (
     <div>
-      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Planets</h3>
       <div className="overflow-x-auto">
-        <table className="w-full text-base">
+        <table className="w-full max-w-xl text-base">
           <thead>
-            <tr className="text-sm text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-800">
-              <th className="text-left py-1 pr-2">{t('natal.planet')}</th>
-              <th className="text-left py-1 pr-2">{t('natal.sign')}</th>
-              <th className="text-right py-1 pr-2">{t('natal.degree')}</th>
-              <th className="text-center py-1 pr-2">Rx</th>
-              {showHouse && <th className="text-center py-1">{t('natal.house')}</th>}
+            <tr className="border-b border-line text-sm text-muted">
+              <th scope="col" className="py-1.5 pr-3 text-left font-normal">{t('natal.planet')}</th>
+              <th scope="col" className="py-1.5 pr-3 text-left font-normal">{t('natal.sign')}</th>
+              <th scope="col" className="py-1.5 pr-3 text-right font-normal">{t('natal.degree')}</th>
+              <th scope="col" className="py-1.5 pr-3 text-center font-normal">Rx</th>
+              {showHouse && <th scope="col" className="py-1.5 text-center font-normal">{t('natal.house')}</th>}
             </tr>
           </thead>
           <tbody>
             {planets.map(p => (
-              <tr key={p.id} className="border-b border-gray-50 dark:border-gray-800">
-                <td className="py-1.5 pr-2">
-                  <span className="mr-1">{PLANET_SYMBOLS[p.id]}</span>
-                  <span className="text-gray-600 dark:text-gray-300">{t(`planet.${p.id}`)}</span>
-                </td>
-                <td className="py-1.5 pr-2 whitespace-nowrap">
-                  <span className="mr-1">{ZODIAC_SYMBOLS[p.sign]}</span>
-                  <span className="text-gray-600 dark:text-gray-300 sm:hidden">{t(`zodiac.short.${p.sign}`)}</span>
-                  <span className="text-gray-600 dark:text-gray-300 hidden sm:inline">{t(`zodiac.${p.sign}`)}</span>
-                </td>
-                <td className="py-1.5 pr-2 text-right font-mono text-gray-700 dark:text-gray-200">
-                  {formatDegree(p.longitude)}
-                </td>
-                <td className="py-1.5 pr-2 text-center text-red-500 dark:text-red-400">
-                  {p.isRetrograde ? 'R' : ''}
-                </td>
+              <tr key={p.id} className="border-b border-line last:border-b-0">
+                <th scope="row" className="py-1.5 pr-3 text-left font-normal whitespace-nowrap text-fg-2">
+                  <span className="mr-1.5 inline-block w-5 text-center font-symbol text-lg leading-none text-fg">{textGlyph(PLANET_SYMBOLS[p.id])}</span>
+                  {t(`planet.${p.id}`)}
+                </th>
+                <td className="py-1.5 pr-3 whitespace-nowrap text-fg-2"><Sign sign={p.sign} /></td>
+                <td className="py-1.5 pr-3 text-right text-fg tabular-nums">{formatDegree(p.longitude)}</td>
+                <td className="py-1.5 pr-3 text-center font-medium text-tone-red">{p.isRetrograde ? 'R' : ''}</td>
                 {showHouse && (
-                  <td className="py-1.5 text-center text-gray-600 dark:text-gray-300">
-                    {p.house != null ? ROMAN[p.house - 1] : ''}
-                  </td>
+                  <td className="py-1.5 text-center text-fg-2">{p.house != null ? ROMAN[p.house - 1] : ''}</td>
                 )}
               </tr>
             ))}
@@ -54,11 +55,11 @@ export default function PlanetTable({ planets, angles }: Props) {
         </table>
       </div>
 
-      {/* Angles — 시간 있을 때만 */}
+      {/* 앵글: 출생 시각이 있을 때만 */}
       {angles && (
-        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Angles</h3>
-          <div className="grid grid-cols-2 gap-2 text-base">
+        <>
+          <h4 className="mt-6 mb-2 text-base font-semibold text-fg">{t('natal.angles')}</h4>
+          <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-1.5 text-base sm:grid-cols-2">
             {([
               ['ASC', angles.asc],
               ['MC', angles.mc],
@@ -66,15 +67,15 @@ export default function PlanetTable({ planets, angles }: Props) {
               ['IC', angles.ic],
             ] as const).map(([label, a]) => (
               <div key={label} className="flex items-center gap-2 whitespace-nowrap">
-                <span className="font-medium text-gray-700 dark:text-gray-200 w-10">{label}</span>
-                <span>{ZODIAC_SYMBOLS[a.sign]}</span>
-                <span className="text-gray-600 dark:text-gray-300 sm:hidden">{t(`zodiac.short.${a.sign}`)}</span>
-                <span className="text-gray-600 dark:text-gray-300 hidden sm:inline">{t(`zodiac.${a.sign}`)}</span>
-                <span className="font-mono text-gray-700 dark:text-gray-200">{formatDegree(a.longitude)}</span>
+                <dt className="w-12 font-medium text-muted">{label}</dt>
+                <dd className="flex flex-1 items-center justify-between gap-3 text-fg-2">
+                  <span><Sign sign={a.sign} /></span>
+                  <span className="text-fg tabular-nums">{formatDegree(a.longitude)}</span>
+                </dd>
               </div>
             ))}
-          </div>
-        </div>
+          </dl>
+        </>
       )}
     </div>
   )

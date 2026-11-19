@@ -15,9 +15,11 @@ import PlanetMarkers from './PlanetMarkers.tsx'
 
 interface Props {
   chart: NatalChart
+  /** 화면 낭독기에 읽어 줄 이름 */
+  label: string
 }
 
-export default function NatalWheel({ chart }: Props) {
+export default function NatalWheel({ chart, label }: Props) {
   if (!chart.angles) return null
 
   const ascLon = chart.angles.asc.longitude
@@ -27,7 +29,7 @@ export default function NatalWheel({ chart }: Props) {
       viewBox="0 0 600 600"
       className="w-full max-w-[600px] mx-auto"
       role="img"
-      aria-label="Natal Chart Wheel"
+      aria-label={label}
     >
       <AspectLines aspects={chart.aspects} planets={chart.planets} ascLon={ascLon} />
       <HouseWheel houses={chart.houses} angles={chart.angles} />

@@ -2,72 +2,263 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * 색 토큰. 로고의 먹색(#15161c)과 주색(#d7391e)이 기준이다.
+ * 글자색은 배경 대비 4.5:1 이상, 입력 테두리(--control)는 3:1 이상을 지킨다.
+ */
 :root {
-  --color-tree: #22c55e;
-  --color-fire: #ef4444;
-  --color-earth: #eab308;
-  --color-metal: #9ca3af;
-  --color-water: #1a1a1a;
+  --bg: #fbfbfc;
+  --surface: #ffffff;
+  --sunken: #f1f1f4;
+  --fg: #15161c;
+  --fg-2: #3d3f4a;
+  --muted: #5c5e6a;
+  --faint: #8a8b96;
+  --line: #e2e2e7;
+  --control: #8a8b96;
+  --accent: #d7391e;
+  --accent-soft: #fbeae6;
+  /* 옅은 주색 바탕 위에 놓는 글자 (4.5:1 이상) */
+  --accent-ink: #b9301c;
+  --inverse: #15161c;
+  --inverse-fg: #ffffff;
 
-  --wheel-axis: #374151;
-  --wheel-grid: #9ca3af;
-  --wheel-outline: #6b7280;
-  --wheel-inner: #d1d5db;
-  --wheel-planet: #1f2937;
+  /* 길흉·사화 등 뜻을 가진 색 (글자색과 옅은 바탕) */
+  --tone-green: #1f7a46;
+  --tone-amber: #8a5a00;
+  --tone-blue: #2456b8;
+  --tone-red: #b9301c;
+  --tone-green-soft: #e6f4ec;
+  --tone-amber-soft: #fbf3dd;
+  --tone-blue-soft: #e8eefb;
+  --tone-red-soft: #fbe9e5;
+
+  /* 오행 글자색 */
+  --el-tree: #1f7a46;
+  --el-fire: #c8321c;
+  --el-earth: #8a6a00;
+  --el-metal: #666874;
+  --el-water: #15161c;
+
+  /* 오행 칸(천간·지지) 바탕과 글자 */
+  --tile-tree: #23834d;
+  --tile-fire: #cf361f;
+  --tile-earth: #e9b90c;
+  --tile-metal: #ffffff;
+  --tile-water: #15161c;
+  --tile-outline: #b9bac3;
+
+  --wheel-axis: #3d3f4a;
+  --wheel-grid: #8a8b96;
+  --wheel-outline: #5c5e6a;
+  --wheel-inner: #c9cad2;
+  --wheel-planet: #15161c;
   --wheel-segment-opacity: 0.12;
   --wheel-segment-stroke-opacity: 0.3;
+
+  color-scheme: light;
 }
 
 .dark {
-  --wheel-axis: #d1d5db;
-  --wheel-grid: #6b7280;
-  --wheel-outline: #9ca3af;
-  --wheel-inner: #4b5563;
-  --wheel-planet: #e5e7eb;
+  --bg: #111216;
+  --surface: #1a1b21;
+  --sunken: #17181d;
+  --fg: #eeebe4;
+  --fg-2: #cfccc6;
+  --muted: #a3a2a4;
+  --faint: #73747f;
+  --line: #2b2d36;
+  --control: #73747f;
+  --accent: #f0603f;
+  --accent-soft: #33190f;
+  --accent-ink: #f0603f;
+  --inverse: #eeebe4;
+  --inverse-fg: #15161c;
+
+  --tone-green: #6cc893;
+  --tone-amber: #e2bd4b;
+  --tone-blue: #93b3ff;
+  --tone-red: #ff8a73;
+  --tone-green-soft: #14281d;
+  --tone-amber-soft: #2a2412;
+  --tone-blue-soft: #18223d;
+  --tone-red-soft: #33190f;
+
+  --el-tree: #6cc893;
+  --el-fire: #ff8068;
+  --el-earth: #e2bd4b;
+  --el-metal: #c6c8d1;
+  --el-water: #93b3ff;
+
+  --tile-metal: #ecebe8;
+  --tile-water: #0a0a0d;
+  --tile-outline: #73747f;
+
+  --wheel-axis: #cfccc6;
+  --wheel-grid: #73747f;
+  --wheel-outline: #a3a2a4;
+  --wheel-inner: #4a4c58;
+  --wheel-planet: #eeebe4;
   --wheel-segment-opacity: 0.2;
   --wheel-segment-stroke-opacity: 0.5;
+
+  color-scheme: dark;
 }
 
-body {
-  margin: 0;
-  font-family:
-    'Pretendard Variable', Pretendard,
-    'Noto Sans KR',
-    'Apple SD Gothic Neo', 'Malgun Gothic',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-control: var(--control);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-inverse: var(--inverse);
+  --color-inverse-fg: var(--inverse-fg);
+  --color-tone-green: var(--tone-green);
+  --color-tone-amber: var(--tone-amber);
+  --color-tone-blue: var(--tone-blue);
+  --color-tone-red: var(--tone-red);
+  --color-tone-green-soft: var(--tone-green-soft);
+  --color-tone-amber-soft: var(--tone-amber-soft);
+  --color-tone-blue-soft: var(--tone-blue-soft);
+  --color-tone-red-soft: var(--tone-red-soft);
 }
 
-.font-hanja {
-  font-family:
-    'Noto Sans KR',
-    'Apple SD Gothic Neo', 'Malgun Gothic',
-    sans-serif;
+/* 기본 규칙은 base 레이어에 둔다. 레이어 밖에 두면 Tailwind 유틸리티로 덮어쓸 수 없다. */
+@layer base {
+  html {
+    background-color: var(--bg);
+    /* 고정 탭에 가리지 않도록 앵커 이동 위치를 띄운다 */
+    scroll-padding-top: 4rem;
+  }
+
+  body {
+    margin: 0;
+    color: var(--fg);
+    background-color: var(--bg);
+    font-family:
+      'Pretendard Variable', Pretendard,
+      'Noto Sans KR',
+      'Apple SD Gothic Neo', 'Malgun Gothic',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 한국어는 낱말 중간에서 줄을 바꾸지 않는다 */
+  :lang(ko) {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .font-hanja {
+    font-family:
+      'Noto Sans KR',
+      'Apple SD Gothic Neo', 'Malgun Gothic',
+      sans-serif;
+  }
+
+  /* 행성·별자리 기호: 이모지가 아니라 글자 모양으로 그린다 */
+  .font-symbol {
+    font-family:
+      'Apple Symbols', 'Segoe UI Symbol', 'Noto Sans Symbols', 'Noto Sans Symbols 2',
+      'DejaVu Sans', sans-serif;
+    font-variant-emoji: text;
+  }
+
+  /* 키보드 포커스: 모든 조작 요소에 같은 고리를 쓴다 */
+  :focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+  }
+
+  button,
+  [role='tab'],
+  [role='option'],
+  select,
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  select:disabled {
+    cursor: not-allowed;
+  }
+
+  /*
+   * 겹침 순서: 고정 탭 z-10 < 드롭다운 z-20 < 대화상자(브라우저의 top layer).
+   * 그 밖의 z-index 값은 쓰지 않는다.
+   */
+
+  /* 대화상자 */
+  dialog {
+    color: var(--fg);
+  }
+
+  dialog::backdrop {
+    background: rgb(10 10 14 / 0.5);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    dialog[open] {
+      animation: dialog-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    dialog[open]::backdrop {
+      animation: backdrop-in 180ms ease-out;
+    }
+  }
 }
 
-.el-tree { color: var(--color-tree); }
-.el-fire { color: var(--color-fire); }
-.el-earth { color: var(--color-earth); }
-.el-metal { color: var(--color-metal); }
-.el-water { color: var(--color-water); }
+@layer components {
+  /* 가로로 넘치는 탭 줄: 밀어서 볼 수는 있되 스크롤 막대는 그리지 않는다 */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
 
-.bg-el-tree { background-color: color-mix(in srgb, var(--color-tree) 15%, transparent); }
-.bg-el-fire { background-color: color-mix(in srgb, var(--color-fire) 15%, transparent); }
-.bg-el-earth { background-color: color-mix(in srgb, var(--color-earth) 15%, transparent); }
-.bg-el-metal { background-color: color-mix(in srgb, var(--color-metal) 15%, transparent); }
-.bg-el-water { background-color: color-mix(in srgb, var(--color-water) 15%, transparent); }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 
-.bg-el-solid-tree  { background-color: var(--color-tree); color: #fff; }
-.bg-el-solid-fire  { background-color: var(--color-fire); color: #fff; }
-.bg-el-solid-earth { background-color: var(--color-earth); color: #1a1a1a; }
-.bg-el-solid-metal { background-color: #fff; color: #000; box-shadow: inset 0 0 0 1px #d1d5db; }
-.bg-el-solid-water { background-color: var(--color-water); color: #fff; }
+  /* 오행 글자색 */
+  .el-tree { color: var(--el-tree); }
+  .el-fire { color: var(--el-fire); }
+  .el-earth { color: var(--el-earth); }
+  .el-metal { color: var(--el-metal); }
+  .el-water { color: var(--el-water); }
 
-/* Dark mode: water element border for visibility */
-.dark .bg-el-solid-water { box-shadow: inset 0 0 0 1px #6b7280; }
+  /* 오행 칸 */
+  .bg-el-solid-tree  { background-color: var(--tile-tree); color: #fff; }
+  .bg-el-solid-fire  { background-color: var(--tile-fire); color: #fff; }
+  .bg-el-solid-earth { background-color: var(--tile-earth); color: #15161c; }
+  .bg-el-solid-metal { background-color: var(--tile-metal); color: #15161c; box-shadow: inset 0 0 0 1px var(--tile-outline); }
+  .bg-el-solid-water { background-color: var(--tile-water); color: #fff; }
+  /* 다크 테마에서는 水 칸이 바탕에 묻히지 않게 테두리를 둔다 */
+  .dark .bg-el-solid-water { box-shadow: inset 0 0 0 1px var(--tile-outline); }
+}
 
-/* Dialog */
-dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
-dialog[open] { border: none; }
+@keyframes dialog-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
+@keyframes backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

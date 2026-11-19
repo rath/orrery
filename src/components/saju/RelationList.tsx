@@ -1,5 +1,6 @@
 import type { AllRelations, RelationResult } from '@orrery/core/types'
 import { ELEMENT_HANJA } from '@orrery/core/constants'
+import Section from '../ui/Section.tsx'
 
 interface Props {
   relations: AllRelations
@@ -20,9 +21,9 @@ function getRelKind(type: string): RelKind {
 }
 
 const KIND_STYLES: Record<RelKind, string> = {
-  good: 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400',
-  bad: 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400',
-  neutral: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300',
+  good: 'bg-tone-blue-soft text-tone-blue',
+  bad: 'bg-tone-red-soft text-tone-red',
+  neutral: 'bg-sunken text-fg-2',
 }
 
 function formatRelation(r: RelationResult, char1: string, char2: string) {
@@ -69,19 +70,18 @@ export default function RelationList({ relations, pillars }: Props) {
   if (lines.length === 0) return null
 
   return (
-    <section>
-      <h3 className="text-base font-medium text-gray-700 dark:text-gray-200 mb-2">八字關係</h3>
-      <div className="space-y-1.5">
+    <Section hanja title="八字關係">
+      <div className="space-y-2 font-hanja">
         {lines.map((line, i) => (
           <div key={i} className="flex items-center gap-2 text-base">
             {line.label && (
-              <span className="text-gray-400 dark:text-gray-500 w-10 shrink-0">{line.label}</span>
+              <span className="w-12 shrink-0 text-muted">{line.label}</span>
             )}
             <div className="flex flex-wrap gap-1.5">
               {line.tags.map((tag, j) => (
                 <span
                   key={j}
-                  className={`px-2 py-0.5 rounded text-sm font-medium ${KIND_STYLES[tag.kind]}`}
+                  className={`rounded px-2 py-0.5 text-base font-medium ${KIND_STYLES[tag.kind]}`}
                 >
                   {tag.text}
                 </span>
@@ -90,6 +90,6 @@ export default function RelationList({ relations, pillars }: Props) {
           </div>
         ))}
       </div>
-    </section>
+    </Section>
   )
 }

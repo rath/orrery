@@ -2,6 +2,7 @@
  * 행성 심볼 배치 — 클러스터링, tick mark, 역행 표시
  */
 import { PLANET_SYMBOLS } from '@orrery/core/natal'
+import { textGlyph } from '../../../utils/format.ts'
 import type { PlanetId, PlanetPosition } from '@orrery/core/types'
 import {
   R_ZODIAC_INNER, R_PLANET,
@@ -65,11 +66,12 @@ export default function PlanetMarkers({ planets, ascLon }: Props) {
               y={symbolPos.y}
               textAnchor="middle"
               dominantBaseline="central"
-              fontSize={13}
+              fontSize={15}
+              className="font-symbol"
               fill="var(--wheel-planet)"
               style={{ userSelect: 'none' }}
             >
-              {symbol}
+              {textGlyph(symbol)}
             </text>
 
             {/* 역행 표시 */}
@@ -80,7 +82,7 @@ export default function PlanetMarkers({ planets, ascLon }: Props) {
                 textAnchor="middle"
                 dominantBaseline="central"
                 fontSize={7}
-                fill="#ef4444"
+                fill="var(--tone-red)"
                 fontWeight={600}
                 style={{ userSelect: 'none' }}
               >

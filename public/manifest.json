@@ -5,8 +5,8 @@
   "start_url": "/orrery/",
   "scope": "/orrery/",
   "display": "standalone",
-  "theme_color": "#1e293b",
-  "background_color": "#0f172a",
+  "theme_color": "#fbfbfc",
+  "background_color": "#fbfbfc",
   "lang": "ko",
   "icons": [
     {

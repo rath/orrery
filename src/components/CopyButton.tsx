@@ -1,12 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocale } from '../i18n/index.ts'
+import { buttonClass } from './ui/classes.ts'
+import type { ButtonSize, ButtonVariant } from './ui/classes.ts'
 
 interface Props {
   getText: () => string | Promise<string>
-  label?: React.ReactNode
+  label?: string
+  variant?: ButtonVariant
+  size?: ButtonSize
+  className?: string
 }
 
-export default function CopyButton({ getText, label }: Props) {
+export default function CopyButton({ getText, label, variant = 'secondary', size = 'sm', className = '' }: Props) {
   const { t } = useLocale()
   const [status, setStatus] = useState<'idle' | 'copying' | 'copied' | 'error'>('idle')
   const busy = useRef(false)
@@ -56,16 +61,36 @@ export default function CopyButton({ getText, label }: Props) {
     }
   }
 
+  const idleLabel = label ?? t('copy.copy')
+  // 세 문구를 같은 칸에 겹쳐 두어, 가장 긴 문구에 맞춘 폭이 유지되게 한다.
+  const faces = [
+    ['idle', idleLabel],
+    ['copied', t('copy.copied')],
+    ['error', t('copy.failed')],
+  ] as const
+  const shown = status === 'copied' || status === 'error' ? status : 'idle'
+  const shownText = faces.find(([face]) => face === shown)![1]
+
   return (
-    <button
-      onClick={handleClick}
-      type="button"
-      disabled={status === 'copying'}
-      aria-live="polite"
-      aria-busy={status === 'copying'}
-      className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-600 dark:text-gray-300 whitespace-nowrap"
-    >
-      {status === 'copied' ? t('copy.copied') : status === 'error' ? t('copy.failed') : (label ?? t('copy.copy'))}
-    </button>
+    <>
+      <button
+        onClick={handleClick}
+        type="button"
+        disabled={status === 'copying'}
+        aria-busy={status === 'copying'}
+        aria-label={shownText}
+        className={`${buttonClass(variant, size)} ${className}`}
+      >
+        <span className="grid justify-items-center" aria-hidden="true">
+          {faces.map(([face, text]) => (
+            <span key={face} className={`col-start-1 row-start-1 ${face === shown ? '' : 'invisible'}`}>
+              {text}
+            </span>
+          ))}
+        </span>
+      </button>
+      {/* 복사 결과는 화면 낭독기에도 알린다 */}
+      <span role="status" className="sr-only">{shown === 'idle' ? '' : shownText}</span>
+    </>
   )
 }

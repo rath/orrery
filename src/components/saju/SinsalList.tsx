@@ -1,6 +1,7 @@
 import type { SpecialSals } from '@orrery/core/types'
 import { PILLAR_NAMES } from '@orrery/core/constants'
 import { useLocale } from '../../i18n/index.ts'
+import Section from '../ui/Section.tsx'
 
 interface Props {
   sals: SpecialSals
@@ -53,22 +54,19 @@ export default function SinsalList({ sals }: Props) {
   if (items.length === 0) return null
 
   return (
-    <section>
-      <h3 className="text-base font-medium text-gray-700 dark:text-gray-200 mb-2">神殺</h3>
+    <Section hanja title="神殺">
       <div className="flex flex-wrap gap-2">
         {items.map(item => (
           <span
             key={item.label}
-            className={`text-base px-2 py-0.5 rounded ${
-              item.type === 'good'
-                ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400'
-                : 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400'
+            className={`rounded px-2 py-0.5 text-base font-medium ${
+              item.type === 'good' ? 'bg-tone-blue-soft text-tone-blue' : 'bg-tone-red-soft text-tone-red'
             }`}
           >
             {item.label}
           </span>
         ))}
       </div>
-    </section>
+    </Section>
   )
 }
