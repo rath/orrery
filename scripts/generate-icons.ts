@@ -1,4 +1,5 @@
-// 로고 원본(scripts/logo-master.png)에서 앱 로고·파비콘·홈 화면 아이콘을 만든다.
+// 로고 원본(scripts/logo-master.png)에서 앱 로고·홈 화면 아이콘을 만들고,
+// 손으로 그린 단순화 마크(public/favicon.svg)에서 PNG 파비콘을 만든다.
 // 원본의 모양(알파)만 쓰고 색은 아래 상수로 평탄화한다. 다크 테마용은 먹색만 미색으로 바꾼다.
 import sharp, { type Sharp } from 'sharp'
 import { mkdir, writeFile } from 'node:fs/promises'
@@ -6,6 +7,7 @@ import { dirname, join } from 'node:path'
 
 const ROOT = join(import.meta.dirname, '..')
 const MASTER = join(import.meta.dirname, 'logo-master.png')
+const FAVICON_SVG = join(ROOT, 'public/favicon.svg')
 
 interface Rgb { r: number, g: number, b: number }
 
@@ -80,29 +82,15 @@ async function save(output: string, buffer: Buffer): Promise<void> {
 await save('src/assets/logo.png', await renderSquare('light', 512, 0.96))
 await save('src/assets/logo-dark.png', await renderSquare('dark', 512, 0.96))
 
-// 파비콘: 작은 칸을 최대한 채운다
-await save('public/favicon-32.png', await renderSquare('light', 32, 1))
-await save('public/favicon-16.png', await renderSquare('light', 16, 1))
-
-// SVG 파비콘: 브라우저 색 구성표에 따라 라이트·다크 변형을 고른다
-const FAVICON_SIZE = 128
-const favicon = {
-  light: (await renderSquare('light', FAVICON_SIZE, 1)).toString('base64'),
-  dark: (await renderSquare('dark', FAVICON_SIZE, 1)).toString('base64'),
+// PNG 파비콘: 작은 크기에서 뭉개지지 않도록 원본 대신 단순화한 SVG 마크를 래스터화한다.
+// librsvg는 prefers-color-scheme을 적용하지 않으므로 라이트 테마 색으로 그려진다.
+for (const size of [32, 16]) {
+  const png = await sharp(FAVICON_SVG, { density: (72 * size) / 64 })
+    .resize(size, size)
+    .png({ compressionLevel: 9 })
+    .toBuffer()
+  await save(`public/favicon-${size}.png`, png)
 }
-const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${FAVICON_SIZE}" height="${FAVICON_SIZE}" viewBox="0 0 ${FAVICON_SIZE} ${FAVICON_SIZE}">
-  <style>
-    .dark { display: none; }
-    @media (prefers-color-scheme: dark) {
-      .light { display: none; }
-      .dark { display: inline; }
-    }
-  </style>
-  <image class="light" width="${FAVICON_SIZE}" height="${FAVICON_SIZE}" href="data:image/png;base64,${favicon.light}"/>
-  <image class="dark" width="${FAVICON_SIZE}" height="${FAVICON_SIZE}" href="data:image/png;base64,${favicon.dark}"/>
-</svg>
-`
-await save('public/favicon.svg', Buffer.from(faviconSvg))
 
 // 홈 화면·PWA 아이콘: OS가 모서리를 깎으므로 여백을 두고 불투명 바탕에 놓는다
 await save('public/apple-touch-icon.png', await renderSquare('light', 180, 0.72, TILE_BACKGROUND))

@@ -110,7 +110,7 @@ src/                                # 웹앱 (Vite + React)
     ├── text-export.ts              # 복사용 텍스트 생성
     └── timezones.ts                # 좌표 → 타임존 추론, 현지 시각 검증
 
-public/                             # 정적 파일 (CNAME, manifest, robots.txt, sitemap)
+public/                             # 정적 파일 (CNAME, manifest, robots.txt, sitemap), favicon.svg는 손으로 그린 단순화 마크 (PNG 파비콘의 원본)
 scripts/                            # 로고·파비콘·OG 이미지 생성 스크립트 (sharp), 로고 원본 logo-master.png
 .github/workflows/deploy.yml        # 린트·테스트·빌드 후 GitHub Pages 배포
 ```
