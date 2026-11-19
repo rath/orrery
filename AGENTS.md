@@ -81,17 +81,22 @@ packages/core/                      # @orrery/core — 독립 npm 패키지 (계
 
 src/                                # 웹앱 (Vite + React)
 ├── main.tsx                        # 진입점
-├── index.css                       # Tailwind, 전역 스타일
+├── index.css                       # Tailwind, 색 토큰(CSS 변수, 라이트·다크), 전역 스타일
 ├── assets/                         # 로고 (logo.png 라이트, logo-dark.png 다크 테마용)
 ├── components/
-│   ├── App.tsx                     # 루트: 탭 네비게이션 + 상태, AI 해석용 일괄 복사
-│   ├── BirthForm.tsx               # 생년월일시/성별/출생지 입력 폼, 타임존 추론
+│   ├── App.tsx                     # 루트: 화면 구성, 보고 있는 대상·프로필·폼 상태, 결과 탭
+│   ├── Header.tsx                  # 상단 바: 로고, 언어, 테마, GitHub
+│   ├── LogoMark.tsx                # 작은 크기용 로고 마크 (favicon.svg와 같은 도형)
+│   ├── PeoplePanel.tsx             # 프로필 목록 (선택, 새로 입력, 이름 검색, JSON 가져오기/내보내기)
+│   ├── PeopleDialog.tsx            # 좁은 화면에서 프로필 목록을 띄우는 대화상자
+│   ├── SubjectHeader.tsx           # 명식 위 요약: 누구의 명식인지, 저장·수정·전체 복사
+│   ├── BirthForm.tsx               # 이름·생년월일시·성별·출생지 입력 폼 (새로 입력, 프로필 수정·삭제)
 │   ├── CityCombobox.tsx            # 도시 검색 콤보박스
 │   ├── CopyButton.tsx              # 클립보드 복사
-│   ├── Guide.tsx                   # 사용 가이드, 용어 설명
+│   ├── Guide.tsx                   # 사용 방법, AI에게 물어볼 예시
 │   ├── LanguageMenu.tsx            # 언어 선택
-│   ├── ProfileModal.tsx            # 프로필 관리 (저장, JSON 가져오기/내보내기)
 │   ├── ThemeToggle.tsx             # 시스템/라이트/다크 테마
+│   ├── ui/                         # 공용 UI: classes.ts(버튼·입력 클래스), Section, Notice, Segmented
 │   ├── saju/                       # 사주 UI 컴포넌트
 │   ├── ziwei/                      # 자미두수 UI 컴포넌트
 │   └── natal/                      # 출생차트 UI 컴포넌트
@@ -103,12 +108,16 @@ src/                                # 웹앱 (Vite + React)
 │   └── locales.test.ts             # 언어별 키 집합 일치 검증
 ├── types/                          # 타입 선언이 없는 외부 패키지용 .d.ts
 └── utils/
-    ├── birth-state.ts              # 저장된 폼 상태 검증·복원
+    ├── birth-state.ts              # 저장된 폼 상태(SavedFormState) 검증·복원
+    ├── birth-input.ts              # 폼 상태 → 계산 엔진 입력 (좌표에서 타임존 추론) (+ .test.ts)
+    ├── session.ts                  # 다시 방문했을 때 이어서 보여줄 대상 기억 (+ .test.ts)
+    ├── subject-summary.ts          # 날짜·시각·출생지 요약 포매팅 (+ .test.ts)
     ├── coordinate-input.ts         # 위도/경도 입력 파싱·포매팅 (+ .test.ts)
-    ├── format.ts                   # CJK 포매팅 헬퍼
+    ├── format.ts                   # CJK 포매팅 헬퍼, 기호를 글자 모양으로 그리는 textGlyph
     ├── profiles.ts                 # 프로필 저장소 (localStorage) (+ .test.ts)
     ├── text-export.ts              # 복사용 텍스트 생성
-    └── timezones.ts                # 좌표 → 타임존 추론, 현지 시각 검증
+    ├── timezones.ts                # 좌표 → 타임존 추론, 현지 시각 검증
+    └── ziwei-year.ts               # 유년 조회 연도 기본값
 
 public/                             # 정적 파일 (CNAME, manifest, robots.txt, sitemap), favicon.svg는 손으로 그린 단순화 마크 (PNG 파비콘의 원본)
 scripts/                            # 로고·파비콘·OG 이미지 생성 스크립트 (sharp), 로고 원본 logo-master.png
@@ -138,9 +147,28 @@ Python에서 TypeScript로 포팅 시 주의:
 
 ## Conventions
 
+- 제품 맥락은 `PRODUCT.md`, 시각 규칙(색 토큰, 타이포, 컴포넌트)은 `DESIGN.md`에 있다. UI를 고치기 전에 읽을 것.
 - 기본 폰트: Pretendard (한글/라틴), Noto Sans KR (한자 fallback)
-- `.font-hanja` 클래스: Noto Sans KR (한자 전용)
-- 오행 색상: 木=green, 火=red, 土=yellow, 金=gray, 水=blue
+- `.font-hanja` 클래스: Noto Sans KR (한자 전용). `.font-symbol` 클래스: 행성·별자리 기호 (`textGlyph()`와 함께 써서 이모지로 그려지지 않게 한다)
+- 색은 `src/index.css`의 CSS 변수 토큰만 쓴다 (`bg-bg`, `text-fg`, `text-muted`, `border-line`, `text-accent`, `text-tone-red` 등). `text-gray-*` 같은 Tailwind 기본 색이나 `dark:` 색 쌍을 쓰지 않는다. 다크 테마는 `.dark`에서 변수 값만 바뀐다.
+- 주색(vermilion, `accent`)은 지금 선택했거나 현재에 해당하는 것을 표시할 때만 쓴다 (활성 탭, 열려 있는 프로필, 현재 대운). 버튼이나 장식에 쓰지 않는다.
+- 오행 색상: 木=green, 火=red, 土=yellow, 金=white(글자는 회색), 水=black(다크 테마의 글자는 blue)
+- 결과 화면의 구획은 테두리 상자 대신 `ui/Section.tsx`(위쪽 구분선 + 여백)로 나눈다.
+- 버튼·입력 모양은 `ui/classes.ts`의 `buttonClass()`, `inputClass`, `selectClass`를 쓴다.
+
+## 화면 상태 (`App.tsx`)
+
+- **대상(Subject)**: 지금 명식을 띄운 출생 정보. `profileId`가 있으면 저장된 프로필이고, `null`이면 저장하지 않은 입력이다.
+- **폼(Editor)**: `new`(새로 입력)이면 폼만 보이고, `edit`(수정)이면 폼 아래에 고치기 전 명식이 그대로 보인다. 폼이 닫혀 있으면 `SubjectHeader`가 대상을 요약한다.
+- 폼에 이름을 적고 제출하면 프로필로 저장된다. 저장된 프로필을 고치면 같은 프로필이 갱신된다 (새 프로필이 생기지 않는다).
+- localStorage 키: `orrery-profiles`(프로필 목록), `orrery-active-profile`(마지막으로 보던 프로필 id), `orrery-birth-input`(저장하지 않은 마지막 입력), `orrery-theme`, `orrery-locale`. 다시 방문하면 `session.ts`가 마지막 대상을 바로 띄운다.
+- 틀린 기본값이 명식을 조용히 바꾸는 항목(성별, 생년월일, 시각)은 미리 채우지 않는다. 출생지는 한국어 화면에서만 서울을 기본으로 둔다.
+
+## 브라우저에서 확인할 때
+
+- `bun dev`의 `http://localhost:5173` 저장소(localStorage)에는 소유자가 실제로 쓰는 프로필이 들어 있다. 저장·수정·삭제를 시험할 때는 저장소가 비어 있는 다른 주소를 띄워서 한다: `bunx vite --host 127.0.0.1 --port 5174 --strictPort`.
+- 휴대폰 폭은 브라우저 창을 줄여서는 재현되지 않는다. 같은 주소를 폭 390px의 iframe에 넣어 확인한다.
+- 라이트·다크 두 테마와 한국어·영어 두 언어를 함께 본다 (영어는 탭 이름과 버튼 문구가 훨씬 길다).
 
 ## i18n (다국어)
 
