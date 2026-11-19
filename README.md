@@ -1,7 +1,10 @@
 **한국어** | [English](./README.en.md) | [中文](./README.zh.md) | [日本語](./README.ja.md)
 
 <div align="center">
-  <img src="src/assets/icon-512.png" alt="Orrery" width="256" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="src/assets/logo-dark.png" />
+    <img src="src/assets/logo.png" alt="Orrery" width="160" />
+  </picture>
   <h1>Orrery — 혼천의(渾天儀)</h1>
 </div>
 

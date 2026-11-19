@@ -82,7 +82,7 @@ packages/core/                      # @orrery/core — 독립 npm 패키지 (계
 src/                                # 웹앱 (Vite + React)
 ├── main.tsx                        # 진입점
 ├── index.css                       # Tailwind, 전역 스타일
-├── assets/                         # 앱 아이콘
+├── assets/                         # 로고 (logo.png 라이트, logo-dark.png 다크 테마용)
 ├── components/
 │   ├── App.tsx                     # 루트: 탭 네비게이션 + 상태, AI 해석용 일괄 복사
 │   ├── BirthForm.tsx               # 생년월일시/성별/출생지 입력 폼, 타임존 추론
@@ -111,7 +111,7 @@ src/                                # 웹앱 (Vite + React)
     └── timezones.ts                # 좌표 → 타임존 추론, 현지 시각 검증
 
 public/                             # 정적 파일 (CNAME, manifest, robots.txt, sitemap)
-scripts/                            # 아이콘·OG 이미지 생성 스크립트 (sharp)
+scripts/                            # 로고·파비콘·OG 이미지 생성 스크립트 (sharp), 로고 원본 logo-master.png
 .github/workflows/deploy.yml        # 린트·테스트·빌드 후 GitHub Pages 배포
 ```
 

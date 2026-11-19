@@ -17,7 +17,8 @@ import {
   parseCoordinateDraft,
   stepCoordinate,
 } from '../utils/coordinate-input.ts'
-import logo from '../assets/icon-512.png'
+import logo from '../assets/logo.png'
+import logoDark from '../assets/logo-dark.png'
 import { parseSavedFormState } from '../utils/birth-state.ts'
 import type { SavedFormState } from '../utils/birth-state.ts'
 export type { SavedFormState } from '../utils/birth-state.ts'
@@ -286,9 +287,16 @@ const BirthForm = forwardRef<BirthFormHandle, Props>(function BirthForm({ onSubm
             width={512}
             height={512}
             alt="혼천의"
-            className="w-48 md:w-64"
+            className="w-32 md:w-40 dark:hidden"
           />
-          <span className="text-base text-gray-400 dark:text-gray-500 font-hanja -mt-1">혼천의(渾天儀)</span>
+          <img
+            src={logoDark}
+            width={512}
+            height={512}
+            alt="혼천의"
+            className="hidden w-32 md:w-40 dark:block"
+          />
+          <span className="text-base text-gray-400 dark:text-gray-500 font-hanja mt-3">혼천의(渾天儀)</span>
         </div>
 
         {/* 폼 필드 전체 */}
