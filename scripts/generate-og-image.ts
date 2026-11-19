@@ -9,6 +9,8 @@ const WIDTH = 1200
 const HEIGHT = 630
 const ICON_SIZE = 220
 const BACKGROUND = '#0f172a' // slate-900
+/** 제목(기준선 +20)과 부제(기준선 +60) 묶음의 세로 중심 */
+const TEXT_CENTER_Y = HEIGHT / 2 + ICON_SIZE / 2 + 28
 
 /**
  * 배경에 비처럼 내리는 한자: 천간·지지, 자미두수 14주성, 십신, 12궁, 사화, 오행.
@@ -38,9 +40,9 @@ function createRandom(seed: number): () => number {
 
 /** 원근감을 위한 세 층: 먼 층일수록 글자가 작고 흐리다. */
 const LAYERS = [
-  { fontSize: 15, opacity: 0.11, columnGap: 26 },
-  { fontSize: 21, opacity: 0.16, columnGap: 42 },
-  { fontSize: 29, opacity: 0.22, columnGap: 74 },
+  { fontSize: 15, opacity: 0.16, columnGap: 24 },
+  { fontSize: 21, opacity: 0.24, columnGap: 38 },
+  { fontSize: 29, opacity: 0.33, columnGap: 66 },
 ] as const
 
 const TAIL_COLOR = '#64748b' // slate-500
@@ -64,7 +66,7 @@ function buildRain(random: () => number): string {
           const y = headY - i * step
           if (y < -step || y > HEIGHT + step) continue
           const fade = (1 - i / length) ** 1.6
-          const opacity = layer.opacity * (i === 0 ? 1.25 : fade)
+          const opacity = layer.opacity * (i === 0 ? 1.4 : fade)
           const color = i === 0 ? headColor : TAIL_COLOR
           glyphs.push(
             `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="${layer.fontSize}" fill="${color}" fill-opacity="${opacity.toFixed(3)}">${pick(GLYPHS)}</text>`,
@@ -80,9 +82,15 @@ const background = Buffer.from(`
 <svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}">
   <defs>
     <!-- 가운데의 로고와 제목 주변은 비가 비치지 않게 배경색으로 덮는다 -->
-    <radialGradient id="clear" cx="50%" cy="51%" r="50%" gradientTransform="translate(0.5 0.51) scale(0.78 1) translate(-0.5 -0.51)">
+    <radialGradient id="clear" cx="50%" cy="51%" r="50%" gradientTransform="translate(0.5 0.51) scale(0.72 1) translate(-0.5 -0.51)">
       <stop offset="0" stop-color="${BACKGROUND}" stop-opacity="0.97"/>
-      <stop offset="0.6" stop-color="${BACKGROUND}" stop-opacity="0.9"/>
+      <stop offset="0.5" stop-color="${BACKGROUND}" stop-opacity="0.88"/>
+      <stop offset="1" stop-color="${BACKGROUND}" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 제목과 부제 뒤만 가로로 납작하게 한 번 더 덮는다 -->
+    <radialGradient id="clear-text" gradientUnits="userSpaceOnUse" cx="${WIDTH / 2}" cy="${TEXT_CENTER_Y}" r="360" gradientTransform="translate(${WIDTH / 2} ${TEXT_CENTER_Y}) scale(1 0.24) translate(${-WIDTH / 2} ${-TEXT_CENTER_Y})">
+      <stop offset="0" stop-color="${BACKGROUND}" stop-opacity="0.92"/>
+      <stop offset="0.7" stop-color="${BACKGROUND}" stop-opacity="0.8"/>
       <stop offset="1" stop-color="${BACKGROUND}" stop-opacity="0"/>
     </radialGradient>
   </defs>
@@ -91,6 +99,7 @@ const background = Buffer.from(`
 ${buildRain(createRandom(0x0e7e17))}
   </g>
   <rect width="100%" height="100%" fill="url(#clear)"/>
+  <rect width="100%" height="100%" fill="url(#clear-text)"/>
 </svg>
 `)
 
