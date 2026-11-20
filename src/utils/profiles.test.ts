@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { addProfile, deleteProfile, importProfiles, loadProfiles, MAX_PROFILE_FILE_BYTES, MAX_PROFILES, updateProfile } from './profiles.ts'
+import {
+  addProfile, deleteProfile, exportProfiles, importProfiles, loadProfiles,
+  MAX_PROFILE_FILE_BYTES, MAX_PROFILES, moveProfile, updateProfile,
+} from './profiles.ts'
 import { parseSavedFormState } from './birth-state.ts'
 import type { SavedFormState } from './birth-state.ts'
 
@@ -68,12 +71,57 @@ describe('untrusted saved data', () => {
   })
 
   it('reports failed writes for every mutating operation', () => {
-    importProfiles(JSON.stringify([profile]))
+    const existing = [profile, { ...profile, id: 'last' }]
+    importProfiles(JSON.stringify(existing))
     vi.mocked(localStorage.setItem).mockImplementation(() => { throw new Error('quota') })
     expect(() => addProfile('New', state)).toThrow('quota')
     expect(() => updateProfile('one', { name: 'Renamed' })).toThrow('quota')
     expect(() => deleteProfile('one')).toThrow('quota')
+    expect(() => moveProfile('one', 'last', 'after')).toThrow('quota')
     expect(() => importProfiles(JSON.stringify([{ ...profile, id: 'two' }]))).toThrow('quota')
-    expect(loadProfiles()).toEqual([profile])
+    expect(loadProfiles()).toEqual(existing)
+  })
+})
+
+describe('profile order', () => {
+  const second = { ...profile, id: 'two', name: 'Second', updatedAt: 2 }
+  const third = { ...profile, id: 'three', name: 'Third', createdAt: 3, updatedAt: 4 }
+  const original = [profile, second, third]
+
+  beforeEach(() => {
+    importProfiles(JSON.stringify(original))
+    vi.mocked(localStorage.setItem).mockClear()
+  })
+
+  it.each([
+    ['one', 'three', 'before', [second, profile, third], 2],
+    ['one', 'three', 'after', [second, third, profile], 3],
+    ['three', 'one', 'before', [third, profile, second], 1],
+    ['three', 'one', 'after', [profile, third, second], 2],
+  ] as const)('places %s relative to %s (%s) in storage and exports', (id, target, placement, expected, position) => {
+    expect(moveProfile(id, target, placement)).toBe(position)
+    expect(loadProfiles()).toEqual(expected)
+    expect(JSON.parse(exportProfiles())).toEqual(expected)
+    expect(localStorage.setItem).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps edits and imports made since the list was displayed', () => {
+    const imported = { ...profile, id: 'four' }
+    updateProfile('one', { name: 'Renamed' })
+    importProfiles(JSON.stringify([imported]))
+    const [renamed] = loadProfiles()
+
+    moveProfile('one', 'three', 'after')
+    expect(loadProfiles()).toEqual([second, third, renamed, imported])
+  })
+
+  it('skips writes for unchanged positions and missing profiles', () => {
+    expect(moveProfile('one', 'one', 'after')).toBeNull()
+    expect(moveProfile('one', 'two', 'before')).toBeNull()
+    expect(moveProfile('two', 'one', 'after')).toBeNull()
+    expect(moveProfile('deleted', 'two', 'after')).toBeNull()
+    expect(moveProfile('one', 'deleted', 'before')).toBeNull()
+    expect(localStorage.setItem).not.toHaveBeenCalled()
+    expect(loadProfiles()).toEqual(original)
   })
 })

@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { Profile } from '../utils/profiles.ts'
-import { exportProfiles, importProfiles, MAX_PROFILE_FILE_BYTES } from '../utils/profiles.ts'
+import type { Profile, ProfilePlacement } from '../utils/profiles.ts'
+import { exportProfiles, importProfiles, MAX_PROFILE_FILE_BYTES, moveProfile } from '../utils/profiles.ts'
 import { toBirthInput } from '../utils/birth-input.ts'
-import { formatBirthTime, formatCompactDate } from '../utils/subject-summary.ts'
 import { useLocale } from '../i18n/index.ts'
 import { buttonClass, inputSmallClass } from './ui/classes.ts'
+import ProfileList from './ProfileList.tsx'
 
 interface Props {
   profiles: readonly Profile[]
@@ -12,7 +12,7 @@ interface Props {
   activeId: string | null
   onSelect: (profile: Profile) => void
   onNew: () => void
-  /** 가져오기로 저장소가 바뀌었을 때 목록을 다시 읽게 한다 */
+  /** 프로필을 가져오거나 순서를 옮긴 뒤 목록을 다시 읽게 한다 */
   onChanged: () => void
 }
 
@@ -68,6 +68,19 @@ export default function PeoplePanel({ profiles, activeId, onSelect, onNew, onCha
     if (!needle) return profiles
     return profiles.filter(profile => profile.name.toLocaleLowerCase().includes(needle))
   }, [profiles, query])
+
+  function handleMove(profile: Profile, targetId: string, placement: ProfilePlacement) {
+    try {
+      const position = moveProfile(profile.id, targetId, placement)
+      onChanged()
+      if (position !== null) {
+        const text = t('profile.moved').replace('{n}', String(position)).replace('{name}', () => profile.name)
+        setMessage({ tone: 'ok', text })
+      }
+    } catch {
+      setMessage({ tone: 'error', text: t('profile.storageError') })
+    }
+  }
 
   function handleExport() {
     const blob = new Blob([exportProfiles()], { type: 'application/json' })
@@ -127,7 +140,7 @@ export default function PeoplePanel({ profiles, activeId, onSelect, onNew, onCha
           onChange={e => setQuery(e.target.value)}
           placeholder={t('profile.search')}
           aria-label={t('profile.search')}
-          className={`${inputSmallClass} mt-3 w-full`}
+          className={`${inputSmallClass} mt-3 w-full shrink-0`}
         />
       )}
 
@@ -136,42 +149,7 @@ export default function PeoplePanel({ profiles, activeId, onSelect, onNew, onCha
       ) : visible.length === 0 ? (
         <p className="mt-3 text-sm text-muted">{t('profile.searchEmpty')}</p>
       ) : (
-        <ul className="-mx-2 mt-2 min-h-0 flex-1 overflow-y-auto">
-          {visible.map(profile => {
-            const active = profile.id === activeId
-            const time = formatBirthTime(profile.data)
-            const dayPillar = dayPillars.get(profile.id)
-            return (
-              <li key={profile.id}>
-                <button
-                  type="button"
-                  onClick={() => onSelect(profile)}
-                  aria-current={active ? 'true' : undefined}
-                  className={`flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-left transition-colors ${
-                    active ? 'bg-sunken' : 'hover:bg-sunken'
-                  }`}
-                >
-                  {/* 보고 있는 프로필에는 로고의 주색 점을 찍는다 */}
-                  <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${active ? 'bg-accent' : 'bg-transparent'}`} aria-hidden="true" />
-                  <span className="min-w-0 flex-1">
-                    <span className={`block truncate text-base ${active ? 'font-semibold text-fg' : 'font-medium text-fg'}`}>
-                      {profile.name}
-                    </span>
-                    <span className="block truncate text-sm text-muted tabular-nums">
-                      {formatCompactDate(profile.data)}
-                      {time && ` ${time}`}
-                      {' · '}
-                      {profile.data.gender === 'M' ? t('profile.male') : t('profile.female')}
-                    </span>
-                  </span>
-                  {dayPillar && (
-                    <span className="font-hanja shrink-0 text-sm text-fg-2" title={t('profile.ilju')}>{dayPillar}</span>
-                  )}
-                </button>
-              </li>
-            )
-          })}
-        </ul>
+        <ProfileList profiles={visible} activeId={activeId} dayPillars={dayPillars} onSelect={onSelect} onMove={handleMove} />
       )}
 
       <div className="mt-4 border-t border-line pt-3">

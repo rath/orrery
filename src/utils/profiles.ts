@@ -9,6 +9,8 @@ export interface Profile {
   data: SavedFormState
 }
 
+export type ProfilePlacement = 'before' | 'after'
+
 const STORAGE_KEY = 'orrery-profiles'
 export const MAX_PROFILE_FILE_BYTES = 1024 * 1024
 export const MAX_PROFILES = 500
@@ -95,6 +97,23 @@ export function updateProfile(id: string, patch: { name?: string; data?: SavedFo
 export function deleteProfile(id: string): void {
   const profiles = loadProfiles().filter(p => p.id !== id)
   saveProfiles(profiles)
+}
+
+/** 기준 프로필 앞이나 뒤로 옮긴다. 저장된 새 순번(1부터), 이동이 없으면 null을 반환한다. */
+export function moveProfile(id: string, targetId: string, placement: ProfilePlacement): number | null {
+  const profiles = loadProfiles()
+  const from = profiles.findIndex(profile => profile.id === id)
+  if (from === -1) return null
+
+  const [moved] = profiles.splice(from, 1)
+  const target = profiles.findIndex(profile => profile.id === targetId)
+  if (target === -1) return null
+  const to = placement === 'before' ? target : target + 1
+  if (to === from) return null
+
+  profiles.splice(to, 0, moved)
+  saveProfiles(profiles)
+  return to + 1
 }
 
 export function exportProfiles(): string {
