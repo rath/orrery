@@ -1,13 +1,8 @@
-/**
- * 행성 심볼 배치 — 클러스터링, tick mark, 역행 표시
- */
-import { PLANET_SYMBOLS } from '@orrery/core/natal'
-import { textGlyph } from '../../../utils/format.ts'
-import type { PlanetId, PlanetPosition } from '@orrery/core/types'
-import {
-  R_ZODIAC_INNER, R_PLANET,
-  angleToPoint, spreadPlanets,
-} from './geometry.ts'
+import { formatDegree } from '@orrery/core/natal'
+import type { PlanetPosition } from '@orrery/core/types'
+import { useLocale } from '../../../i18n/index.ts'
+import ChartGlyph from './ChartGlyph.tsx'
+import { R_PLANET, R_SCALE, angleToPoint, lonToAngle, spreadAngles } from './geometry.ts'
 
 interface Props {
   planets: PlanetPosition[]
@@ -15,80 +10,35 @@ interface Props {
 }
 
 export default function PlanetMarkers({ planets, ascLon }: Props) {
-  const items = planets.map(p => ({ id: p.id, lon: p.longitude }))
-  const spread = spreadPlanets(items, ascLon)
-
-  // 역행 여부 lookup
-  const retroMap = new Map(planets.map(p => [p.id, p.isRetrograde]))
-
+  const { t } = useLocale()
+  const angles = planets.map(p => lonToAngle(p.longitude, ascLon))
+  const displayAngles = spreadAngles(angles, 15)
   return (
     <g>
-      {spread.map(({ id, displayAngle, actualAngle }) => {
-        const symbolPos = angleToPoint(displayAngle, R_PLANET)
-        const tickOuter = angleToPoint(actualAngle, R_ZODIAC_INNER - 2)
-        const tickInner = angleToPoint(actualAngle, R_ZODIAC_INNER - 8)
-
-        // 표시 위치와 실제 위치가 다르면 점선 포인터
-        const angleDiff = Math.abs(displayAngle - actualAngle)
-        const needPointer = angleDiff > 1
-
-        const pointerEnd = angleToPoint(actualAngle, R_ZODIAC_INNER - 8)
-        const pointerStart = angleToPoint(displayAngle, R_PLANET + 10)
-
-        const planetId = id as PlanetId
-        const isRetro = retroMap.get(planetId) ?? false
-        const symbol = PLANET_SYMBOLS[planetId] ?? '?'
-
+      {planets.map((planet, i) => {
+        const anchor = angleToPoint(angles[i], R_SCALE)
+        const elbow = angleToPoint(angles[i], R_SCALE - 5)
+        const tip = angleToPoint(displayAngles[i], R_PLANET + 18)
         return (
-          <g key={id}>
-            {/* Tick mark (실제 위치) */}
-            <line
-              x1={tickOuter.x} y1={tickOuter.y}
-              x2={tickInner.x} y2={tickInner.y}
-              stroke="var(--wheel-outline)"
-              strokeWidth={1}
-            />
-
-            {/* 포인터 (표시 위치 ≠ 실제 위치) */}
-            {needPointer && (
-              <line
-                x1={pointerStart.x} y1={pointerStart.y}
-                x2={pointerEnd.x} y2={pointerEnd.y}
-                stroke="var(--wheel-grid)"
-                strokeWidth={0.5}
-                strokeDasharray="2,2"
-              />
-            )}
-
-            {/* 행성 심볼 */}
-            <text
-              x={symbolPos.x}
-              y={symbolPos.y}
-              textAnchor="middle"
-              dominantBaseline="central"
-              fontSize={15}
-              className="font-symbol"
-              fill="var(--wheel-planet)"
-              style={{ userSelect: 'none' }}
-            >
-              {textGlyph(symbol)}
+          <g key={planet.id}>
+            <path d={`M${anchor.x},${anchor.y} L${elbow.x},${elbow.y} L${tip.x},${tip.y}`}
+              fill="none" stroke="var(--muted)" strokeWidth={1.1} strokeLinejoin="round" />
+            <circle cx={anchor.x} cy={anchor.y} r={2} fill="var(--fg)" />
+          </g>
+        )
+      })}
+      {planets.map((planet, i) => {
+        const { x, y } = angleToPoint(displayAngles[i], R_PLANET)
+        const position = `${t(`planet.${planet.id}`)} · ${t(`zodiac.${planet.sign}`)} ${formatDegree(planet.longitude)}`
+        return (
+          <g key={planet.id} transform={`translate(${x} ${y})`} color="var(--fg)">
+            <title>{planet.isRetrograde ? `${position} · ${t('natal.retrograde')}` : position}</title>
+            <rect x={-17} y={-21} width={34} height={44} rx={10} fill="var(--surface)" />
+            <ChartGlyph id={planet.id} x={0} y={-6} size={30} />
+            <text y={15} className="text-lg font-medium tabular-nums @min-[30rem]:text-sm" fill="var(--muted)">
+              {Math.trunc(planet.degreeInSign)}°
+              {planet.isRetrograde && <tspan dx={2} fill="var(--tone-red)" fontSize="0.8em">R</tspan>}
             </text>
-
-            {/* 역행 표시 */}
-            {isRetro && (
-              <text
-                x={symbolPos.x + 9}
-                y={symbolPos.y + 5}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fontSize={7}
-                fill="var(--tone-red)"
-                fontWeight={600}
-                style={{ userSelect: 'none' }}
-              >
-                R
-              </text>
-            )}
           </g>
         )
       })}

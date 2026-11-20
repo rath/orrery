@@ -218,6 +218,17 @@ const zh: Record<string, string> = {
   'natal.houses': '宫位',
   'natal.aspects': '主要相位',
   'natal.houseSystem': '分宫制',
+  'natal.wheelDescription': '外圈标出星座与度数，内圈数字表示宫位。行星旁的 R 表示逆行。中央的连线表示行星间的相位。',
+  'natal.aspectKey': '按类型查看相位',
+  'natal.retrograde': '逆行',
+  'natal.enlargeWheel': '放大星盘',
+  'natal.fitWheel': '适应屏幕',
+
+  'aspect.conjunction': '合相',
+  'aspect.sextile': '六分相',
+  'aspect.square': '四分相',
+  'aspect.trine': '三分相',
+  'aspect.opposition': '对分相',
 
   // Natal - Planets
   'planet.Sun': '太阳', 'planet.Moon': '月亮', 'planet.Mercury': '水星', 'planet.Venus': '金星',

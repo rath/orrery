@@ -1,12 +1,12 @@
-/**
- * 하우스 커스프 선 + 라벨 + 내원
- */
-import { ROMAN } from '@orrery/core/natal'
-import type { NatalHouse, NatalAngles } from '@orrery/core/types'
+import { normalizeDeg } from '@orrery/core/natal'
+import type { NatalAngles, NatalHouse } from '@orrery/core/types'
 import {
-  CX, CY, R_ZODIAC_INNER, R_INNER, R_HOUSE_LABEL,
-  lonToAngle, angleToPoint,
+  R_ASPECT, R_HOUSES, R_RIM, R_SCALE, angleToPoint, lonToAngle, radialLine, spreadAngles,
 } from './geometry.ts'
+
+const axes = [
+  ['asc', 'ASC'], ['mc', 'MC'], ['desc', 'DESC'], ['ic', 'IC'],
+] as const
 
 interface Props {
   houses: NatalHouse[]
@@ -15,90 +15,63 @@ interface Props {
 
 export default function HouseWheel({ houses, angles }: Props) {
   const ascLon = angles.asc.longitude
-
-  const lines: React.ReactNode[] = []
-  const labels: React.ReactNode[] = []
-
-  for (const house of houses) {
-    const angle = lonToAngle(house.cuspLongitude, ascLon)
-    const outer = angleToPoint(angle, R_ZODIAC_INNER)
-    const inner = angleToPoint(angle, R_INNER)
-
-    // ASC(1), DESC(7), MC(10), IC(4) 축은 굵게
-    const isAxis = house.number === 1 || house.number === 7 ||
-                   house.number === 10 || house.number === 4
-    const strokeWidth = isAxis ? 1.5 : 0.5
-    const strokeColor = isAxis ? 'var(--wheel-axis)' : 'var(--wheel-grid)'
-
-    lines.push(
-      <line
-        key={`cusp-${house.number}`}
-        x1={outer.x} y1={outer.y}
-        x2={inner.x} y2={inner.y}
-        stroke={strokeColor}
-        strokeWidth={strokeWidth}
-      />,
-    )
-
-    // 하우스 라벨: 다음 커스프와의 중간 각도에 배치
-    const nextHouse = houses.find(h => h.number === (house.number % 12) + 1)!
-    const nextAngle = lonToAngle(nextHouse.cuspLongitude, ascLon)
-    // 두 각도의 중간 (반시계 방향)
-    let midAngle = (angle + nextAngle) / 2
-    // 각도 차가 180°를 넘으면 보정
-    if (Math.abs(angle - nextAngle) > 180) {
-      midAngle = (midAngle + 180) % 360
+  const axisAngles = axes.map(([key]) => lonToAngle(angles[key].longitude, ascLon))
+  const labelAngles = spreadAngles(axisAngles, 10)
+  const sectors = houses.map((house, i) => {
+    const next = houses[(i + 1) % houses.length]
+    const span = normalizeDeg(next.cuspLongitude - house.cuspLongitude)
+    return {
+      number: house.number,
+      cusp: lonToAngle(house.cuspLongitude, ascLon),
+      middle: lonToAngle(house.cuspLongitude + span / 2, ascLon),
     }
-    const labelPos = angleToPoint(midAngle, R_HOUSE_LABEL)
-
-    labels.push(
-      <text
-        key={`label-${house.number}`}
-        x={labelPos.x}
-        y={labelPos.y}
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize={10}
-        fill="var(--wheel-grid)"
-        style={{ userSelect: 'none' }}
-      >
-        {ROMAN[house.number - 1]}
-      </text>,
-    )
-  }
-
-  // ASC / MC 축 라벨
-  const axisLabels = [
-    { label: 'ASC', lon: angles.asc.longitude, offset: -12 },
-    { label: 'MC', lon: angles.mc.longitude, offset: -12 },
-  ]
-
-  const axisLabelNodes = axisLabels.map(({ label, lon, offset }) => {
-    const angle = lonToAngle(lon, ascLon)
-    const pos = angleToPoint(angle, R_ZODIAC_INNER + offset)
-    return (
-      <text
-        key={`axis-${label}`}
-        x={pos.x}
-        y={pos.y}
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize={9}
-        fontWeight={600}
-        fill="var(--wheel-axis)"
-        style={{ userSelect: 'none' }}
-      >
-        {label}
-      </text>
-    )
   })
-
+  const houseLabels = spreadAngles(sectors.map(s => s.middle), 11)
+  const shifted = sectors.map((s, i) => Math.abs(normalizeDeg(s.middle - houseLabels[i] + 180) - 180) > 0.1)
+  // 극권에서는 여러 하우스가 1° 안에 모일 수 있다. 경계는 원위치에 남기고
+  // 번호를 벌려 놓을 때만 짧은 지시선으로 원래 구획의 가운데를 가리킨다.
+  const cuspEnd = shifted.includes(true) ? R_HOUSES - 5 : R_ASPECT
   return (
     <g>
-      {lines}
-      <circle cx={CX} cy={CY} r={R_INNER} fill="none" stroke="var(--wheel-inner)" strokeWidth={0.5} />
-      {labels}
-      {axisLabelNodes}
+      <circle r={(R_HOUSES + R_ASPECT) / 2} fill="none" stroke="var(--sunken)" strokeWidth={R_HOUSES - R_ASPECT} />
+      <circle r={R_HOUSES} fill="none" stroke="var(--line)" />
+      <circle r={R_ASPECT} fill="none" stroke="var(--control)" strokeWidth={0.9} />
+      {sectors.map(({ number, cusp, middle }, i) => {
+        const label = angleToPoint(houseLabels[i], (R_HOUSES + R_ASPECT) / 2)
+        const anchor = angleToPoint(middle, R_HOUSES)
+        const end = angleToPoint(houseLabels[i], R_HOUSES - 7)
+        return (
+          <g key={number}>
+            <path d={radialLine(cusp, cuspEnd, R_HOUSES)} stroke="var(--control)" strokeWidth={0.8} />
+            <path d={radialLine(cusp, R_HOUSES, R_SCALE)} stroke="var(--line)" />
+            {shifted[i] && <line x1={anchor.x} y1={anchor.y} x2={end.x} y2={end.y} stroke="var(--muted)" />}
+            <text x={label.x} y={label.y} className="text-lg font-medium @min-[30rem]:text-base" fill="var(--fg-2)">
+              {number}
+            </text>
+          </g>
+        )
+      })}
+      {axes.map(([key, name], i) => {
+        // Whole Sign · Equal · Morinus 등에서는 앵글이 하우스 경계와 다를 수 있다.
+        const angle = axisAngles[i]
+        const labelAngle = labelAngles[i]
+        const label = angleToPoint(labelAngle, key === 'asc' || key === 'desc' ? 311 : 302)
+        const stem = angleToPoint(angle, R_RIM + 6)
+        const end = angleToPoint(labelAngle, R_RIM + 9)
+        return (
+          <g key={key}>
+            <path d={radialLine(angle, R_HOUSES, R_SCALE)} stroke="var(--fg-2)" strokeWidth={1.6} />
+            <path d={`M${stem.x},${stem.y} L${end.x},${end.y}`} stroke="var(--fg-2)" />
+            <path
+              d={`M${R_RIM - 1},0 l7,-3.3 v6.6 Z`} transform={`rotate(${-angle})`}
+              fill="var(--fg-2)"
+            />
+            <text x={label.x} y={label.y} className="text-lg font-semibold @min-[30rem]:text-base" fill="var(--fg)">
+              {name}
+            </text>
+          </g>
+        )
+      })}
     </g>
   )
 }

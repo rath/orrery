@@ -218,6 +218,17 @@ const ko: Record<string, string> = {
   'natal.houses': '하우스',
   'natal.aspects': '주요 애스펙트',
   'natal.houseSystem': '하우스 방식',
+  'natal.wheelDescription': '바깥 고리는 별자리와 도수, 안쪽 숫자는 하우스입니다. 행성 옆의 R은 역행을 뜻합니다. 중앙의 선은 행성 사이의 애스펙트입니다.',
+  'natal.aspectKey': '종류별 애스펙트 보기',
+  'natal.retrograde': '역행',
+  'natal.enlargeWheel': '차트 확대',
+  'natal.fitWheel': '화면에 맞추기',
+
+  'aspect.conjunction': '합',
+  'aspect.sextile': '육분각',
+  'aspect.square': '사각',
+  'aspect.trine': '삼분각',
+  'aspect.opposition': '충',
 
   // Natal - Planets
   'planet.Sun': '태양', 'planet.Moon': '달', 'planet.Mercury': '수성', 'planet.Venus': '금성',

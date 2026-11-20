@@ -218,6 +218,17 @@ const es: Record<string, string> = {
   'natal.houses': 'Casas',
   'natal.aspects': 'Aspectos mayores',
   'natal.houseSystem': 'Sistema de casas',
+  'natal.wheelDescription': 'El anillo exterior muestra los signos y los grados. Los números del anillo interior indican las casas. La R junto a un planeta indica que está retrógrado. Las líneas centrales muestran los aspectos entre los planetas.',
+  'natal.aspectKey': 'Mostrar aspectos por tipo',
+  'natal.retrograde': 'Retrógrado',
+  'natal.enlargeWheel': 'Ampliar la carta',
+  'natal.fitWheel': 'Ajustar la carta a la pantalla',
+
+  'aspect.conjunction': 'Conjunción',
+  'aspect.sextile': 'Sextil',
+  'aspect.square': 'Cuadratura',
+  'aspect.trine': 'Trígono',
+  'aspect.opposition': 'Oposición',
 
   // Natal - Planets
   'planet.Sun': 'Sol', 'planet.Moon': 'Luna', 'planet.Mercury': 'Mercurio', 'planet.Venus': 'Venus',

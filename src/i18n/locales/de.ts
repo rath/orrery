@@ -218,6 +218,17 @@ const de: Record<string, string> = {
   'natal.houses': 'Häuser',
   'natal.aspects': 'Hauptaspekte',
   'natal.houseSystem': 'Häusersystem',
+  'natal.wheelDescription': 'Der äußere Ring zeigt Tierkreiszeichen und Grade, der nummerierte Ring die Häuser. R steht für Rückläufigkeit. Die Linien in der Mitte verbinden Planeten, die einen Aspekt bilden.',
+  'natal.aspectKey': 'Aspekte nach Typ anzeigen',
+  'natal.retrograde': 'Rückläufig',
+  'natal.enlargeWheel': 'Horoskop vergrößern',
+  'natal.fitWheel': 'An Bildschirm anpassen',
+
+  'aspect.conjunction': 'Konjunktion',
+  'aspect.sextile': 'Sextil',
+  'aspect.square': 'Quadrat',
+  'aspect.trine': 'Trigon',
+  'aspect.opposition': 'Opposition',
 
   // Natal - Planets
   'planet.Sun': 'Sonne', 'planet.Moon': 'Mond', 'planet.Mercury': 'Merkur', 'planet.Venus': 'Venus',

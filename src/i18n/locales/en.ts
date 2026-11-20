@@ -218,6 +218,17 @@ const en: Record<string, string> = {
   'natal.houses': 'Houses',
   'natal.aspects': 'Major Aspects',
   'natal.houseSystem': 'House system',
+  'natal.wheelDescription': 'The outer ring shows zodiac signs and degrees. The numbered ring shows houses. R marks a retrograde planet. Lines in the centre connect planets in aspect.',
+  'natal.aspectKey': 'Show aspects by type',
+  'natal.retrograde': 'Retrograde',
+  'natal.enlargeWheel': 'Enlarge chart',
+  'natal.fitWheel': 'Fit chart to screen',
+
+  'aspect.conjunction': 'Conjunction',
+  'aspect.sextile': 'Sextile',
+  'aspect.square': 'Square',
+  'aspect.trine': 'Trine',
+  'aspect.opposition': 'Opposition',
 
   // Natal - Planets
   'planet.Sun': 'Sun', 'planet.Moon': 'Moon', 'planet.Mercury': 'Mercury', 'planet.Venus': 'Venus',

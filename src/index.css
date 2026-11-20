@@ -48,14 +48,6 @@
   --tile-water: #15161c;
   --tile-outline: #b9bac3;
 
-  --wheel-axis: #3d3f4a;
-  --wheel-grid: #8a8b96;
-  --wheel-outline: #5c5e6a;
-  --wheel-inner: #c9cad2;
-  --wheel-planet: #15161c;
-  --wheel-segment-opacity: 0.12;
-  --wheel-segment-stroke-opacity: 0.3;
-
   color-scheme: light;
 }
 
@@ -93,14 +85,6 @@
   --tile-metal: #ecebe8;
   --tile-water: #0a0a0d;
   --tile-outline: #73747f;
-
-  --wheel-axis: #cfccc6;
-  --wheel-grid: #73747f;
-  --wheel-outline: #a3a2a4;
-  --wheel-inner: #4a4c58;
-  --wheel-planet: #eeebe4;
-  --wheel-segment-opacity: 0.2;
-  --wheel-segment-stroke-opacity: 0.5;
 
   color-scheme: dark;
 }

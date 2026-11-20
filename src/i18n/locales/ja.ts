@@ -218,6 +218,17 @@ const ja: Record<string, string> = {
   'natal.houses': 'ハウス',
   'natal.aspects': 'メジャーアスペクト',
   'natal.houseSystem': 'ハウスシステム',
+  'natal.wheelDescription': '外側のリングは星座と度数、内側の数字はハウスを示します。天体に付く R は逆行の印です。中央の線は天体間のアスペクトを示します。',
+  'natal.aspectKey': '種類別にアスペクトを表示',
+  'natal.retrograde': '逆行',
+  'natal.enlargeWheel': 'チャートを拡大',
+  'natal.fitWheel': '画面に合わせる',
+
+  'aspect.conjunction': 'コンジャンクション',
+  'aspect.sextile': 'セクスタイル',
+  'aspect.square': 'スクエア',
+  'aspect.trine': 'トライン',
+  'aspect.opposition': 'オポジション',
 
   // Natal - Planets
   'planet.Sun': '太陽', 'planet.Moon': '月', 'planet.Mercury': '水星', 'planet.Venus': '金星',

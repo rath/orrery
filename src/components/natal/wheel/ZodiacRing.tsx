@@ -1,131 +1,63 @@
-/**
- * 외곽 별자리 링 — 12개 호형 세그먼트, 심볼, 눈금
- */
-import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '@orrery/core/natal'
-import { textGlyph } from '../../../utils/format.ts'
-import type { ZodiacSign } from '@orrery/core/types'
-import {
-  CX, CY, R_OUTER, R_ZODIAC_INNER,
-  lonToAngle, angleToPoint,
-} from './geometry.ts'
+import { ZODIAC_SIGNS } from '@orrery/core/natal'
+import { useLocale } from '../../../i18n/index.ts'
+import ChartGlyph from './ChartGlyph.tsx'
+import { R_RIM, R_SCALE, R_ZODIAC, angleToPoint, lonToAngle, radialLine } from './geometry.ts'
 
-/** 원소별 세그먼트 색상 */
-const ELEMENT_COLORS: Record<string, string> = {
-  Fire: '#ef4444',   // red
-  Earth: '#92400e',  // brown
-  Air: '#eab308',    // yellow
-  Water: '#3b82f6',  // blue
+// 양자리부터 불·흙·공기·물이 세 번 반복된다.
+const elementTones = ['red', 'green', 'amber', 'blue'] as const
+
+function signArc(radius: number, inset = 0): string {
+  const start = angleToPoint(inset, radius)
+  const end = angleToPoint(30 - inset, radius)
+  return `M${start.x},${start.y} A${radius},${radius} 0 0 0 ${end.x},${end.y}`
 }
 
-const SIGN_ELEMENT: Record<ZodiacSign, string> = {
-  Aries: 'Fire', Taurus: 'Earth', Gemini: 'Air', Cancer: 'Water',
-  Leo: 'Fire', Virgo: 'Earth', Libra: 'Air', Scorpio: 'Water',
-  Sagittarius: 'Fire', Capricorn: 'Earth', Aquarius: 'Air', Pisces: 'Water',
+const band = signArc((R_RIM + R_ZODIAC) / 2)
+const rim = signArc(R_RIM - 1.5, 0.4)
+const ticks = { degree: '', five: '', ten: '' }
+for (let degree = 0; degree < 360; degree++) {
+  if (degree % 10 === 0) ticks.ten += radialLine(degree, R_SCALE, R_ZODIAC)
+  else if (degree % 5 === 0) ticks.five += radialLine(degree, R_SCALE, R_SCALE + 7)
+  else ticks.degree += radialLine(degree, R_SCALE, R_SCALE + 3.5)
 }
 
-interface Props {
-  ascLon: number
-}
-
-export default function ZodiacRing({ ascLon }: Props) {
-  const segments: React.ReactNode[] = []
-  const symbols: React.ReactNode[] = []
-  const ticks: React.ReactNode[] = []
-
-  for (let i = 0; i < 12; i++) {
-    const sign = ZODIAC_SIGNS[i]
-    const startLon = i * 30
-    const endLon = (i + 1) * 30
-
-    const startAngle = lonToAngle(startLon, ascLon)
-    const endAngle = lonToAngle(endLon, ascLon)
-
-    // 세그먼트 호 (외곽 → 내곽 사이 영역)
-    const outerStart = angleToPoint(startAngle, R_OUTER)
-    const outerEnd = angleToPoint(endAngle, R_OUTER)
-    const innerEnd = angleToPoint(endAngle, R_ZODIAC_INNER)
-    const innerStart = angleToPoint(startAngle, R_ZODIAC_INNER)
-
-    // 호의 방향: startAngle > endAngle (반시계 감소)
-    const outerArc = `M ${outerStart.x} ${outerStart.y} A ${R_OUTER} ${R_OUTER} 0 0 0 ${outerEnd.x} ${outerEnd.y}`
-    const lineToInner = `L ${innerEnd.x} ${innerEnd.y}`
-    const innerArc = `A ${R_ZODIAC_INNER} ${R_ZODIAC_INNER} 0 0 1 ${innerStart.x} ${innerStart.y}`
-    const closePath = 'Z'
-
-    const color = ELEMENT_COLORS[SIGN_ELEMENT[sign]]
-
-    segments.push(
-      <path
-        key={`seg-${i}`}
-        d={`${outerArc} ${lineToInner} ${innerArc} ${closePath}`}
-        fill={color}
-        stroke={color}
-        strokeWidth={0.5}
-        style={{ fillOpacity: 'var(--wheel-segment-opacity)', strokeOpacity: 'var(--wheel-segment-stroke-opacity)' }}
-      />,
-    )
-
-    // 30° 경계선
-    const bStart = angleToPoint(startAngle, R_ZODIAC_INNER)
-    const bEnd = angleToPoint(startAngle, R_OUTER)
-    segments.push(
-      <line
-        key={`border-${i}`}
-        x1={bStart.x} y1={bStart.y}
-        x2={bEnd.x} y2={bEnd.y}
-        stroke="var(--wheel-grid)"
-        strokeWidth={0.5}
-      />,
-    )
-
-    // 별자리 심볼 (세그먼트 중앙)
-    const midLon = startLon + 15
-    const midAngle = lonToAngle(midLon, ascLon)
-    const symbolR = (R_OUTER + R_ZODIAC_INNER) / 2
-    const pos = angleToPoint(midAngle, symbolR)
-
-    symbols.push(
-      <text
-        key={`sym-${i}`}
-        x={pos.x}
-        y={pos.y}
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize={17}
-        className="font-symbol"
-        fill="var(--wheel-axis)"
-        style={{ userSelect: 'none' }}
-      >
-        {textGlyph(ZODIAC_SYMBOLS[sign])}
-      </text>,
-    )
-
-    // 10° 간격 눈금 (30° 경계 제외)
-    for (let d = 10; d < 30; d += 10) {
-      const tickLon = startLon + d
-      const tickAngle = lonToAngle(tickLon, ascLon)
-      const t1 = angleToPoint(tickAngle, R_OUTER)
-      const t2 = angleToPoint(tickAngle, R_OUTER - 5)
-      ticks.push(
-        <line
-          key={`tick-${i}-${d}`}
-          x1={t1.x} y1={t1.y}
-          x2={t2.x} y2={t2.y}
-          stroke="var(--wheel-grid)"
-          strokeWidth={0.5}
-        />,
-      )
-    }
-  }
-
-  // 외곽 원, 내곽 원
+export default function ZodiacRing({ ascLon }: { ascLon: number }) {
+  const { t } = useLocale()
   return (
     <g>
-      {segments}
-      <circle cx={CX} cy={CY} r={R_OUTER} fill="none" stroke="var(--wheel-outline)" strokeWidth={1} />
-      <circle cx={CX} cy={CY} r={R_ZODIAC_INNER} fill="none" stroke="var(--wheel-outline)" strokeWidth={0.5} />
-      {ticks}
-      {symbols}
+      {ZODIAC_SIGNS.map((sign, index) => {
+        const start = lonToAngle(index * 30, ascLon)
+        const middle = lonToAngle(index * 30 + 15, ascLon)
+        const glyph = angleToPoint(middle, R_ZODIAC + 16)
+        const name = angleToPoint(middle, R_RIM - 13)
+        // 아래쪽 반원에서도 이름을 바로 읽을 수 있게 접선 방향을 뒤집는다.
+        const tilt = middle > 180 ? 270 - middle : 90 - middle
+        const tone = elementTones[index % 4]
+        return (
+          <g key={sign} color={`var(--tone-${tone})`}>
+            <g transform={`rotate(${-start})`} fill="none">
+              <path d={band} stroke="currentColor" strokeOpacity={0.075} strokeWidth={R_RIM - R_ZODIAC} />
+              <path d={rim} stroke="currentColor" strokeWidth={3} />
+              <path d={radialLine(0, R_ZODIAC, R_RIM)} stroke="var(--control)" strokeWidth={0.8} />
+            </g>
+            <ChartGlyph id={sign} {...glyph} size={25} />
+            <text
+              x={name.x} y={name.y} transform={`rotate(${tilt} ${name.x} ${name.y})`}
+              className="text-lg font-medium @min-[30rem]:text-sm"
+              fill="currentColor"
+            >{t(`zodiac.${sign}`)}</text>
+          </g>
+        )
+      })}
+      <g fill="none">
+        <circle r={R_ZODIAC} stroke="var(--control)" strokeWidth={0.85} />
+        <circle r={R_SCALE} stroke="var(--muted)" strokeWidth={1} />
+        <g transform={`rotate(${-lonToAngle(0, ascLon)})`}>
+          <path d={ticks.degree} stroke="var(--faint)" strokeWidth={0.8} className="hidden @min-[30rem]:inline" />
+          <path d={ticks.five} stroke="var(--control)" strokeWidth={1} />
+          <path d={ticks.ten} stroke="var(--muted)" strokeWidth={1.2} />
+        </g>
+      </g>
     </g>
   )
 }

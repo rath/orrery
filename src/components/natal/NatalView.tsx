@@ -58,6 +58,7 @@ export default function NatalView({ input, houseSystem, onHouseSystemChange }: P
   if (!chart) return null
 
   const houseSystemName = HOUSE_SYSTEMS.find(([k]) => k === (chart.houseSystem ?? houseSystem))?.[1] ?? 'Placidus'
+  const majorAspects = chart.aspects.slice(0, 15)
 
   return (
     <div>
@@ -72,9 +73,7 @@ export default function NatalView({ input, houseSystem, onHouseSystemChange }: P
 
       {/* 휠: 출생 시각이 있을 때만 */}
       {!unknownTime && (
-        <div className="pt-2 pb-6">
-          <NatalWheel chart={chart} label={t('app.tab.natal')} />
-        </div>
+        <NatalWheel angles={chart.angles} houses={chart.houses} planets={chart.planets} aspects={majorAspects} />
       )}
 
       <Section
@@ -100,7 +99,7 @@ export default function NatalView({ input, houseSystem, onHouseSystemChange }: P
       </Section>
 
       {!unknownTime && chart.houses.length > 0 && <HouseTable houses={chart.houses} />}
-      <AspectGrid aspects={chart.aspects} />
+      <AspectGrid aspects={majorAspects} />
     </div>
   )
 }
